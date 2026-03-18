@@ -17,10 +17,17 @@ function activateTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p =>
     p.classList.toggle('active', p.id === `panel-${tab}`)
   );
-  // Refresh CodeMirror layout when switching to the code tab
+
+  // CodeMirror must refresh AFTER its panel is visible (display:flex)
   if (tab === 'code' && typeof IDE !== 'undefined' && IDE.cm) {
-    setTimeout(() => IDE.cm.refresh(), 50);
+    // rAF ensures the browser has painted the tab as visible
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        IDE.cm.refresh();
+      });
+    });
   }
+
   // Refresh image models when switching to image tab
   if (tab === 'image' && typeof updateImageModels === 'function') {
     updateImageModels();

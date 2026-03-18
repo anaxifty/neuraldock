@@ -26,25 +26,36 @@ const IDE = {
  * @param {string} lang  CodeMirror mode string
  */
 function initCM(content = '', lang = 'null') {
+  const container = document.getElementById('ide-monaco');
   const ta = document.getElementById('ide-editor-ta');
+
   if (IDE.cm) {
+    // Update existing instance
     IDE.cm.setValue(content);
     IDE.cm.setOption('mode', lang);
-    setTimeout(() => IDE.cm.refresh(), 10);
+    // Multiple refreshes needed: once now, once after browser paint
+    IDE.cm.refresh();
+    requestAnimationFrame(() => {
+      IDE.cm.refresh();
+      IDE.cm.focus();
+    });
     return;
   }
 
+  // First init — make sure container is visible before CodeMirror measures it
+  container.style.display = '';
+
   IDE.cm = CodeMirror.fromTextArea(ta, {
-    value:           content,
-    mode:            lang,
-    theme:           'aistudio',
-    lineNumbers:     true,
+    value:             content,
+    mode:              lang,
+    theme:             'aistudio',
+    lineNumbers:       true,
     autoCloseBrackets: true,
-    matchBrackets:   true,
-    lineWrapping:    true,
-    indentUnit:      2,
-    tabSize:         2,
-    indentWithTabs:  false,
+    matchBrackets:     true,
+    lineWrapping:      true,
+    indentUnit:        2,
+    tabSize:           2,
+    indentWithTabs:    false,
     extraKeys: {
       'Ctrl-S': () => ideSaveFile(),
       'Cmd-S':  () => ideSaveFile(),
@@ -55,6 +66,12 @@ function initCM(content = '', lang = 'null') {
   });
 
   IDE.cm.setValue(content);
+
+  // Refresh after next paint so CodeMirror can measure its container
+  requestAnimationFrame(() => {
+    IDE.cm.refresh();
+    IDE.cm.focus();
+  });
 
   // Mark file as unsaved when content changes
   IDE.cm.on('change', () => {
@@ -111,11 +128,12 @@ function ideDeleteFile(id, e) {
 }
 
 function ideSaveFile() {
-  if (!IDE.cm || !IDE.activeFile) return;
+  if (!IDE.activeFile) return;
   const f = IDE.files[IDE.activeFile];
   if (!f) return;
-  f.content = IDE.cm.getValue();
-  f.saved   = true;
+  // Get content from CM if available, otherwise keep stored content
+  if (IDE.cm) f.content = IDE.cm.getValue();
+  f.saved = true;
   renderFileTabs();
   renderFileTree();
   toast('Saved ' + f.name);
@@ -150,11 +168,19 @@ async function ideDownloadZip() {
 }
 
 function openFile(id) {
+  // Save current file's CM content before switching away
+  if (IDE.cm && IDE.activeFile && IDE.files[IDE.activeFile]) {
+    IDE.files[IDE.activeFile].content = IDE.cm.getValue();
+  }
+
   IDE.activeFile = id;
   const f = IDE.files[id];
   if (!f) return;
+
   document.getElementById('ide-welcome').style.display = 'none';
-  document.getElementById('ide-monaco').style.display  = '';
+  const monacoEl = document.getElementById('ide-monaco');
+  monacoEl.style.display = '';
+
   renderFileTree();
   renderFileTabs();
   initCM(f.content, f.language);
@@ -342,14 +368,19 @@ document.querySelectorAll('.ide-ai-chip').forEach(chip => {
 
 function getIdeContext() {
   const include = document.getElementById('ide-include-code')?.checked;
-  if (!include || !IDE.activeFile || !IDE.cm) return '';
-  const f        = IDE.files[IDE.activeFile];
-  const code     = IDE.cm.getValue();
+  if (!include || !IDE.activeFile) return '';
+
+  const f = IDE.files[IDE.activeFile];
+  if (!f) return '';
+
+  // Use live editor value if CM is ready, otherwise use stored content
+  const code     = IDE.cm ? IDE.cm.getValue() : (f.content || '');
   const allFiles = Object.values(IDE.files).map(fl => fl.name).join(', ');
+
   return (
     `\n\n[Project files: ${allFiles}]` +
-    `\n[Active file: ${f.name}]\n\`\`\`${f.language || 'text'}\n` +
-    `${code.slice(0, 8000)}\n\`\`\``
+    `\n[Active file: ${f.name} (${f.language || 'text'})]` +
+    `\n\`\`\`${f.language || 'text'}\n${code.slice(0, 8000)}\n\`\`\``
   );
 }
 
