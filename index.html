@@ -633,22 +633,7 @@
 
   <div class="toast-container" id="toast-container"></div>
 
-  <!--
-    Application modules — load order matters:
-    1. utils    – escHtml, toast, helpers (no deps)
-    2. config   – MODELS, IMAGE_PROVIDERS, TEMPLATES, registries (no deps)
-    3. markdown – renderMarkdown, mermaid (uses CDN globals)
-    4. state    – S, saveSettings, saveConvs (no deps)
-    5. ui       – tabs, sidebar, model selector, settings, canvas (uses state/config)
-    6. conversations – CRUD, sidebar rendering (uses state/ui)
-    7. chat     – sending, rendering, message actions (uses all above)
-    8. image    – provider tabs, generate (uses config/state)
-    9. voice    – TTS, voice input, live voice (uses config/state)
-   10. ide      – CodeMirror, file mgmt, AI assistant (uses config/state/markdown)
-   11. auth     – Puter login, bootstraps all above on auth (must be last module)
-   12. effects  – particles, ripple, cursor glow (standalone, runs on DOMContentLoaded)
-  -->
-  <script src="js/utils.js"></script>
+    <script src="js/utils.js"></script>
   <script src="js/config.js"></script>
   <script src="js/markdown.js"></script>
   <script src="js/state.js"></script>

@@ -323,8 +323,8 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   S.activeConvId  = null;
   S.chatMessages  = [];
   saveConvs();
-  renderSidebar();
-  renderChatMessages();
+  if (typeof renderSidebar === 'function')      renderSidebar();
+  if (typeof renderChatMessages === 'function') renderChatMessages();
   toast('All history cleared');
 });
 
@@ -369,7 +369,7 @@ document.addEventListener('keydown', e => {
   }
 
   if (!e.ctrlKey && !e.metaKey) return;
-  if (e.key === 'k') { e.preventDefault(); if (typeof newChat === 'function') newChat(); }
+  if      (e.key === 'k') { e.preventDefault(); if (typeof newChat === 'function') newChat(); }
   else if (e.key === '/') { e.preventDefault(); toggleSidebar(); }
   else if (e.key === '.') { e.preventDefault(); openSettings(); }
   else if (e.key === '1') { e.preventDefault(); activateTab('chat'); }

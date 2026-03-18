@@ -25,7 +25,7 @@ function newChat() {
   S.chatMessages  = [];
   saveConvs();
   renderSidebar();
-  renderChatMessages();
+  if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
   activateTab('chat');
   // Close sidebar on mobile after creating chat
@@ -47,7 +47,7 @@ function loadConv(id) {
     buildModelDropdown();
   }
   renderSidebar();
-  renderChatMessages();
+  if (typeof renderChatMessages === 'function') renderChatMessages();
   activateTab('chat');
   if (window.innerWidth <= 768) {
     document.getElementById('sidebar').classList.remove('open');
@@ -60,7 +60,7 @@ function deleteConv(id) {
   if (S.activeConvId === id) {
     S.activeConvId = null;
     S.chatMessages = [];
-    renderChatMessages();
+    if (typeof renderChatMessages === 'function') renderChatMessages();
   }
   saveConvs();
   renderSidebar();

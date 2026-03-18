@@ -213,7 +213,7 @@ async function sendChatWith(text, attachments = []) {
     S.chatMessages.push(assistantMsg);
     persistConversation(text, full);
     buildMsgActions(wrap, body, assistantMsg);
-    if (S.speakResponses && full) speakText(full);
+    if (S.speakResponses && full && typeof speakText === 'function') speakText(full);
 
   } catch (err) {
     if (thinkEl?.parentNode) thinkEl.remove();
