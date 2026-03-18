@@ -1681,34 +1681,6 @@ header h1 span { color: var(--accent); font-weight: 600; font-style: italic; }
 .conv-item-delete:hover { color: var(--err); }
 
 /* ── CONTEXT INDICATOR ── */
-.ctx-indicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0;
-  transition: opacity .3s;
-}
-.ctx-bar {
-  width: 60px;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.ctx-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: var(--ok);
-  transition: width .4s ease, background .4s ease;
-  width: 0%;
-}
-.ctx-label {
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: .04em;
-  white-space: nowrap;
-}
-
 /* ── STOP BUTTON ── */
 .stop-btn {
   flex-shrink: 0;
@@ -2229,6 +2201,339 @@ kbd {
 /* ── RESPONSIVE: canvas full width on mobile ── */
 @media (max-width: 640px) {
   .canvas-panel { width: 100vw; }
-  .ctx-indicator { display: none; }
   .length-btns { display: none; }
+}
+
+/* ══════════════════════════════════════════════
+   ENHANCED ANIMATIONS & INTERACTIVE EFFECTS
+══════════════════════════════════════════════ */
+
+/* ── Animated background grid drift ── */
+@keyframes grid-drift {
+  0%   { background-position: 0 0, 0 0; }
+  50%  { background-position: 8px 8px, 8px 8px; }
+  100% { background-position: 0 0, 0 0; }
+}
+body::before {
+  animation: grid-drift 24s ease-in-out infinite;
+}
+
+/* ── Login particle canvas ── */
+#login-particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Login card enhanced entrance + glow ── */
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(32px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.login-card {
+  animation: card-rise .6s cubic-bezier(.22,1,.36,1) both;
+  transition: box-shadow .4s ease;
+}
+.login-card:hover {
+  box-shadow: 0 24px 80px rgba(0,0,0,.65), 0 0 40px rgba(212,168,83,.08);
+}
+
+/* ── Login button glow ── */
+.login-btn {
+  position: relative;
+  overflow: hidden;
+}
+.login-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.18) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform .5s ease;
+}
+.login-btn:hover::after { transform: translateX(100%); }
+.login-btn:hover {
+  box-shadow: 0 0 20px rgba(212,168,83,.45);
+}
+
+/* ── Header logo dot enhanced pulse ── */
+@keyframes logo-pulse {
+  0%,100% { box-shadow: 0 0 6px var(--accent2), 0 0 0 0 rgba(212,168,83,.3); }
+  50%      { box-shadow: 0 0 18px var(--accent),  0 0 0 8px rgba(212,168,83,.0); }
+}
+.logo-dot {
+  animation: logo-pulse 2.8s ease-in-out infinite;
+}
+
+/* ── Glowing send button ── */
+.send-btn:hover {
+  background: #e0b96a;
+  box-shadow: 0 0 14px rgba(212,168,83,.5);
+}
+
+/* ── Input row glow on focus ── */
+.input-row:focus-within {
+  border-color: var(--accent2);
+  box-shadow: 0 0 0 2px rgba(212,168,83,.08);
+}
+
+/* ── Tip cards — lift + glow on hover ── */
+@keyframes tip-glow {
+  from { box-shadow: none; }
+  to   { box-shadow: 0 4px 20px rgba(212,168,83,.12); }
+}
+.tip {
+  transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+}
+.tip:hover {
+  border-color: var(--accent2);
+  background: var(--surface2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(212,168,83,.12);
+}
+
+/* ── Empty state icon float animation ── */
+@keyframes float-icon {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-10px); }
+}
+.empty-state .icon {
+  animation: float-icon 4s ease-in-out infinite;
+  display: block;
+}
+
+/* ── Tab button shimmer on hover ── */
+.tab-btn {
+  position: relative;
+  overflow: hidden;
+}
+.tab-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 140%, rgba(212,168,83,.12) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.tab-btn:hover::before, .tab-btn.active::before { opacity: 1; }
+.tab-btn.active {
+  text-shadow: 0 0 12px rgba(212,168,83,.4);
+}
+
+/* ── Message slide-in ── */
+@keyframes msg-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.message {
+  animation: msg-in .28s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* ── Message body subtle hover ── */
+.message.assistant .msg-body {
+  transition: border-color .2s, box-shadow .2s;
+}
+.message.assistant .msg-body:hover {
+  border-color: #2e3135;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+
+/* ── Model dropdown animated open ── */
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.model-selector.open .model-dropdown {
+  display: block;
+  animation: dropdown-in .18s ease both;
+}
+
+/* ── Model option hover glow ── */
+.model-option {
+  transition: background .15s, box-shadow .15s;
+  border-radius: 6px;
+  margin: 1px 6px;
+  padding: 8px 10px;
+}
+.model-option:hover {
+  background: var(--surface2);
+  box-shadow: inset 0 0 0 1px rgba(212,168,83,.1);
+}
+.model-option.selected {
+  box-shadow: inset 0 0 0 1px rgba(212,168,83,.2);
+}
+
+/* ── FREE tag — glowing green badge ── */
+.model-option-tag.free-tag {
+  color: #4caf82;
+  border-color: rgba(76,175,130,.4);
+  background: rgba(76,175,130,.08);
+  box-shadow: 0 0 8px rgba(76,175,130,.2);
+  animation: free-pulse 3s ease-in-out infinite;
+}
+@keyframes free-pulse {
+  0%,100% { box-shadow: 0 0 6px rgba(76,175,130,.2); }
+  50%     { box-shadow: 0 0 12px rgba(76,175,130,.4); }
+}
+
+/* ── New Chat button shimmer ── */
+.new-chat-btn {
+  position: relative;
+  overflow: hidden;
+}
+.new-chat-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212,168,83,.15), transparent);
+  transform: skewX(-20deg);
+  transition: left .6s ease;
+}
+.new-chat-btn:hover::after { left: 140%; }
+
+/* ── Sidebar conversation item animation ── */
+.conv-item {
+  transition: background .15s, transform .15s;
+}
+.conv-item:hover { transform: translateX(2px); }
+
+/* ── Gen/Speak button glow ── */
+.gen-btn:hover, .speak-btn:hover {
+  box-shadow: 0 0 16px rgba(212,168,83,.4);
+}
+
+/* ── Image card hover ── */
+.img-card {
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+}
+.img-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.4);
+  border-color: var(--accent2);
+}
+
+/* ── Sidebar settings btn glow ── */
+.sidebar-settings-btn:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+/* ── Toggle switch pulse when active ── */
+.toggle-switch.active {
+  position: relative;
+}
+.toggle-switch.active::after {
+  box-shadow: 0 0 6px rgba(76,175,130,.5);
+}
+
+/* ── Toast entrance animation ── */
+@keyframes toast-in {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.toast { animation: toast-in .25s ease both; }
+
+/* ── Streaming cursor accent glow ── */
+.streaming-cursor::after {
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(212,168,83,.7);
+}
+
+/* ── Settings drawer entrance ── */
+.settings-drawer {
+  transition: transform .3s cubic-bezier(.22,1,.36,1);
+}
+
+/* ── Canvas panel entrance ── */
+.canvas-panel {
+  transition: transform .28s cubic-bezier(.22,1,.36,1);
+}
+
+/* ── Input toggle active glow ── */
+.input-toggle.active {
+  box-shadow: 0 0 10px rgba(212,168,83,.2);
+}
+
+/* ── Code block header copy btn ── */
+.code-block-header button:hover {
+  color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: none;
+}
+
+/* ── Inline orbit animation for logo ── */
+@keyframes orbit-glow {
+  0%   { filter: drop-shadow(0 0 3px rgba(212,168,83,.6)); }
+  50%  { filter: drop-shadow(0 0 9px rgba(212,168,83,.9)); }
+  100% { filter: drop-shadow(0 0 3px rgba(212,168,83,.6)); }
+}
+header h1 span {
+  animation: orbit-glow 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* ── Login card animated border ── */
+@keyframes border-glow {
+  0%,100% { box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(212,168,83,.08); }
+  50%      { box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(212,168,83,.22); }
+}
+.login-card {
+  animation: card-rise .6s cubic-bezier(.22,1,.36,1) both, border-glow 4s ease-in-out 1s infinite;
+}
+
+/* ── Model selector button hover glow ── */
+.model-selector-btn:hover {
+  border-color: var(--accent2);
+  background: var(--surface2);
+  box-shadow: 0 0 10px rgba(212,168,83,.12);
+}
+
+/* ── Header subtle gradient separator ── */
+header {
+  background: linear-gradient(180deg, rgba(20,22,24,.98) 0%, rgba(20,22,24,.92) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ── Sidebar logo shimmer ── */
+.sidebar-logo span, .login-logo span {
+  position: relative;
+}
+
+/* ── Tab active underline glow ── */
+.tab-btn.active {
+  border-bottom-color: var(--accent);
+  box-shadow: inset 0 -2px 8px rgba(212,168,83,.15);
+}
+
+/* ── Input area glass effect ── */
+.input-area {
+  background: rgba(12,14,15,.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── Voice orb enhanced pulse ── */
+@keyframes orb-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(212,168,83,.2); }
+  50%      { box-shadow: 0 0 0 12px rgba(212,168,83,.0); }
+}
+.live-voice-orb:not(.recording) {
+  animation: orb-pulse 2.5s ease-in-out infinite;
+}
+
+/* ── Style preset active glow ── */
+.style-preset.active {
+  box-shadow: 0 0 10px rgba(212,168,83,.2);
+}
+
+/* ── Thinking dots enhanced ── */
+.dot {
+  background: var(--accent);
+  box-shadow: 0 0 6px rgba(212,168,83,.5);
 }

@@ -419,7 +419,8 @@ function renderModelList(filter = '') {
     const lbl = document.createElement('div'); lbl.className = 'model-group-label'; lbl.textContent = g.provider; list.appendChild(lbl);
     for (const m of matched) {
       const opt = document.createElement('div'); opt.className = 'model-option'+(m.id===S.currentModel?' selected':'');
-      opt.innerHTML = `<span class="model-dot" style="background:${color}"></span><span class="model-option-name">${m.name}</span>${m.tag?`<span class="model-option-tag">${m.tag}</span>`:''}`;
+      const tagClass = m.tag === 'FREE' ? 'model-option-tag free-tag' : 'model-option-tag';
+      opt.innerHTML = `<span class="model-dot" style="background:${color}"></span><span class="model-option-name">${m.name}</span>${m.tag?`<span class="${tagClass}">${m.tag}</span>`:''}`;
       opt.addEventListener('click', () => setModel(m.id)); list.appendChild(opt);
     }
   }
@@ -1125,21 +1126,8 @@ function copyCodeBlock(btn){const code=btn.closest('pre').querySelector('code');
 function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 function relativeTime(ts){const d=(Date.now()-ts)/1000;if(d<60) return 'just now';if(d<3600) return Math.floor(d/60)+'m ago';if(d<86400) return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
 
-// ── 18. CONTEXT USAGE INDICATOR ──
-function updateCtxIndicator() {
-  const msgs = S.chatMessages;
-  if (!msgs.length) { document.getElementById('ctx-indicator').style.opacity='0'; return; }
-  // Rough token estimate: ~4 chars per token
-  let chars = msgs.reduce((acc,m)=>acc+(m.content||'').length,0);
-  const tokens = Math.round(chars/4);
-  S.tokenCount = tokens;
-  const maxTokens = 128000; // rough max for most models
-  const pct = Math.min(100, Math.round((tokens/maxTokens)*100));
-  document.getElementById('ctx-fill').style.width = pct+'%';
-  document.getElementById('ctx-fill').style.background = pct>80 ? 'var(--err)' : pct>50 ? 'var(--accent)' : 'var(--ok)';
-  document.getElementById('ctx-label').textContent = tokens > 999 ? (tokens/1000).toFixed(1)+'k tk' : tokens+' tk';
-  document.getElementById('ctx-indicator').style.opacity='1';
-}
+// ── 18. CONTEXT USAGE INDICATOR (removed) ──
+function updateCtxIndicator() { /* token counter removed */ }
 
 // ── 19. CANVAS / ARTIFACT PANEL ──
 function openCanvas(btn) {
@@ -1351,7 +1339,8 @@ function populatePicker(q){
     if(!matched.length) continue;
     const lbl=document.createElement('div');lbl.className='model-group-label';lbl.textContent=g.provider;list.appendChild(lbl);
     for(const m of matched){
-      const opt=document.createElement('div');opt.className='model-option';opt.innerHTML=`<span class="model-dot" style="background:${g.color||'#888'}"></span><span class="model-option-name">${m.name}</span>`;
+      const opt=document.createElement('div');opt.className='model-option';const _tc=m.tag==='FREE'?'model-option-tag free-tag':'model-option-tag';opt.innerHTML=`<span class="model-dot" style="background:${g.color||'#888'}"></span><span class="model-option-name">${m.name}</span>${m.tag?`<span class="${_tc}">${m.tag}</span>`:''}`;
+
       opt.addEventListener('click',e=>{e.stopPropagation();if(_pickerEl._onSelect)_pickerEl._onSelect(m.id);});
       list.appendChild(opt); count++;
     }
@@ -1425,3 +1414,203 @@ function openShareModal(msg){
 }
 document.getElementById('share-modal-close').addEventListener('click',()=>document.getElementById('share-modal-overlay').classList.remove('open'));
 document.getElementById('share-modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget) e.currentTarget.classList.remove('open');});
+
+// ══════════════════════════════════════════════
+//  INTERACTIVE ENHANCEMENTS
+// ══════════════════════════════════════════════
+
+// ── Particle System for Login Screen ──
+(function initLoginParticles() {
+  const canvas = document.getElementById('login-particles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], animFrame;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function mkParticle() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.4,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      o: Math.random() * 0.4 + 0.1,
+      life: 0,
+      maxLife: Math.random() * 300 + 200,
+    };
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    for (let i = 0; i < 80; i++) particles.push(mkParticle());
+  }
+
+  function drawConnections() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 120) {
+          const alpha = (1 - d/120) * 0.12;
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(212,168,83,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    drawConnections();
+    particles.forEach((p, idx) => {
+      p.x += p.vx; p.y += p.vy; p.life++;
+      // Wrap around
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10;
+      if (p.y > H + 10) p.y = -10;
+      // Fade in/out
+      const fade = p.life < 60 ? p.life / 60 : p.life > p.maxLife - 60 ? (p.maxLife - p.life) / 60 : 1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212,168,83,${p.o * fade})`;
+      ctx.fill();
+      if (p.life >= p.maxLife) particles[idx] = mkParticle();
+    });
+    animFrame = requestAnimationFrame(tick);
+  }
+
+  init();
+  tick();
+  window.addEventListener('resize', () => { cancelAnimationFrame(animFrame); init(); tick(); });
+
+  // Stop when login screen hides
+  const obs = new MutationObserver(() => {
+    const ls = document.getElementById('login-screen');
+    if (ls && ls.style.display === 'none') {
+      cancelAnimationFrame(animFrame);
+      obs.disconnect();
+    }
+  });
+  const ls = document.getElementById('login-screen');
+  if (ls) obs.observe(ls, { attributes: true, attributeFilter: ['style'] });
+})();
+
+
+// ── Ripple effect on buttons ──
+(function addRipples() {
+  const TARGETS = '.send-btn, .gen-btn, .speak-btn, .login-btn, .new-chat-btn, .tab-btn';
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest(TARGETS);
+    if (!btn) return;
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const rip = document.createElement('span');
+    rip.className = '__ripple';
+    rip.style.cssText = `position:absolute;border-radius:50%;background:rgba(255,255,255,.18);pointer-events:none;width:4px;height:4px;left:${x}px;top:${y}px;transform:scale(0);animation:__ripple-anim .55s ease-out forwards;`;
+    if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+    btn.style.overflow = 'hidden';
+    btn.appendChild(rip);
+    rip.addEventListener('animationend', () => rip.remove());
+  });
+  if (!document.getElementById('__ripple-style')) {
+    const st = document.createElement('style');
+    st.id = '__ripple-style';
+    st.textContent = '@keyframes __ripple-anim{to{transform:scale(60);opacity:0;}}';
+    document.head.appendChild(st);
+  }
+})();
+
+
+// ── Smooth scroll-to-bottom with a glow flash on new AI message ──
+const _origAddThinking = addThinkingEl;
+function addThinkingEl(container, modelId) {
+  const el = _origAddThinking(container, modelId);
+  // subtle ambient flash when thinking starts
+  container.style.transition = 'box-shadow .3s';
+  container.style.boxShadow = 'inset 0 0 24px rgba(212,168,83,.04)';
+  setTimeout(() => { container.style.boxShadow = ''; }, 600);
+  return el;
+}
+
+
+// ── Typing placeholder cycle on chat input ──
+(function cyclePlaceholders() {
+  const ta = document.getElementById('chatInput');
+  if (!ta) return;
+  const phrases = [
+    'Ask anything…',
+    'Summarize a document…',
+    'Write code for me…',
+    'Explain a concept…',
+    'Generate ideas…',
+    'Debug this error…',
+  ];
+  let idx = 0;
+  setInterval(() => {
+    if (document.activeElement === ta) return;
+    idx = (idx + 1) % phrases.length;
+    ta.placeholder = phrases[idx];
+  }, 3500);
+})();
+
+
+// ── Cursor glow that follows mouse on the main app ──
+(function cursorGlow() {
+  const glow = document.createElement('div');
+  glow.id = '__cursor-glow';
+  glow.style.cssText = `
+    position:fixed; pointer-events:none; z-index:9999;
+    width:240px; height:240px; border-radius:50%;
+    background:radial-gradient(circle, rgba(212,168,83,.045) 0%, transparent 70%);
+    transform:translate(-50%,-50%);
+    transition:opacity .4s ease;
+    opacity:0;
+  `;
+  document.body.appendChild(glow);
+  let visible = false;
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top  = e.clientY + 'px';
+    if (!visible) { glow.style.opacity = '1'; visible = true; }
+  });
+  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; visible = false; });
+})();
+
+
+// ── Intersection-based fade-in for tip cards ──
+(function observeTips() {
+  if (!window.IntersectionObserver) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((en, i) => {
+      if (en.isIntersecting) {
+        setTimeout(() => {
+          en.target.style.opacity = '1';
+          en.target.style.transform = 'translateY(0)';
+        }, i * 60);
+        obs.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  // Observe existing tips + future ones via a MutationObserver
+  function observeAllTips() {
+    document.querySelectorAll('.tip:not([data-observed])').forEach(tip => {
+      tip.dataset.observed = '1';
+      tip.style.cssText += 'opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease,border-color .2s,background .2s,box-shadow .2s;';
+      obs.observe(tip);
+    });
+  }
+  observeAllTips();
+  const mo = new MutationObserver(observeAllTips);
+  mo.observe(document.body, { childList: true, subtree: true });
+})();
