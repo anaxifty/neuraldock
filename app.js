@@ -272,7 +272,6 @@ window.addEventListener('load', async () => {
   try { if (puter.auth.isSignedIn()) { const user = await puter.auth.getUser(); onAuthed(user); } } catch(e) {}
   // init stop buttons hidden
   document.getElementById('chatStopBtn').style.display = 'none';
-  document.getElementById('codeStopBtn').style.display = 'none';
 });
 
 // ── 5. SIDEBAR TOGGLE ──
@@ -599,17 +598,14 @@ function addSearchingEl(container) {
 
 // ── 11. CORE CHAT / CODE ──
 document.getElementById('chatSendBtn').addEventListener('click', sendChat);
-document.getElementById('codeSendBtn').addEventListener('click', sendCode);
 document.getElementById('chatStopBtn').addEventListener('click', stopGeneration);
-document.getElementById('codeStopBtn').addEventListener('click', stopGeneration);
 document.getElementById('chatInput').addEventListener('keydown', e => { if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendChat();} });
-document.getElementById('codeInput').addEventListener('keydown', e => { if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();sendCode();} });
 document.getElementById('imagePrompt').addEventListener('keydown', e => { if(e.key==='Enter'){e.preventDefault();generateImage();} });
 
 function setBusy(val, panel='chat') {
   S.busy = val;
-  const sendId = panel==='chat'?'chatSendBtn':'codeSendBtn';
-  const stopId = panel==='chat'?'chatStopBtn':'codeStopBtn';
+  const sendId = 'chatSendBtn';
+  const stopId = 'chatStopBtn';
   document.getElementById(sendId).style.display = val ? 'none' : '';
   document.getElementById(stopId).style.display = val ? '' : 'none';
 }
@@ -769,132 +765,301 @@ async function sendChatWith(text, attachments=[]) {
   setBusy(false, 'chat'); S.abortStream = false;
 }
 
-async function sendCode() {
-  if (S.busy) return;
-  const input = document.getElementById('codeInput');
-  const text = input.value.trim(); if (!text) return;
-  input.value=''; input.style.height='auto';
-  setBusy(true, 'code'); S.abortStream = false;
+// sendCode is now handled by the IDE AI assistant (see IDE section below)
 
-  const area = document.getElementById('codeMessages');
-  const emptyEl = document.getElementById('codeEmpty');
-  if (emptyEl) emptyEl.style.display='none';
-
-  S.codeMessages.push({ role:'user', content:text });
-  area.appendChild(createMsgEl({ role:'user', content:text }));
-
-  const codeModel = S.currentModel;
-  let sysMsgs = [...S.codeMessages];
-  if (S.customInstructions) sysMsgs = [{ role:'system', content:S.customInstructions }, ...sysMsgs.filter(m=>m.role!=='system')];
-  const msgs = sysMsgs.slice(-20).map(m=>({ role:m.role, content:m.content }));
-  const thinkEl = addThinkingEl(area, codeModel);
-
-  let full = '';
-  try {
-    const resp = await puter.ai.chat(msgs, { model:codeModel, stream:true });
-    if (thinkEl && thinkEl.parentNode) thinkEl.remove();
-
-    const wrap = document.createElement('div'); wrap.className='message assistant';
-    const meta = document.createElement('div'); meta.className='msg-meta';
-    const _ci = getModelInfo(codeModel); meta.textContent=_ci.name; meta.style.setProperty('--meta-dot-color',_ci.color);
-    const body = document.createElement('div'); body.className='msg-body md streaming-cursor';
-    wrap.append(meta, body); area.appendChild(wrap);
-
-    if (resp && typeof resp[Symbol.asyncIterator]==='function') {
-      for await (const part of resp) {
-        if (S.abortStream) break;
-        const t = part?.text||part?.message?.content||'';
-        if (t) { full+=t; body.innerHTML=renderMarkdown(full); area.scrollTop=area.scrollHeight; }
+// ── 12. IMAGE GENERATION — Comprehensive Provider Registry ──
+const IMAGE_PROVIDERS = {
+  'openai-image-generation': {
+    label: 'OpenAI', color: '#10a37f', puterKey: 'openai-image-generation',
+    models: [
+      { id: 'gpt-image-1',      name: 'GPT Image 1',       badge: 'LATEST', info: 'Most capable OpenAI image model. Supports edits & variations.' },
+      { id: 'gpt-image-1-mini', name: 'GPT Image 1 Mini',  badge: 'FAST',   info: 'Faster, lower-cost version of GPT Image 1.' },
+      { id: 'dall-e-3',         name: 'DALL·E 3',          badge: 'HD',     info: 'High-quality images with natural/vivid style options.' },
+      { id: 'dall-e-2',         name: 'DALL·E 2',          badge: '',       info: 'Classic DALL-E model. Supports multiple output sizes.' },
+    ],
+    caps: {
+      'gpt-image-1':      { sizes:[['1024x1024','1024×1024 (Square)'],['1536x1024','1536×1024 (Landscape)'],['1024x1536','1024×1536 (Portrait)'],['auto','Auto']], qualities:[['auto','Auto'],['high','High'],['medium','Medium'],['low','Low']], formats:true, steps:false, guidance:false, neg:false, styleMode:false, count:true },
+      'gpt-image-1-mini': { sizes:[['1024x1024','1024×1024 (Square)'],['1536x1024','1536×1024 (Landscape)'],['1024x1536','1024×1536 (Portrait)'],['auto','Auto']], qualities:[['auto','Auto'],['high','High'],['medium','Medium'],['low','Low']], formats:true, steps:false, guidance:false, neg:false, styleMode:false, count:false },
+      'dall-e-3':         { sizes:[['1024x1024','1024×1024 (Square)'],['1792x1024','1792×1024 (Landscape)'],['1024x1792','1024×1792 (Portrait)']], qualities:[['standard','Standard'],['hd','HD']], formats:false, steps:false, guidance:false, neg:false, styleMode:true, count:false },
+      'dall-e-2':         { sizes:[['256x256','256×256 (Small)'],['512x512','512×512 (Medium)'],['1024x1024','1024×1024 (Large)']], qualities:[], formats:false, steps:false, guidance:false, neg:false, styleMode:false, count:true },
+    }
+  },
+  together: {
+    label: 'Together AI', color: '#ff6b35', puterKey: 'together',
+    models: [
+      { id: 'black-forest-labs/FLUX.1-schnell-Free', name: 'FLUX.1 Schnell',        badge: 'FREE', info: 'Free FLUX model. Fast generation, great quality.' },
+      { id: 'black-forest-labs/FLUX.1-schnell',      name: 'FLUX.1 Schnell Pro',    badge: 'FAST', info: 'Fastest FLUX model with premium features.' },
+      { id: 'black-forest-labs/FLUX.1.1-pro',        name: 'FLUX 1.1 Pro',          badge: 'BEST', info: 'Highest quality FLUX model. Best for professional use.' },
+      { id: 'black-forest-labs/FLUX.1-dev',          name: 'FLUX.1 Dev',            badge: '',     info: 'Development model with guidance scale support.' },
+      { id: 'black-forest-labs/FLUX.1-pro',          name: 'FLUX.1 Pro',            badge: 'PRO',  info: 'Pro-tier FLUX with enhanced quality controls.' },
+      { id: 'black-forest-labs/FLUX.1-depth-dev',    name: 'FLUX.1 Depth',          badge: '',     info: 'Depth-aware FLUX model for structured scenes.' },
+      { id: 'black-forest-labs/FLUX.1-canny-dev',    name: 'FLUX.1 Canny',          badge: '',     info: 'Edge-guided FLUX model for precise control.' },
+      { id: 'stabilityai/stable-diffusion-xl-base-1.0', name: 'SDXL Base 1.0',      badge: '',     info: 'Stable Diffusion XL — powerful open-source model.' },
+      { id: 'stabilityai/stable-diffusion-2-1',      name: 'Stable Diffusion 2.1',  badge: '',     info: 'Classic SD 2.1 with negative prompt support.' },
+      { id: 'SG161222/Realistic_Vision_V3.0_VAE',    name: 'Realistic Vision V3',   badge: '',     info: 'Fine-tuned for photorealistic portraits and scenes.' },
+      { id: 'prompthero/openjourney',                name: 'OpenJourney v4',         badge: '',     info: 'Midjourney-inspired artistic style model.' },
+      { id: 'wavymulder/Analog-Diffusion',           name: 'Analog Diffusion',       badge: '',     info: 'Vintage analog photography aesthetic.' },
+    ],
+    caps: {
+      default: {
+        sizes:[['512x512','512×512'],['768x768','768×768 (Square)'],['1024x1024','1024×1024 (Square)'],['1280x720','1280×720 (16:9 HD)'],['720x1280','720×1280 (9:16 Portrait)'],['1024x768','1024×768 (4:3)'],['768x1024','768×1024 (3:4)'],['1536x640','1536×640 (Ultrawide)'],['640x1536','640×1536 (Tall)']],
+        qualities:[], steps:true, guidance:true, neg:true, formats:false, styleMode:false, count:false,
+        stepsRange:[10,50,28], guidanceRange:[1,20,7.5]
       }
-    } else if (resp?.message?.content) { full=resp.message.content; body.innerHTML=renderMarkdown(full); }
+    }
+  },
+  xai: {
+    label: 'xAI / Grok', color: '#d4d4d4', puterKey: 'xai',
+    models: [
+      { id: 'grok-2-image',      name: 'Grok 2 Image',       badge: 'SMART', info: 'xAI\'s image generation model with high coherence.' },
+      { id: 'grok-2-image-1212', name: 'Grok 2 Image 1212',  badge: '',      info: 'Updated December 2024 Grok image model.' },
+    ],
+    caps: {
+      default: {
+        sizes:[['1024x1024','1024×1024 (Square)'],['1792x1024','1792×1024 (Landscape)'],['1024x1792','1024×1792 (Portrait)']],
+        qualities:[], steps:false, guidance:false, neg:false, formats:false, styleMode:false, count:true
+      }
+    }
+  }
+};
 
-    body.classList.remove('streaming-cursor');
-    body.querySelectorAll('pre code').forEach(b => { try { hljs.highlightElement(b); } catch(e){} });
-    renderMermaidBlocks(body);
+let activeImgProvider = 'openai-image-generation';
+let activeImgCount = 1;
 
-    const codeAssistantMsg = { role:'assistant', content:full, model:codeModel };
-    S.codeMessages.push(codeAssistantMsg);
-    buildMsgActions(wrap, body, codeAssistantMsg);
+// AR → size mappings per provider
+const AR_SIZE_MAP = {
+  'openai-image-generation': {
+    '1:1': '1024x1024', '16:9': '1792x1024', '9:16': '1024x1792',
+    '4:3': '1024x1024', '3:4': '1024x1024', '3:2': '1792x1024'
+  },
+  together: {
+    '1:1': '1024x1024', '16:9': '1280x720', '9:16': '720x1280',
+    '4:3': '1024x768', '3:4': '768x1024', '3:2': '1024x768'
+  },
+  xai: {
+    '1:1': '1024x1024', '16:9': '1792x1024', '9:16': '1024x1792',
+    '4:3': '1024x1024', '3:4': '1024x1792', '3:2': '1792x1024'
+  }
+};
+let activeAR = '1:1';
 
-  } catch(err) {
-    if (thinkEl && thinkEl.parentNode) thinkEl.remove();
-    if (!S.abortStream) {
-      const errWrap = document.createElement('div'); errWrap.className='message error';
-      errWrap.innerHTML=`<div class="msg-meta">Error</div><div class="msg-body">${escHtml(err.message||'Something went wrong.')}</div>`;
-      area.appendChild(errWrap);
-      toast('Error: '+(err.message||'Request failed'),'error');
+// Provider tab switching
+document.querySelectorAll('.img-prov-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeImgProvider = btn.dataset.provider;
+    document.querySelectorAll('.img-prov-btn').forEach(b => b.classList.toggle('active', b === btn));
+    updateImageModels();
+  });
+});
+
+document.getElementById('imageModel').addEventListener('change', updateImageCaps);
+
+function updateImageModels() {
+  const p = IMAGE_PROVIDERS[activeImgProvider]; if (!p) return;
+  const sel = document.getElementById('imageModel');
+  sel.innerHTML = '';
+  p.models.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m.id;
+    o.textContent = m.name + (m.badge ? ` [${m.badge}]` : '');
+    sel.appendChild(o);
+  });
+  updateImageCaps();
+}
+
+function updateImageCaps() {
+  const p = IMAGE_PROVIDERS[activeImgProvider]; if (!p) return;
+  const modelId = document.getElementById('imageModel').value;
+  const caps = p.caps[modelId] || p.caps.default || {};
+  const modelMeta = p.models.find(m => m.id === modelId);
+
+  // Model info tooltip
+  const infoEl = document.getElementById('img-model-info');
+  if (infoEl) infoEl.textContent = modelMeta?.info || '';
+
+  // Resolution
+  const sF = document.getElementById('imageSizeField');
+  const sS = document.getElementById('imageSize');
+  if (caps.sizes && caps.sizes.length) {
+    sS.innerHTML = caps.sizes.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+    // Try to match active AR
+    const arTarget = AR_SIZE_MAP[activeImgProvider]?.[activeAR];
+    if (arTarget) {
+      const opt = sS.querySelector(`option[value="${arTarget}"]`);
+      if (opt) opt.selected = true;
+    }
+    sF.style.display = '';
+  } else { sF.style.display = 'none'; }
+
+  // Quality
+  const qF = document.getElementById('imageQualityField');
+  const qS = document.getElementById('imageQuality');
+  if (caps.qualities && caps.qualities.length) {
+    qS.innerHTML = caps.qualities.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+    qF.style.display = '';
+  } else { qF.style.display = 'none'; }
+
+  // DALL-E 3 style mode
+  const smF = document.getElementById('imgStyleModeField');
+  if (smF) smF.style.display = caps.styleMode ? '' : 'none';
+
+  // Output format
+  const fmF = document.getElementById('imgFormatField');
+  if (fmF) fmF.style.display = caps.formats ? '' : 'none';
+
+  // Steps
+  const stepsRow = document.getElementById('cap-steps');
+  if (stepsRow) {
+    stepsRow.style.display = caps.steps ? '' : 'none';
+    if (caps.steps && caps.stepsRange) {
+      const sl = document.getElementById('imageSteps');
+      sl.min = caps.stepsRange[0]; sl.max = caps.stepsRange[1]; sl.value = caps.stepsRange[2];
+      document.getElementById('stepsVal').textContent = sl.value;
     }
   }
 
-  setBusy(false, 'code'); S.abortStream=false; area.scrollTop=area.scrollHeight;
+  // Guidance
+  const guideRow = document.getElementById('cap-guidance');
+  if (guideRow) {
+    guideRow.style.display = caps.guidance ? '' : 'none';
+    if (caps.guidance && caps.guidanceRange) {
+      const gl = document.getElementById('imageGuidance');
+      gl.min = caps.guidanceRange[0] * 10; gl.max = caps.guidanceRange[1] * 10; gl.value = caps.guidanceRange[2] * 10;
+      document.getElementById('guidanceVal').textContent = (gl.value / 10).toFixed(1);
+    }
+  }
+
+  // Negative prompt
+  const negWrap = document.getElementById('negPromptWrap');
+  if (negWrap) negWrap.style.display = caps.neg ? '' : 'none';
+
+  // Count field hide for models that only support n=1
+  const countField = document.getElementById('imageCountField');
+  if (countField) countField.style.display = (caps.count === false) ? 'none' : '';
 }
 
-// ── 12. IMAGE GENERATION ──
-document.getElementById('imageProvider').addEventListener('change', updateImageModels);
-document.getElementById('imageModel').addEventListener('change', updateImageSizeQuality);
-document.getElementById('genImgBtn').addEventListener('click', generateImage);
+// Aspect ratio buttons
+document.querySelectorAll('.img-ar-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeAR = btn.dataset.ar;
+    document.querySelectorAll('.img-ar-btn').forEach(b => b.classList.toggle('active', b === btn));
+    // Update size select to match AR
+    const target = AR_SIZE_MAP[activeImgProvider]?.[activeAR];
+    if (target) {
+      const sS = document.getElementById('imageSize');
+      const opt = sS.querySelector(`option[value="${target}"]`);
+      if (opt) opt.selected = true;
+    }
+  });
+});
+
+// Count buttons
+document.querySelectorAll('.img-count-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeImgCount = parseInt(btn.dataset.count) || 1;
+    document.querySelectorAll('.img-count-btn').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+
+// Sliders live update
+document.getElementById('imageSteps').addEventListener('input', function() { document.getElementById('stepsVal').textContent = this.value; });
+document.getElementById('imageGuidance').addEventListener('input', function() { document.getElementById('guidanceVal').textContent = (this.value / 10).toFixed(1); });
+
+// Style presets
 document.querySelectorAll('.style-preset').forEach(btn => {
   btn.addEventListener('click', () => { document.querySelectorAll('.style-preset').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); S.activeStyle=btn.dataset.style; });
 });
 
-const IMAGE_REGISTRY = {
-  'openai-image-generation': {
-    models: [{ id:'gpt-image-1', label:'GPT Image 1 (Latest)' },{ id:'gpt-image-1-mini', label:'GPT Image 1 Mini' },{ id:'dall-e-3', label:'DALL-E 3' },{ id:'dall-e-2', label:'DALL-E 2' }],
-    sizes: { 'dall-e-3':['1024x1024','1792x1024','1024x1792'], 'dall-e-2':['256x256','512x512','1024x1024'], 'gpt-image-1':['1024x1024','1536x1024','1024x1536','auto'], 'gpt-image-1-mini':['1024x1024','1536x1024','1024x1536','auto'] },
-    qualities: { 'dall-e-3':[['standard','Standard'],['hd','HD']], 'gpt-image-1':[['auto','Auto'],['high','High'],['medium','Medium'],['low','Low']] },
-  },
-  'together': {
-    models: [{ id:'black-forest-labs/FLUX.1-schnell-Free', label:'FLUX.1 Schnell (Free)' },{ id:'black-forest-labs/FLUX.1-schnell', label:'FLUX.1 Schnell' },{ id:'black-forest-labs/FLUX.1.1-pro', label:'FLUX 1.1 Pro' },{ id:'black-forest-labs/FLUX.1-dev', label:'FLUX.1 Dev' },{ id:'black-forest-labs/FLUX.1-pro', label:'FLUX.1 Pro' },{ id:'stabilityai/stable-diffusion-xl-base-1.0', label:'Stable Diffusion XL' },{ id:'SG161222/Realistic_Vision_V3.0_VAE', label:'Realistic Vision V3' }],
-    sizes: { default:['512x512','768x768','1024x1024','1280x720','720x1280'] }, qualities: {},
-  },
-  'xai': {
-    models: [{ id:'grok-2-image', label:'Grok 2 Image' },{ id:'grok-2-image-1212', label:'Grok 2 Image 1212' }],
-    sizes: { default:['1024x1024','1792x1024','1024x1792'] }, qualities: {},
-  },
-};
+// Enhance prompt with AI
+document.getElementById('img-enhance-btn').addEventListener('click', async function() {
+  const ta = document.getElementById('imagePrompt');
+  const orig = ta.value.trim(); if (!orig) { toast('Enter a prompt first', 'error'); return; }
+  this.textContent = '…'; this.disabled = true;
+  try {
+    const resp = await puter.ai.chat([{ role: 'user', content: `Enhance this image generation prompt to be more vivid, detailed and descriptive. Keep the same subject and concept but add: artistic details, lighting direction, mood, color palette, composition, and style cues. Return ONLY the enhanced prompt, no explanation, no quotes, no preamble:\n\n${orig}` }], { model: 'gpt-4o-mini', stream: false });
+    const enhanced = (typeof resp === 'string' ? resp : resp?.message?.content || '').trim().replace(/^["']|["']$/g, '');
+    if (enhanced) { ta.value = enhanced; toast('Prompt enhanced ✨'); }
+  } catch(e) { toast('Enhancement failed', 'error'); }
+  this.textContent = '✨ Enhance'; this.disabled = false;
+});
 
-function updateImageModels() {
-  const p=document.getElementById('imageProvider').value, sel=document.getElementById('imageModel'), reg=IMAGE_REGISTRY[p];
-  if(!reg) return; sel.innerHTML='';
-  reg.models.forEach(m=>{ const o=document.createElement('option'); o.value=m.id; o.textContent=m.label; sel.appendChild(o); });
-  updateImageSizeQuality();
-}
-function updateImageSizeQuality() {
-  const p=document.getElementById('imageProvider').value, m=document.getElementById('imageModel').value, reg=IMAGE_REGISTRY[p]; if(!reg) return;
-  const sF=document.getElementById('imageSizeField'), qF=document.getElementById('imageQualityField'), sS=document.getElementById('imageSize'), qS=document.getElementById('imageQuality');
-  const sizes=(reg.sizes&&(reg.sizes[m]||reg.sizes.default))||[];
-  if(sizes.length){sS.innerHTML=sizes.map(s=>`<option value="${s}">${s}</option>`).join(''); sF.style.display='';}else sF.style.display='none';
-  const quals=(reg.qualities&&reg.qualities[m])||[];
-  if(quals.length){qS.innerHTML=quals.map(([v,l])=>`<option value="${v}">${l}</option>`).join(''); qF.style.display='';}else qF.style.display='none';
-}
+document.getElementById('genImgBtn').addEventListener('click', generateImage);
 
 async function generateImage() {
-  const promptEl=document.getElementById('imagePrompt'); const prompt=promptEl.value.trim(); if(!prompt) return;
-  const fullPrompt=S.activeStyle?`${prompt}, ${S.activeStyle}`:prompt;
-  const provider=document.getElementById('imageProvider').value, model=document.getElementById('imageModel').value;
-  const sEl=document.getElementById('imageSize'), qEl=document.getElementById('imageQuality');
-  const sF=document.getElementById('imageSizeField'), qF=document.getElementById('imageQualityField');
-  const imgSize=(sEl&&sF&&sF.style.display!=='none'&&sEl.value&&sEl.value!=='auto')?sEl.value:undefined;
-  const imgQuality=(qEl&&qF&&qF.style.display!=='none'&&qEl.value&&qEl.value!=='auto')?qEl.value:undefined;
-  const btn=document.getElementById('genImgBtn'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Generating…';
-  const gallery=document.getElementById('imageGallery'), emptyEl=document.getElementById('imageEmpty');
-  if(emptyEl) emptyEl.style.display='none';
-  const card=document.createElement('div'); card.className='img-card'; card.innerHTML='<div class="loading-box"><span class="spinner"></span> Creating…</div>';
-  gallery.insertBefore(card,gallery.firstChild);
-  try {
-    const imgOpts={prompt:fullPrompt,provider,model};
-    if(imgSize) imgOpts.size=imgSize; if(imgQuality) imgOpts.quality=imgQuality;
-    const image=await puter.ai.txt2img(imgOpts);
-    const src=image.src||image.url||(image instanceof Blob?URL.createObjectURL(image):image);
-    card.innerHTML=`<img src="${src}" alt="${escHtml(prompt)}"/><button class="dl-btn" title="Download">⬇</button><div class="caption">${escHtml(prompt)}</div>`;
-    card.querySelector('.dl-btn').addEventListener('click',()=>dlImg(card));
-  } catch(err) {
-    card.innerHTML=`<div class="loading-box" style="flex-direction:column;gap:6px;color:var(--err);"><span style="font-size:1.5rem;">✕</span>${escHtml(err.message||'Generation failed')}</div>`;
-    toast('Image generation failed: '+(err.message||''),'error');
+  const promptEl = document.getElementById('imagePrompt');
+  const prompt = promptEl.value.trim(); if (!prompt) { toast('Enter a prompt first', 'error'); return; }
+  const fullPrompt = S.activeStyle ? `${prompt}, ${S.activeStyle}` : prompt;
+  const p = IMAGE_PROVIDERS[activeImgProvider]; if (!p) return;
+  const modelId = document.getElementById('imageModel').value;
+  const caps = p.caps[modelId] || p.caps.default || {};
+
+  const sEl = document.getElementById('imageSize');
+  const qEl = document.getElementById('imageQuality');
+  const fmEl = document.getElementById('imageFormat');
+  const smEl = document.getElementById('imageStyleMode');
+  const seedEl = document.getElementById('imageSeed');
+
+  const sF = document.getElementById('imageSizeField');
+  const qF = document.getElementById('imageQualityField');
+
+  const imgSize = (sEl && sF && sF.style.display !== 'none' && sEl.value && sEl.value !== 'auto') ? sEl.value : undefined;
+  const imgQuality = (qEl && qF && qF.style.display !== 'none' && qEl.value && qEl.value !== 'auto') ? qEl.value : undefined;
+  const imgFormat = (caps.formats && fmEl?.value) ? fmEl.value : undefined;
+  const imgStyleMode = (caps.styleMode && smEl?.value) ? smEl.value : undefined;
+  const negPrompt = document.getElementById('imageNegPrompt')?.value?.trim() || '';
+  const steps = caps.steps ? parseInt(document.getElementById('imageSteps').value) : undefined;
+  const guidance = caps.guidance ? parseFloat(document.getElementById('imageGuidance').value) / 10 : undefined;
+  const seed = seedEl?.value?.trim() ? parseInt(seedEl.value) : undefined;
+  const count = (caps.count !== false) ? activeImgCount : 1;
+
+  const btn = document.getElementById('genImgBtn'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generating…';
+  const gallery = document.getElementById('imageGallery');
+  const emptyEl = document.getElementById('imageEmpty'); if (emptyEl) emptyEl.style.display = 'none';
+
+  const cards = [];
+  for (let i = 0; i < count; i++) {
+    const card = document.createElement('div'); card.className = 'img-card';
+    card.innerHTML = '<div class="loading-box"><span class="spinner"></span> Creating…</div>';
+    gallery.insertBefore(card, gallery.firstChild);
+    cards.push(card);
   }
-  btn.disabled=false; btn.innerHTML='✦ Generate';
+
+  const genOne = async (card) => {
+    try {
+      const imgOpts = { prompt: fullPrompt, provider: p.puterKey, model: modelId };
+      if (imgSize) imgOpts.size = imgSize;
+      if (imgQuality) imgOpts.quality = imgQuality;
+      if (imgFormat) imgOpts.output_format = imgFormat;
+      if (imgStyleMode) imgOpts.style = imgStyleMode;
+      if (steps) imgOpts.steps = steps;
+      if (guidance) imgOpts.guidance_scale = guidance;
+      if (negPrompt && caps.neg) imgOpts.negative_prompt = negPrompt;
+      if (seed !== undefined) imgOpts.seed = seed;
+      const image = await puter.ai.txt2img(imgOpts);
+      const src = image.src || image.url || (image instanceof Blob ? URL.createObjectURL(image) : String(image));
+      const shortPrompt = prompt.length > 90 ? prompt.slice(0, 90) + '…' : prompt;
+      card.innerHTML = `
+        <div class="img-card-overlay">
+          <button class="img-card-btn dl-btn" title="Download">⬇</button>
+          <button class="img-card-btn img-card-vary" title="Variations">↻</button>
+        </div>
+        <img src="${src}" alt="${escHtml(shortPrompt)}" loading="lazy"/>
+        <div class="caption">${escHtml(shortPrompt)}</div>`;
+      card.querySelector('.dl-btn').addEventListener('click', () => dlImg(card));
+      card.querySelector('.img-card-vary').addEventListener('click', () => {
+        document.getElementById('imagePrompt').value = prompt;
+        toast('Prompt set — click Generate for a variation');
+      });
+    } catch(err) {
+      card.innerHTML = `<div class="loading-box" style="flex-direction:column;gap:6px;color:var(--err);font-size:11px;padding:14px;text-align:center;"><span style="font-size:1.6rem">✕</span>${escHtml(err.message||'Generation failed')}</div>`;
+      toast('Image failed: ' + (err.message || ''), 'error');
+    }
+  };
+
+  await Promise.all(cards.map(genOne));
+  btn.disabled = false; btn.innerHTML = '✦ Generate Image';
 }
-function dlImg(card) { const src=card.querySelector('img').src; const a=document.createElement('a'); a.href=src; a.download=`ai-studio-${Date.now()}.png`; a.click(); toast('Image downloaded'); }
+function dlImg(card) { const src=card.querySelector('img').src; const a=document.createElement('a'); a.href=src; a.download=`neuraldock-${Date.now()}.png`; a.click(); toast('Image downloaded'); }
 
 // ── 13. VOICE / TTS ──
 document.getElementById('voiceProvider').addEventListener('change', updateVoiceOptions);
@@ -1119,7 +1284,7 @@ document.querySelectorAll('.tip').forEach(tip=>{
     const input=document.getElementById(targetId);
     if(input){input.value=prompt;input.focus();autoResize(input);}
     if(targetId==='chatInput') activateTab('chat');
-    if(targetId==='codeInput') activateTab('code');
+    if(targetId==='codeInput') { activateTab('code'); document.getElementById('ide-ai-input').value=prompt; ideAiSend(); }
   });
 });
 function copyCodeBlock(btn){const code=btn.closest('pre').querySelector('code');navigator.clipboard.writeText(code.textContent);toast('Code copied');}
@@ -1356,7 +1521,7 @@ _menuEl.addEventListener('click',e=>e.stopPropagation());
 function buildMenuItems(body, msg){
   _menuEl.innerHTML='';
   const items=[
-    {icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',label:'Write Code',fn(){closeAllPopups();activateTab('code');const inp=document.getElementById('codeInput');inp.value='Based on this response, write the relevant code:\n\n'+(body.innerText||'').slice(0,800);autoResize(inp);inp.focus();}},
+    {icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',label:'Write Code',fn(){closeAllPopups();activateTab('code');const snippet=(body.innerText||'').slice(0,800);document.getElementById('ide-ai-input').value='Write code based on:\n\n'+snippet;ideAiSend();}},
     {icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',label:'Generate Image',fn(){closeAllPopups();activateTab('image');document.getElementById('imagePrompt').value=(body.innerText||'').replace(/\n+/g,' ').trim().slice(0,200);toast('Prompt set in Image tab');}},
     {icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>',label:'Generate Voice',fn(){closeAllPopups();activateTab('voice');const ta=document.getElementById('voiceText');ta.value=(body.innerText||'').slice(0,3000);ta.dispatchEvent(new Event('input'));ta.focus();toast('Text set in Voice tab');}},
     {sep:true},
@@ -1614,3 +1779,652 @@ function addThinkingEl(container, modelId) {
   const mo = new MutationObserver(observeAllTips);
   mo.observe(document.body, { childList: true, subtree: true });
 })();
+
+
+// ══════════════════════════════════════════════
+//  PROJECT IDE — CodeMirror-based
+// ══════════════════════════════════════════════
+
+const IDE = {
+  files: {},        // { [id]: { id, name, content, language, saved } }
+  activeFile: null,
+  cm: null,         // CodeMirror instance
+  aiMessages: [],
+  aiOpen: true,
+  ideBusy: false,
+  abortIde: false,
+  currentOutTab: 'preview',
+};
+
+const LANG_MAP = {
+  js:'javascript', jsx:'javascript', mjs:'javascript',
+  ts:'javascript', tsx:'javascript',
+  py:'python', html:'htmlmixed', htm:'htmlmixed',
+  css:'css', scss:'css', less:'css',
+  json:'javascript', md:'markdown',
+  sh:'shell', bash:'shell', zsh:'shell',
+  c:'clike', cpp:'clike', h:'clike', java:'clike', cs:'clike',
+};
+
+const FILE_ICONS = {
+  js:'🟨', jsx:'⚛', ts:'🔷', tsx:'⚛',
+  py:'🐍', rb:'💎', php:'🐘', java:'☕',
+  html:'🌐', htm:'🌐', css:'🎨', scss:'🎨',
+  json:'📋', md:'📝', xml:'📄', yaml:'⚙', yml:'⚙',
+  sh:'💻', sql:'🗃', svg:'🖼',
+};
+function getFileIcon(name) { return FILE_ICONS[name.split('.').pop().toLowerCase()] || '📄'; }
+function getLang(name) { return LANG_MAP[name.split('.').pop().toLowerCase()] || 'null'; }
+
+// ── CodeMirror Init ──
+function initCM(content = '', lang = 'null') {
+  const ta = document.getElementById('ide-editor-ta');
+  if (IDE.cm) {
+    IDE.cm.setValue(content);
+    IDE.cm.setOption('mode', lang);
+    setTimeout(() => IDE.cm.refresh(), 10);
+    return;
+  }
+  IDE.cm = CodeMirror.fromTextArea(ta, {
+    value: content,
+    mode: lang,
+    theme: 'aistudio',
+    lineNumbers: true,
+    autoCloseBrackets: true,
+    matchBrackets: true,
+    lineWrapping: true,
+    indentUnit: 2,
+    tabSize: 2,
+    indentWithTabs: false,
+    extraKeys: {
+      'Ctrl-S': () => ideSaveFile(),
+      'Cmd-S':  () => ideSaveFile(),
+      'Ctrl-/': 'toggleComment',
+      'Cmd-/':  'toggleComment',
+      'Tab': cm => cm.execCommand('insertSoftTab'),
+    },
+  });
+  IDE.cm.setValue(content);
+  IDE.cm.on('change', () => {
+    if (IDE.activeFile && IDE.files[IDE.activeFile]) {
+      IDE.files[IDE.activeFile].saved = false;
+      renderFileTabs();
+      renderFileTree();
+    }
+  });
+}
+
+// ── File management ──
+function ideNewFile(suggestedName) {
+  const name = suggestedName || prompt('File name (e.g. index.html, app.py):', 'index.html');
+  if (!name || !name.trim()) return;
+  const id = crypto.randomUUID();
+  IDE.files[id] = { id, name: name.trim(), content: '', language: getLang(name), saved: true };
+  renderFileTree();
+  openFile(id);
+  toast('Created ' + name.trim());
+}
+
+function ideUploadFile() { document.getElementById('ide-file-input').click(); }
+
+document.getElementById('ide-file-input').addEventListener('change', async function(e) {
+  const files = Array.from(e.target.files); e.target.value = '';
+  for (const f of files) {
+    const content = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsText(f); });
+    const id = crypto.randomUUID();
+    IDE.files[id] = { id, name: f.name, content, language: getLang(f.name), saved: true };
+  }
+  renderFileTree();
+  const ids = Object.keys(IDE.files);
+  if (ids.length && !IDE.activeFile) openFile(ids[0]);
+  else if (ids.length) openFile(ids[ids.length - 1]);
+  toast(`Uploaded ${files.length} file(s)`);
+});
+
+function ideDeleteFile(id, e) {
+  e && e.stopPropagation();
+  const f = IDE.files[id]; if (!f) return;
+  if (!confirm('Delete ' + f.name + '?')) return;
+  delete IDE.files[id];
+  if (IDE.activeFile === id) {
+    IDE.activeFile = null;
+    const remaining = Object.keys(IDE.files);
+    if (remaining.length) openFile(remaining[remaining.length - 1]);
+    else showWelcome();
+  }
+  renderFileTree(); renderFileTabs();
+  toast('Deleted ' + f.name);
+}
+
+function ideSaveFile() {
+  if (!IDE.cm || !IDE.activeFile) return;
+  const f = IDE.files[IDE.activeFile]; if (!f) return;
+  f.content = IDE.cm.getValue();
+  f.saved = true;
+  renderFileTabs(); renderFileTree();
+  toast('Saved ' + f.name);
+}
+
+function ideDownloadFile() {
+  if (!IDE.activeFile) { toast('No file open', 'error'); return; }
+  ideSaveFile();
+  const f = IDE.files[IDE.activeFile];
+  const blob = new Blob([f.content], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = f.name; a.click();
+  toast('Downloaded ' + f.name);
+}
+
+async function ideDownloadZip() {
+  const ids = Object.keys(IDE.files);
+  if (!ids.length) { toast('No files to download', 'error'); return; }
+  ideSaveFile();
+  if (!window.JSZip) { toast('Loading ZIP library…'); }
+  const zip = new JSZip();
+  for (const id of ids) { const f = IDE.files[id]; zip.file(f.name, f.content); }
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = (document.getElementById('ide-project-name')?.textContent?.trim() || 'project') + '.zip';
+  a.click();
+  toast('Downloaded project ZIP');
+}
+
+function openFile(id) {
+  IDE.activeFile = id;
+  const f = IDE.files[id]; if (!f) return;
+  document.getElementById('ide-welcome').style.display = 'none';
+  document.getElementById('ide-monaco').style.display = '';
+  renderFileTree(); renderFileTabs();
+  initCM(f.content, f.language);
+}
+
+function showWelcome() {
+  document.getElementById('ide-monaco').style.display = 'none';
+  document.getElementById('ide-welcome').style.display = '';
+  IDE.activeFile = null;
+  renderFileTabs(); renderFileTree();
+}
+
+function renderFileTree() {
+  const list = document.getElementById('ide-file-list');
+  const empty = document.getElementById('ide-empty-tree');
+  const ids = Object.keys(IDE.files);
+  if (!ids.length) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  Array.from(list.children).forEach(c => { if (c.id !== 'ide-empty-tree') c.remove(); });
+  ids.forEach(id => {
+    const f = IDE.files[id];
+    const el = document.createElement('div');
+    el.className = 'ide-file-item' + (id === IDE.activeFile ? ' active' : '');
+    el.innerHTML = `<span class="ide-file-icon">${getFileIcon(f.name)}</span>
+      <span class="ide-file-name">${escHtml(f.name)}</span>
+      ${!f.saved ? '<span class="ide-file-modified" title="Unsaved">●</span>' : ''}
+      <button class="ide-file-del" title="Delete file">✕</button>`;
+    el.addEventListener('click', (e) => { if (!e.target.classList.contains('ide-file-del')) openFile(id); });
+    el.querySelector('.ide-file-del').addEventListener('click', (e) => ideDeleteFile(id, e));
+    list.appendChild(el);
+  });
+}
+
+function renderFileTabs() {
+  const list = document.getElementById('ide-tabs-list');
+  list.innerHTML = '';
+  Object.values(IDE.files).forEach(f => {
+    const tab = document.createElement('button');
+    tab.className = 'ide-tab' + (f.id === IDE.activeFile ? ' active' : '');
+    tab.innerHTML = `<span>${getFileIcon(f.name)}</span>
+      <span class="ide-tab-name">${escHtml(f.name)}</span>
+      ${!f.saved ? '<span class="ide-tab-dot" title="Unsaved">●</span>' : ''}
+      <button class="ide-tab-close" data-id="${f.id}">×</button>`;
+    tab.addEventListener('click', (e) => { if (!e.target.classList.contains('ide-tab-close')) openFile(f.id); });
+    tab.querySelector('.ide-tab-close').addEventListener('click', (e) => {
+      e.stopPropagation();
+      // Auto-save then close
+      if (IDE.activeFile === f.id && IDE.cm) { f.content = IDE.cm.getValue(); f.saved = true; }
+      delete IDE.files[f.id];
+      if (IDE.activeFile === f.id) {
+        const remaining = Object.keys(IDE.files);
+        if (remaining.length) openFile(remaining[remaining.length - 1]);
+        else showWelcome();
+      } else { renderFileTabs(); renderFileTree(); }
+    });
+    list.appendChild(tab);
+  });
+}
+
+// ── Templates ──
+const TEMPLATES = {
+  html: [
+    { name: 'index.html', content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Project</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Hello World 🌐</h1>
+  </header>
+  <main>
+    <p>Build something amazing.</p>
+    <button id="btn">Click me</button>
+  </main>
+  <script src="app.js"><\/script>
+</body>
+</html>` },
+    { name: 'style.css', content: `* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; padding: 2rem; background: #0f1117; color: #e8e2d9; min-height: 100vh; }
+header { margin-bottom: 2rem; }
+h1 { font-size: 2rem; color: #d4a853; }
+p { color: #aaa; margin-bottom: 1rem; }
+button { padding: 10px 20px; background: #d4a853; border: none; border-radius: 8px; color: #0f1117; font-weight: 600; cursor: pointer; transition: all .2s; }
+button:hover { background: #e0b96a; transform: translateY(-2px); }` },
+    { name: 'app.js', content: `const btn = document.getElementById('btn');
+let count = 0;
+
+btn.addEventListener('click', () => {
+  count++;
+  btn.textContent = \`Clicked \${count} time\${count !== 1 ? 's' : ''}!\`;
+  console.log('Button clicked:', count);
+});
+
+console.log('App loaded!');` },
+  ],
+  react: [
+    { name: 'App.jsx', content: `import { useState } from 'react';
+import './App.css';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const [items, setItems] = useState(['React', 'Vite', 'AI Studio']);
+
+  return (
+    <div className="app">
+      <h1>⚛ React App</h1>
+      <div className="card">
+        <button onClick={() => setCount(c => c + 1)}>
+          Count is {count}
+        </button>
+        <ul>
+          {items.map((item, i) => <li key={i}>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+  );
+}` },
+    { name: 'App.css', content: `.app { font-family: system-ui, sans-serif; max-width: 640px; margin: 0 auto; padding: 2rem; background: #0f1117; color: #e8e2d9; min-height: 100vh; }
+h1 { font-size: 2rem; color: #d4a853; margin-bottom: 1.5rem; }
+.card { background: #1a1c1e; border: 1px solid #2a2c2e; border-radius: 12px; padding: 1.5rem; }
+button { padding: 10px 24px; background: #d4a853; border: none; border-radius: 8px; color: #0f1117; font-weight: 600; cursor: pointer; margin-bottom: 1rem; }
+button:hover { background: #e0b96a; }
+ul { list-style: none; padding: 0; }
+li { padding: 8px 0; border-bottom: 1px solid #2a2c2e; color: #aaa; }` },
+    { name: 'package.json', content: `{
+  "name": "react-app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  }
+}` },
+    { name: 'vite.config.js', content: `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({ plugins: [react()] });` },
+    { name: '.gitignore', content: `node_modules/\ndist/\n.env\n.DS_Store` },
+  ],
+  node: [
+    { name: 'server.js', content: `const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'Hello from Node.js!', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/data', (req, res) => {
+  res.json({ items: ['item1', 'item2', 'item3'] });
+});
+
+app.post('/api/data', (req, res) => {
+  const { name } = req.body;
+  res.status(201).json({ created: name, id: Date.now() });
+});
+
+app.listen(PORT, () => {
+  console.log(\`✅ Server running at http://localhost:\${PORT}\`);
+});` },
+    { name: 'package.json', content: `{
+  "name": "node-server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}` },
+    { name: '.env', content: `PORT=3000\n# Add your environment variables here\n# DATABASE_URL=\n# API_KEY=` },
+    { name: '.gitignore', content: `node_modules/\n.env\n*.log\ndist/\n.DS_Store` },
+    { name: 'README.md', content: `# Node.js Server\n\n## Setup\n\n\`\`\`bash\nnpm install\nnpm run dev\n\`\`\`\n\n## Endpoints\n\n- \`GET /\` — Health check\n- \`GET /api/data\` — Get items\n- \`POST /api/data\` — Create item\n` },
+  ],
+  python: [
+    { name: 'main.py', content: `#!/usr/bin/env python3
+"""Main application script."""
+
+from utils import greet, calculate
+
+def main():
+    name = input("Enter your name: ")
+    print(greet(name))
+    
+    result = calculate(10, 5)
+    print(f"10 + 5 = {result}")
+
+if __name__ == "__main__":
+    main()` },
+    { name: 'utils.py', content: `"""Utility functions."""
+
+def greet(name: str) -> str:
+    """Return a personalized greeting."""
+    return f"Hello, {name}! 🐍"
+
+def calculate(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b` },
+    { name: 'requirements.txt', content: `# Add your dependencies here
+# requests==2.31.0
+# flask==3.0.0` },
+    { name: '.gitignore', content: `__pycache__/\n*.pyc\n.env\nvenv/\n.venv/\n*.egg-info/\ndist/\n.DS_Store` },
+    { name: 'README.md', content: `# Python Project\n\n## Setup\n\n\`\`\`bash\npython -m venv venv\nsource venv/bin/activate  # Windows: venv\\Scripts\\activate\npip install -r requirements.txt\n\`\`\`\n\n## Run\n\n\`\`\`bash\npython main.py\n\`\`\`` },
+  ],
+};
+
+function ideQuickStart(tpl) {
+  const files = TEMPLATES[tpl]; if (!files) return;
+  const existing = Object.keys(IDE.files);
+  if (existing.length > 0 && !confirm('Load template? This will add files to your project.')) return;
+  files.forEach(f => {
+    const id = crypto.randomUUID();
+    IDE.files[id] = { id, name: f.name, content: f.content, language: getLang(f.name), saved: true };
+  });
+  renderFileTree();
+  openFile(Object.keys(IDE.files)[0]);
+  toast('Template loaded — ' + tpl + ' project ready!');
+}
+
+// ── Run code ──
+function ideRunCode() {
+  if (!IDE.activeFile || !IDE.cm) { toast('No file open', 'error'); return; }
+  ideSaveFile();
+  const f = IDE.files[IDE.activeFile];
+  const ext = f.name.split('.').pop().toLowerCase();
+  const outDiv = document.getElementById('ide-output');
+  const outPre = document.getElementById('ide-output-pre');
+  const frame = document.getElementById('ide-html-frame');
+  outDiv.style.display = '';
+  outPre.style.display = 'none'; frame.style.display = 'none';
+  showOutTab(IDE.currentOutTab);
+  const code = IDE.cm.getValue();
+
+  if (['html', 'htm'].includes(ext)) {
+    showOutTab('preview');
+    frame.srcdoc = code;
+  } else if (['js', 'mjs'].includes(ext)) {
+    showOutTab('console');
+    outPre.style.display = ''; outPre.textContent = '';
+    const log = (...a) => { outPre.textContent += a.map(x => typeof x === 'object' ? JSON.stringify(x, null, 2) : String(x)).join(' ') + '\n'; };
+    try {
+      const sandboxFrame = document.createElement('iframe');
+      sandboxFrame.style.display = 'none';
+      document.body.appendChild(sandboxFrame);
+      sandboxFrame.contentWindow.console = { log, warn: log, error: log, info: log, debug: log };
+      sandboxFrame.contentWindow.eval(code);
+      sandboxFrame.remove();
+      if (!outPre.textContent.trim()) outPre.textContent = '(no console output)';
+    } catch (err) {
+      outPre.textContent = '⚠ Error: ' + err.message;
+    }
+  } else {
+    showOutTab('console');
+    outPre.style.display = '';
+    outPre.textContent = `Cannot run .${ext} files in browser.\n\n`;
+    if (ext === 'py') outPre.textContent += `Run in your terminal:\n  python ${f.name}`;
+    else if (['ts', 'tsx'].includes(ext)) outPre.textContent += `Run with ts-node:\n  npx ts-node ${f.name}`;
+    else if (['jsx'].includes(ext)) outPre.textContent += `Build and run with Vite:\n  npm run dev`;
+    else outPre.textContent += `Run with the appropriate runtime for .${ext} files.`;
+  }
+}
+
+function showOutTab(tab) {
+  IDE.currentOutTab = tab;
+  document.querySelectorAll('.ide-out-tab').forEach(t => t.classList.toggle('active', t.dataset.out === tab));
+  const frame = document.getElementById('ide-html-frame');
+  const pre = document.getElementById('ide-output-pre');
+  if (tab === 'preview') { frame.style.display = ''; pre.style.display = 'none'; }
+  else { frame.style.display = 'none'; pre.style.display = ''; }
+}
+
+// ── AI Assistant ──
+document.getElementById('ide-ai-send').addEventListener('click', ideAiSend);
+document.getElementById('ide-ai-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); ideAiSend(); }
+  // Auto-resize
+  e.target.style.height = 'auto';
+  e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
+});
+document.getElementById('ide-ai-stop').addEventListener('click', () => { IDE.abortIde = true; });
+document.querySelectorAll('.ide-ai-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.getElementById('ide-ai-input').value = chip.dataset.p;
+    ideAiSend();
+  });
+});
+
+function getIdeContext() {
+  const include = document.getElementById('ide-include-code')?.checked;
+  if (!include || !IDE.activeFile || !IDE.cm) return '';
+  const f = IDE.files[IDE.activeFile];
+  const code = IDE.cm.getValue();
+  const allFiles = Object.values(IDE.files).map(fl => fl.name).join(', ');
+  return `\n\n[Current project files: ${allFiles}]\n[Active file: ${f.name}]\n\`\`\`${f.language || 'text'}\n${code.slice(0, 8000)}\n\`\`\``;
+}
+
+async function ideAiSend() {
+  if (IDE.ideBusy) return;
+  const input = document.getElementById('ide-ai-input');
+  const text = input.value.trim(); if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+
+  const msgs = document.getElementById('ide-ai-msgs');
+  const welcome = msgs.querySelector('.ide-ai-welcome-msg');
+  if (welcome) welcome.style.display = 'none';
+  const chipsEl = document.getElementById('ide-ai-msgs')?.querySelector('.ide-ai-chips');
+  if (chipsEl) chipsEl.style.display = 'none';
+
+  addIdeMsg('user', text);
+  IDE.aiMessages.push({ role: 'user', content: text });
+
+  IDE.ideBusy = true; IDE.abortIde = false;
+  document.getElementById('ide-ai-send').style.display = 'none';
+  document.getElementById('ide-ai-stop').style.display = '';
+
+  const contextStr = getIdeContext();
+  const sysPrompt = [
+    'You are an expert full-stack coding assistant embedded in a project IDE.',
+    'Help the user write, debug, refactor, and deploy their code.',
+    'Always use markdown with fenced code blocks (```language ... ```) for code.',
+    'When giving deployment instructions, provide exact terminal commands the user can copy.',
+    'Be concise but thorough. When writing complete files, write the full content.',
+    'When asked about GitHub or deployment, give step-by-step instructions with exact commands.',
+  ].join(' ');
+
+  const chatMessages = [
+    { role: 'system', content: sysPrompt },
+    ...IDE.aiMessages.slice(-20).map((m, i, arr) => ({
+      role: m.role,
+      content: m.role === 'user' && i === arr.length - 1 ? m.content + contextStr : m.content
+    }))
+  ];
+
+  // Thinking dots
+  const thinkEl = document.createElement('div');
+  thinkEl.className = 'ide-ai-msg assistant';
+  thinkEl.innerHTML = '<div style="display:flex;gap:5px;align-items:center;padding:4px 0"><div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div></div>';
+  msgs.appendChild(thinkEl); msgs.scrollTop = msgs.scrollHeight;
+
+  let full = '';
+  try {
+    const resp = await puter.ai.chat(chatMessages, { model: S.currentModel, stream: true, temperature: S.temperature || 0.7 });
+    thinkEl.remove();
+    const bodyEl = addIdeMsg('assistant', '', true);
+
+    if (resp && typeof resp[Symbol.asyncIterator] === 'function') {
+      for await (const part of resp) {
+        if (IDE.abortIde) break;
+        const t = part?.text || part?.message?.content || '';
+        if (t) { full += t; bodyEl.innerHTML = renderMarkdown(full); msgs.scrollTop = msgs.scrollHeight; }
+      }
+    } else if (resp?.message?.content) {
+      full = resp.message.content;
+      bodyEl.innerHTML = renderMarkdown(full);
+    } else if (typeof resp === 'string') {
+      full = resp; bodyEl.innerHTML = renderMarkdown(full);
+    }
+
+    bodyEl.classList.remove('streaming-cursor');
+    bodyEl.querySelectorAll('pre code').forEach(b => { try { hljs.highlightElement(b); } catch(e){} });
+
+    // Add "Apply to editor" buttons on code blocks
+    bodyEl.querySelectorAll('pre').forEach(pre => {
+      const code = pre.querySelector('code');
+      if (!code) return;
+      const applyBtn = document.createElement('button');
+      applyBtn.className = 'ide-apply-btn';
+      applyBtn.textContent = '⤵ Apply to editor';
+      applyBtn.title = 'Replace editor content with this code';
+      applyBtn.addEventListener('click', () => {
+        if (!IDE.cm) { toast('Open a file first', 'error'); return; }
+        const codeText = code.textContent || '';
+        IDE.cm.setValue(codeText);
+        if (IDE.activeFile && IDE.files[IDE.activeFile]) {
+          IDE.files[IDE.activeFile].content = codeText;
+          IDE.files[IDE.activeFile].saved = false;
+          renderFileTabs(); renderFileTree();
+        }
+        toast('Code applied to editor ✓');
+      });
+      pre.style.position = 'relative';
+      pre.appendChild(applyBtn);
+    });
+
+    IDE.aiMessages.push({ role: 'assistant', content: full });
+  } catch (err) {
+    thinkEl.remove();
+    if (!IDE.abortIde) {
+      addIdeMsg('assistant', '⚠ ' + (err.message || 'Request failed'));
+      toast('AI error: ' + (err.message || ''), 'error');
+    }
+  }
+
+  IDE.ideBusy = false; IDE.abortIde = false;
+  document.getElementById('ide-ai-send').style.display = '';
+  document.getElementById('ide-ai-stop').style.display = 'none';
+}
+
+function addIdeMsg(role, text, streaming = false) {
+  const msgs = document.getElementById('ide-ai-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'ide-ai-msg ' + role;
+  if (streaming) wrap.classList.add('streaming-cursor');
+  if (text) {
+    if (role === 'assistant') { wrap.classList.add('md'); wrap.innerHTML = renderMarkdown(text); }
+    else wrap.textContent = text;
+  }
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+  return wrap;
+}
+
+// ── Wire up all IDE buttons ──
+document.getElementById('ide-new-btn').addEventListener('click', () => ideNewFile());
+document.getElementById('ide-upload-btn').addEventListener('click', ideUploadFile);
+document.getElementById('ide-zip-btn').addEventListener('click', ideDownloadZip);
+document.getElementById('ide-tree-new-btn').addEventListener('click', () => ideNewFile());
+document.getElementById('ide-tree-upload-btn').addEventListener('click', ideUploadFile);
+document.getElementById('ide-save-btn').addEventListener('click', ideSaveFile);
+document.getElementById('ide-dl-btn').addEventListener('click', ideDownloadFile);
+document.getElementById('ide-run-btn').addEventListener('click', ideRunCode);
+
+document.querySelectorAll('.ide-wlc-card[data-tpl]').forEach(card => {
+  card.addEventListener('click', () => ideQuickStart(card.dataset.tpl));
+});
+document.querySelectorAll('.ide-tpl-chip[data-tpl]').forEach(chip => {
+  chip.addEventListener('click', () => ideQuickStart(chip.dataset.tpl));
+});
+
+document.getElementById('ide-wlc-new').addEventListener('click', () => ideNewFile());
+document.getElementById('ide-wlc-upload').addEventListener('click', ideUploadFile);
+
+// Output panel
+document.getElementById('ide-output-close').addEventListener('click', () => { document.getElementById('ide-output').style.display = 'none'; });
+document.getElementById('ide-output-clear').addEventListener('click', () => {
+  document.getElementById('ide-output-pre').textContent = '';
+  document.getElementById('ide-html-frame').srcdoc = '';
+});
+document.getElementById('ide-output-rerun')?.addEventListener('click', ideRunCode);
+document.querySelectorAll('.ide-out-tab').forEach(tab => {
+  tab.addEventListener('click', () => showOutTab(tab.dataset.out));
+});
+
+// AI panel toggle
+document.getElementById('ide-ai-toggle').addEventListener('click', () => {
+  const panel = document.getElementById('ide-ai-panel');
+  panel.classList.toggle('hidden');
+});
+document.getElementById('ide-ai-close').addEventListener('click', () => {
+  document.getElementById('ide-ai-panel').classList.add('hidden');
+});
+document.getElementById('ide-ai-clear').addEventListener('click', () => {
+  const msgs = document.getElementById('ide-ai-msgs');
+  msgs.innerHTML = '';
+  IDE.aiMessages = [];
+  msgs.innerHTML = `<div class="ide-ai-welcome-msg"><div class="ide-ai-welcome-icon">🤖</div><strong>AI Code Assistant</strong><p>Chat cleared. Ask me anything about your code.</p></div>`;
+});
+
+// Project name editable
+document.getElementById('ide-project-name')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
+});
+
+// ── Tab activation ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.tab === 'image') { updateImageModels(); }
+    if (btn.dataset.tab === 'code' && IDE.cm) { setTimeout(() => IDE.cm.refresh(), 50); }
+  });
+});
+
+// Initialize image section on load
+window.addEventListener('load', () => {
+  updateImageModels();
+});

@@ -7,6 +7,7 @@
   <meta name="description" content="Access free AI models for chat, coding, image generation, and text-to-speech — all powered by Puter.js with no API keys.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -14,6 +15,19 @@
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://js.puter.com/v2/"></script>
 </head>
 <body>
@@ -140,55 +154,331 @@
         </div>
       </div>
 
-      <!-- CODE TAB -->
+      <!-- CODE TAB — Full IDE -->
       <div class="tab-panel" id="panel-code">
-        <div class="chat-area" id="codeMessages">
-          <div class="empty-state" id="codeEmpty">
-            <div class="icon">⌘</div>
-            <h3>Code Assistant</h3>
-            <p>Get help writing, debugging, and explaining code in any language.</p>
-            <div class="tips">
-              <div class="tip" data-prompt="Write a Python function to merge two sorted arrays" data-target="codeInput"><div class="t-icon">⟠</div><h4>Python</h4><p>Merge sorted arrays</p></div>
-              <div class="tip" data-prompt="Create a responsive CSS grid layout" data-target="codeInput"><div class="t-icon">⊞</div><h4>CSS</h4><p>Responsive grid</p></div>
-              <div class="tip" data-prompt="Explain async/await in JavaScript with examples" data-target="codeInput"><div class="t-icon">⟁</div><h4>JavaScript</h4><p>Async/await guide</p></div>
+        <div class="ide-layout">
+
+          <!-- LEFT: File Explorer -->
+          <div class="ide-explorer" id="ide-explorer">
+            <div class="ide-explorer-hdr">
+              <span class="ide-explorer-title">EXPLORER</span>
+              <div class="ide-explorer-actions">
+                <button class="ide-hdr-btn" id="ide-new-btn" title="New File">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                </button>
+                <button class="ide-hdr-btn" id="ide-upload-btn" title="Upload File">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </button>
+                <button class="ide-hdr-btn" id="ide-zip-btn" title="Download All as ZIP">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="ide-project-row">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              <span class="ide-proj-name" id="ide-project-name" contenteditable="true" spellcheck="false" title="Click to rename">my-project</span>
+            </div>
+            <div class="ide-file-list" id="ide-file-list">
+              <div class="ide-empty-tree" id="ide-empty-tree">
+                <p>No files yet</p>
+                <button class="ide-empty-btn" id="ide-tree-new-btn">+ New File</button>
+                <button class="ide-empty-btn" id="ide-tree-upload-btn">↑ Upload</button>
+              </div>
+            </div>
+            <div class="ide-explorer-footer">
+              <div class="ide-tpl-label">Templates</div>
+              <div class="ide-tpl-grid">
+                <button class="ide-tpl-chip" data-tpl="html">🌐 Web</button>
+                <button class="ide-tpl-chip" data-tpl="react">⚛ React</button>
+                <button class="ide-tpl-chip" data-tpl="node">🟩 Node</button>
+                <button class="ide-tpl-chip" data-tpl="python">🐍 Python</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="input-area">
-          <div class="input-row">
-            <textarea id="codeInput" rows="1" placeholder="Ask anything about code…"></textarea>
-            <button class="send-btn" id="codeSendBtn">➤</button>
-            <button class="stop-btn" id="codeStopBtn" title="Stop generation">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-            </button>
+
+          <!-- CENTER: Editor -->
+          <div class="ide-editor-col">
+            <div class="ide-topbar">
+              <div class="ide-tabs-list" id="ide-tabs-list"></div>
+              <div class="ide-toolbar">
+                <button class="ide-tool-btn" id="ide-save-btn" title="Save (Ctrl+S)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  Save
+                </button>
+                <button class="ide-tool-btn" id="ide-dl-btn" title="Download current file">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Download
+                </button>
+                <button class="ide-tool-btn" id="ide-run-btn" title="Run code">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Run
+                </button>
+                <button class="ide-tool-btn ide-ai-toggle" id="ide-ai-toggle">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  AI Help
+                </button>
+              </div>
+            </div>
+            <div class="ide-editor-body" id="ide-editor-body">
+              <div class="ide-welcome" id="ide-welcome">
+                <div class="ide-welcome-icon">⌘</div>
+                <h3>Project IDE</h3>
+                <p>Build full projects, get AI assistance, and deploy your code.</p>
+                <div class="ide-welcome-cards">
+                  <button class="ide-wlc-card" data-tpl="html"><span>🌐</span><strong>Web App</strong><small>HTML + CSS + JS</small></button>
+                  <button class="ide-wlc-card" data-tpl="react"><span>⚛</span><strong>React App</strong><small>JSX + CSS</small></button>
+                  <button class="ide-wlc-card" data-tpl="node"><span>🟩</span><strong>Node.js</strong><small>Express server</small></button>
+                  <button class="ide-wlc-card" data-tpl="python"><span>🐍</span><strong>Python</strong><small>Script + utils</small></button>
+                </div>
+                <div class="ide-welcome-or">— or —</div>
+                <div class="ide-welcome-row">
+                  <button class="ide-welcome-btn" id="ide-wlc-new">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    New File
+                  </button>
+                  <button class="ide-welcome-btn" id="ide-wlc-upload">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload Files
+                  </button>
+                </div>
+              </div>
+              <div id="ide-monaco" style="display:none;height:100%;width:100%;"></div>
+            </div>
+            <div class="ide-output" id="ide-output" style="display:none">
+              <div class="ide-output-hdr">
+                <div class="ide-out-tabs">
+                  <button class="ide-out-tab active" data-out="preview">Preview</button>
+                  <button class="ide-out-tab" data-out="console">Console</button>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <button class="ide-hdr-btn" id="ide-output-rerun">▶ Rerun</button>
+                  <button class="ide-hdr-btn" id="ide-output-clear">Clear</button>
+                  <button class="ide-hdr-btn" id="ide-output-close">✕</button>
+                </div>
+              </div>
+              <div class="ide-output-body">
+                <iframe id="ide-html-frame" style="display:none;width:100%;height:100%;border:none;background:#fff;"></iframe>
+                <pre id="ide-output-pre" style="display:none;"></pre>
+              </div>
+            </div>
           </div>
-          <p class="hint">Ctrl+Enter to send · Shift+Enter for new line</p>
-        </div>
+
+          <!-- RIGHT: AI Panel -->
+          <div class="ide-ai-panel" id="ide-ai-panel">
+            <div class="ide-ai-hdr">
+              <span class="ide-ai-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                AI Assistant
+              </span>
+              <button class="ide-hdr-btn" id="ide-ai-clear" title="Clear chat">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>
+              </button>
+              <button class="ide-hdr-btn" id="ide-ai-close">✕</button>
+            </div>
+            <div class="ide-ai-msgs" id="ide-ai-msgs">
+              <div class="ide-ai-welcome-msg">
+                <div class="ide-ai-welcome-icon">🤖</div>
+                <strong>AI Code Assistant</strong>
+                <p>Write, debug, refactor, explain, or deploy. I can read your current file and make changes directly.</p>
+              </div>
+              <div class="ide-ai-chips">
+                <button class="ide-ai-chip" data-p="Explain this code step by step">Explain code</button>
+                <button class="ide-ai-chip" data-p="Find and fix all bugs in this code. Show me the corrected version.">Fix bugs</button>
+                <button class="ide-ai-chip" data-p="Refactor and optimize this code for performance and readability. Return the improved version.">Optimize</button>
+                <button class="ide-ai-chip" data-p="Add detailed JSDoc/docstring comments to all functions and classes">Add comments</button>
+                <button class="ide-ai-chip" data-p="Write comprehensive unit tests for this code">Write tests</button>
+                <button class="ide-ai-chip" data-p="Convert this to TypeScript with proper types and interfaces">→ TypeScript</button>
+                <button class="ide-ai-chip" data-p="How do I push this project to GitHub? Give me exact step-by-step git terminal commands including git init, add remote, push.">Push to GitHub</button>
+                <button class="ide-ai-chip" data-p="How do I deploy this project? Cover Vercel, Netlify, GitHub Pages, and Railway with step-by-step instructions for each.">Deploy options</button>
+                <button class="ide-ai-chip" data-p="Write a detailed README.md for this project with setup, usage, features, and contributing sections">Write README</button>
+                <button class="ide-ai-chip" data-p="Create a .gitignore file appropriate for this project">.gitignore</button>
+              </div>
+            </div>
+            <div class="ide-ai-input-row">
+              <div class="ide-ai-ctx-row">
+                <label class="ide-ctx-label">
+                  <input type="checkbox" id="ide-include-code" checked>
+                  <span>Send current file as context</span>
+                </label>
+              </div>
+              <div class="ide-ai-bottom-row">
+                <textarea id="ide-ai-input" rows="2" placeholder="Ask about code, deployment, tools…"></textarea>
+                <div class="ide-ai-btns">
+                  <button class="ide-ai-send-btn" id="ide-ai-send">➤</button>
+                  <button class="ide-ai-stop-btn" id="ide-ai-stop" style="display:none">■</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- .ide-layout -->
+        <input type="file" id="ide-file-input" multiple style="display:none">
       </div>
 
       <!-- IMAGE TAB -->
       <div class="tab-panel" id="panel-image">
-        <div class="img-controls">
-          <div class="controls-row">
-            <div class="field" style="flex:3"><label>prompt</label><input type="text" id="imagePrompt" placeholder="A futuristic city at sunset…"/></div>
-            <div class="field" style="flex:1"><label>provider</label><select id="imageProvider"><option value="openai-image-generation">OpenAI</option><option value="together">Together AI</option><option value="xai">xAI (Grok)</option></select></div>
-            <div class="field" style="flex:1"><label>model</label><select id="imageModel"></select></div>
-            <div class="field" id="imageSizeField" style="flex:1"><label>size</label><select id="imageSize"></select></div>
-            <div class="field" id="imageQualityField" style="flex:1;display:none"><label>quality</label><select id="imageQuality"></select></div>
-            <button class="gen-btn" id="genImgBtn">✦ Generate</button>
+        <div class="img-layout">
+
+          <!-- LEFT: Controls Sidebar -->
+          <div class="img-ctrl-sidebar">
+            <div class="img-ctrl-scroll">
+
+              <!-- Provider selection -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Provider</div>
+                <div class="img-provider-tabs" id="img-provider-tabs">
+                  <button class="img-prov-btn active" data-provider="openai-image-generation">
+                    <span class="img-prov-dot" style="background:#10a37f"></span>OpenAI
+                  </button>
+                  <button class="img-prov-btn" data-provider="together">
+                    <span class="img-prov-dot" style="background:#ff6b35"></span>Together AI
+                  </button>
+                  <button class="img-prov-btn" data-provider="xai">
+                    <span class="img-prov-dot" style="background:#d4d4d4"></span>xAI / Grok
+                  </button>
+                </div>
+              </div>
+
+              <!-- Model -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Model</div>
+                <select id="imageModel" class="img-select"></select>
+                <div class="img-model-info" id="img-model-info"></div>
+              </div>
+
+              <!-- Prompt -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label-row">
+                  <span class="img-ctrl-label">Prompt</span>
+                  <button class="img-enhance-btn" id="img-enhance-btn" title="Enhance prompt with AI">✨ Enhance</button>
+                </div>
+                <textarea id="imagePrompt" class="img-prompt-ta" placeholder="Describe the image you want to generate…" rows="4" maxlength="2000"></textarea>
+              </div>
+
+              <!-- Negative Prompt (SD models) -->
+              <div class="img-ctrl-section" id="negPromptWrap" style="display:none">
+                <div class="img-ctrl-label">Negative Prompt</div>
+                <textarea id="imageNegPrompt" class="img-prompt-ta img-neg-ta" placeholder="What to avoid — blurry, watermark, low quality…" rows="2"></textarea>
+              </div>
+
+              <!-- Style Presets -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Style Preset</div>
+                <div class="style-presets" id="style-presets">
+                  <button class="style-preset active" data-style="">None</button>
+                  <button class="style-preset" data-style="photorealistic, 8k ultra detailed, hyperrealistic">Photorealistic</button>
+                  <button class="style-preset" data-style="anime style, vibrant colors, detailed line art">Anime</button>
+                  <button class="style-preset" data-style="oil painting on canvas, textured brushstrokes, masterpiece">Oil Painting</button>
+                  <button class="style-preset" data-style="pixel art, 16-bit retro style, sharp pixels">Pixel Art</button>
+                  <button class="style-preset" data-style="pencil sketch, hand-drawn, black and white, detailed">Sketch</button>
+                  <button class="style-preset" data-style="cinematic lighting, dramatic atmosphere, film grain, movie still">Cinematic</button>
+                  <button class="style-preset" data-style="watercolor painting, soft edges, pastel colors, artistic">Watercolor</button>
+                  <button class="style-preset" data-style="3D render, octane render, highly detailed, volumetric lighting">3D Render</button>
+                  <button class="style-preset" data-style="fantasy art, ethereal, magical glowing particles, epic scene">Fantasy</button>
+                  <button class="style-preset" data-style="minimalist, clean lines, flat design, simple geometric">Minimalist</button>
+                  <button class="style-preset" data-style="cyberpunk, neon lights, futuristic city, rain-soaked streets">Cyberpunk</button>
+                </div>
+              </div>
+
+              <!-- Aspect Ratio -->
+              <div class="img-ctrl-section" id="cap-aspectRatio">
+                <div class="img-ctrl-label">Aspect Ratio</div>
+                <div class="img-ar-grid" id="img-ar-grid">
+                  <button class="img-ar-btn active" data-ar="1:1" title="Square (1:1)">
+                    <div class="ar-preview ar-1-1"></div><span>1:1</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="16:9" title="Landscape (16:9)">
+                    <div class="ar-preview ar-16-9"></div><span>16:9</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="9:16" title="Portrait (9:16)">
+                    <div class="ar-preview ar-9-16"></div><span>9:16</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="4:3" title="Standard (4:3)">
+                    <div class="ar-preview ar-4-3"></div><span>4:3</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="3:4" title="Portrait (3:4)">
+                    <div class="ar-preview ar-3-4"></div><span>3:4</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="3:2" title="Photo (3:2)">
+                    <div class="ar-preview ar-3-2"></div><span>3:2</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Resolution -->
+              <div class="img-ctrl-section" id="imageSizeField">
+                <div class="img-ctrl-label">Resolution</div>
+                <select id="imageSize" class="img-select"></select>
+              </div>
+
+              <!-- Quality -->
+              <div class="img-ctrl-section" id="imageQualityField" style="display:none">
+                <div class="img-ctrl-label">Quality</div>
+                <select id="imageQuality" class="img-select"></select>
+              </div>
+
+              <!-- DALL-E 3 Style Mode -->
+              <div class="img-ctrl-section" id="imgStyleModeField" style="display:none">
+                <div class="img-ctrl-label">Image Style</div>
+                <select id="imageStyleMode" class="img-select">
+                  <option value="vivid">Vivid (hyper-real)</option>
+                  <option value="natural">Natural (subtle)</option>
+                </select>
+              </div>
+
+              <!-- Output Format -->
+              <div class="img-ctrl-section" id="imgFormatField" style="display:none">
+                <div class="img-ctrl-label">Format</div>
+                <select id="imageFormat" class="img-select">
+                  <option value="png">PNG</option>
+                  <option value="jpeg">JPEG</option>
+                  <option value="webp">WebP</option>
+                </select>
+              </div>
+
+              <!-- Steps (diffusion models) -->
+              <div class="img-ctrl-section" id="cap-steps" style="display:none">
+                <div class="img-ctrl-label">Steps <span class="img-slider-val" id="stepsVal">28</span></div>
+                <input type="range" id="imageSteps" class="img-range" min="10" max="50" value="28">
+              </div>
+
+              <!-- Guidance Scale -->
+              <div class="img-ctrl-section" id="cap-guidance" style="display:none">
+                <div class="img-ctrl-label">Guidance Scale <span class="img-slider-val" id="guidanceVal">7.5</span></div>
+                <input type="range" id="imageGuidance" class="img-range" min="10" max="200" value="75">
+              </div>
+
+              <!-- Image Count -->
+              <div class="img-ctrl-section" id="imageCountField">
+                <div class="img-ctrl-label">Count</div>
+                <div class="img-count-row">
+                  <button class="img-count-btn active" data-count="1">1</button>
+                  <button class="img-count-btn" data-count="2">2</button>
+                  <button class="img-count-btn" data-count="4">4</button>
+                </div>
+              </div>
+
+              <!-- Seed -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Seed <span class="img-optional">(optional)</span></div>
+                <input type="number" id="imageSeed" class="img-input-sm" placeholder="Random" min="0" max="999999999">
+              </div>
+
+              <button class="gen-btn" id="genImgBtn" style="width:100%;margin-top:6px">✦ Generate Image</button>
+            </div>
           </div>
-          <div class="style-presets" id="style-presets">
-            <button class="style-preset active" data-style="">None</button>
-            <button class="style-preset" data-style="photorealistic, 8k, detailed">Photorealistic</button>
-            <button class="style-preset" data-style="anime style, vibrant colors">Anime</button>
-            <button class="style-preset" data-style="oil painting, textured canvas">Oil Painting</button>
-            <button class="style-preset" data-style="pixel art, 16-bit style">Pixel Art</button>
-            <button class="style-preset" data-style="pencil sketch, hand-drawn">Sketch</button>
-            <button class="style-preset" data-style="cinematic lighting, film grain">Cinematic</button>
+
+          <!-- RIGHT: Gallery -->
+          <div class="img-gallery-area">
+            <div class="img-gallery" id="imageGallery">
+              <div class="empty-state" id="imageEmpty">
+                <div class="icon">✦</div>
+                <h3>Generate Images</h3>
+                <p>Choose a model, describe your image, and let AI create it.</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="img-gallery" id="imageGallery">
-          <div class="empty-state" id="imageEmpty"><div class="icon">✦</div><h3>Generate Images</h3><p>Describe what you want to see and let AI create it.</p></div>
+
         </div>
       </div>
 
@@ -342,6 +632,8 @@
   </div>
 
   <div class="toast-container" id="toast-container"></div>
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
