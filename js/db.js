@@ -61,6 +61,7 @@ async function dbLoadSettings(userId) {
       'current_model', 'temperature', 'response_length', 'memory_enabled',
       'speak_responses', 'speak_speed', 'font_size', 'system_prompt',
       'custom_instructions',
+      'theme', 'font_ui', 'font_head', 'density', 'radius', 'bg_texture', 'bubble_style',
     ];
     for (const k of KEYS) {
       if (data[k] !== undefined) {
@@ -91,6 +92,13 @@ function dbSaveSettings() {
         font_size:           S.fontSize,
         system_prompt:       S.systemPrompt,
         custom_instructions: S.customInstructions,
+        theme:               S.theme,
+        font_ui:             S.fontUi,
+        font_head:           S.fontHead,
+        density:             S.density,
+        radius:              S.radius,
+        bg_texture:          S.bgTexture,
+        bubble_style:        S.bubbleStyle,
         updated_at:          new Date().toISOString(),
       }, { onConflict: 'user_id' });
     } catch (e) {

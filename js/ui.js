@@ -316,6 +316,7 @@ function openSettings(sectionId) {
   document.getElementById('settings-drawer').classList.add('open');
   refreshSettingsStats();
   refreshAccountPanel();
+  if (typeof buildAppearanceUI === 'function') buildAppearanceUI();
   if (sectionId) switchSettingsSection(sectionId);
 }
 function closeSettings() {
@@ -605,6 +606,9 @@ function refreshAccountPanel() {
 
 // ── applySettingsUI — syncs all controls to S state on open ──────────────
 function applySettingsUI() {
+  // NEW: apply theme settings
+  if (typeof applyAllThemeSettings === 'function') applyAllThemeSettings();
+
   // Temperature
   const tempEl = document.getElementById('settings-temperature');
   if (tempEl) tempEl.value = S.temperature * 100;

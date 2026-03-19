@@ -259,6 +259,10 @@ function showPuterBanner() {
 function onFullyAuthed(user) {
   if (authPollInterval) clearInterval(authPollInterval);
 
+  // Apply all saved theme/font/density settings
+  if (typeof applyAllThemeSettings === 'function') applyAllThemeSettings();
+  if (typeof buildAppearanceUI     === 'function') buildAppearanceUI();
+
   document.getElementById('login-screen').style.display = 'none';
 
   // Update sidebar user display
