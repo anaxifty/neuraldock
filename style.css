@@ -3441,55 +3441,21 @@ header {
 }
 .img-card-btn:hover { background: rgba(212,168,83,.8); color: #0c0e0f; }
 
+
 /* ══════════════════════════════════════════════
-   SUPABASE AUTH — LOGIN SCREEN ADDITIONS
+   AUTH ADDITIONS — social row, email form, banner
 ══════════════════════════════════════════════ */
 
-/* Social login buttons */
-.login-social-btns {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.login-social-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-family: 'DM Mono', monospace;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all .2s;
-  border: 1px solid var(--border);
-  letter-spacing: .02em;
-}
-.login-github-btn {
-  background: #24292e;
-  color: #fff;
-  border-color: #444;
-}
-.login-github-btn:hover { background: #2f363d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.4); }
-
-.login-google-btn {
-  background: var(--surface2);
-  color: var(--text);
-  border-color: var(--border);
-}
-.login-google-btn:hover { background: var(--surface); border-color: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.3); }
-
-/* Divider */
+/* Divider between Puter btn and social options */
 .login-divider-line {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 6px 0;
+  margin: 18px 0 14px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
 }
 .login-divider-line::before,
 .login-divider-line::after {
@@ -3499,32 +3465,47 @@ header {
   background: var(--border);
 }
 
-/* Email toggle button */
-.login-email-toggle-btn {
-  width: 100%;
-  padding: 8px;
-  background: none;
-  border: 1px dashed var(--border);
-  border-radius: 7px;
-  color: var(--muted);
+/* Three compact social buttons in a row */
+.login-social-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.login-social-sm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
   font-family: 'DM Mono', monospace;
   font-size: 11px;
   cursor: pointer;
   transition: all .2s;
-  margin-bottom: 10px;
+  white-space: nowrap;
 }
-.login-email-toggle-btn:hover { color: var(--text); border-color: var(--accent2); background: var(--accent-dim); }
+.login-social-sm:hover {
+  border-color: var(--accent2);
+  background: var(--surface);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
 
-/* Email form */
+/* Email form (revealed on click) */
 .login-email-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 4px;
+  animation: fadeUp .2s ease both;
 }
 .login-input {
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px 14px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -3536,12 +3517,10 @@ header {
 }
 .login-input:focus { border-color: var(--accent2); }
 .login-input::placeholder { color: var(--muted); }
-
 .login-form-footer {
   display: flex;
   justify-content: space-between;
   gap: 8px;
-  margin-top: -2px;
 }
 .login-text-btn {
   background: none;
@@ -3551,20 +3530,9 @@ header {
   font-size: 10px;
   cursor: pointer;
   padding: 0;
-  text-align: left;
   transition: color .15s;
 }
 .login-text-btn:hover { color: var(--accent); }
-
-/* Login status message */
-.login-status {
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--muted);
-  min-height: 18px;
-  text-align: center;
-  line-height: 1.5;
-}
 
 /* Shake animation for wrong password */
 @keyframes shake {
@@ -3591,11 +3559,7 @@ header {
   margin: 0 auto;
 }
 .puter-banner-icon { font-size: 16px; flex-shrink: 0; }
-.puter-banner-text {
-  flex: 1;
-  font-size: 12px;
-  color: var(--text);
-}
+.puter-banner-text { flex: 1; font-size: 12px; color: var(--text); }
 .puter-banner-text strong { color: var(--accent); }
 .puter-banner-btn {
   padding: 6px 14px;
@@ -3625,19 +3589,15 @@ header {
 }
 .puter-banner-dismiss:hover { color: var(--text); }
 
-/* ── Sign-out button in sidebar ─────────────────────────────────────────── */
-#sign-out-btn {
-  color: var(--err) !important;
-}
-#sign-out-btn:hover {
-  background: rgba(224,112,112,.1) !important;
-  color: var(--err) !important;
-}
+/* ── Sign-out button ─────────────────────────────────────────────────────── */
+#sign-out-btn { color: var(--err) !important; }
+#sign-out-btn:hover { background: rgba(224,112,112,.1) !important; }
 
-/* ── Sidebar user avatar (supports background-image for OAuth avatars) ── */
+/* ── Sidebar user avatar (supports OAuth profile pictures) ───────────────── */
 #user-avatar {
   background-color: var(--accent2);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
+

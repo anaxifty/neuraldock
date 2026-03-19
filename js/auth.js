@@ -152,22 +152,17 @@ function triggerPuterAuth(supabaseUser) {
 }
 
 function setupPuterOnlyUI() {
-  // Show original Puter-only login button
-  const card = document.querySelector('.login-card');
-  if (!card) return;
-  const puterBtn = document.getElementById('login-btn');
-  if (puterBtn) {
-    puterBtn.addEventListener('click', startPuterLogin);
-    puterBtn.style.display = '';
-  }
-  const fallbackBtn = document.getElementById('login-fallback');
-  if (fallbackBtn) fallbackBtn.addEventListener('click', manualPuterCheck);
+  // Puter button is always visible - just wire it up
+  document.getElementById('login-btn')?.addEventListener('click', startPuterLogin);
+  document.getElementById('login-fallback')?.addEventListener('click', manualPuterCheck);
+  document.getElementById('login-fallback').style.display = '';
 
-  // Hide Supabase auth buttons if they exist
-  ['login-github-btn','login-google-btn','login-email-form'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  // Hide social/email section since Supabase not configured
+  document.getElementById('login-github-btn')?.closest('.login-social-row')?.style.setProperty('display','none');
+  const divider = document.querySelector('.login-divider-line');
+  if (divider) divider.style.display = 'none';
+  const emailToggle = document.getElementById('login-email-toggle');
+  if (emailToggle) emailToggle.style.display = 'none';
 }
 
 function startPuterLogin() {
@@ -306,6 +301,11 @@ function onFullyAuthed(user) {
 // ══════════════════════════════════════════════════════════════════════════
 
 function setupSupabaseUI() {
+  // Puter button — also show as primary login when Supabase configured
+  // (user can sign in with Puter first, then optionally link social account)
+  document.getElementById('login-btn')?.addEventListener('click', startPuterLogin);
+  document.getElementById('login-fallback')?.addEventListener('click', manualPuterCheck);
+
   // GitHub button
   document.getElementById('login-github-btn')?.addEventListener('click', signInWithGitHub);
   // Google button
@@ -317,7 +317,6 @@ function setupSupabaseUI() {
   emailToggle?.addEventListener('click', () => {
     const open = emailForm.style.display !== 'none';
     emailForm.style.display = open ? 'none' : '';
-    emailToggle.textContent = open ? 'Sign in with Email ↓' : 'Hide email form ↑';
   });
 
   // Email form submit
@@ -340,7 +339,7 @@ function setupSupabaseUI() {
   modeToggle?.addEventListener('click', () => {
     const isSignUp = modeToggle.dataset.mode !== 'signup';
     modeToggle.dataset.mode    = isSignUp ? 'signup' : 'signin';
-    modeToggle.textContent     = isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up";
+    modeToggle.textContent     = isSignUp ? 'Already have an account? Sign in' : 'No account? Sign up';
     const submitBtn = document.getElementById('login-email-submit');
     if (submitBtn) submitBtn.textContent = isSignUp ? 'Create Account' : 'Sign In';
   });
