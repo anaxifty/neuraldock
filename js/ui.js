@@ -5,12 +5,27 @@
 
 'use strict';
 
-// ── Tab switching ──────────────────────────────────────────────────────────
-document.querySelectorAll('.tab-btn').forEach(btn =>
-  btn.addEventListener('click', () => activateTab(btn.dataset.tab))
-);
+// ── Client-side router ────────────────────────────────────────────────────
+/**
+ * Valid tab names and their URL paths.
+ * / and /chat both map to the chat tab.
+ */
+const VALID_TABS = ['chat', 'code', 'image', 'voice'];
 
-function activateTab(tab) {
+/**
+ * Map a URL pathname to a tab name.
+ * e.g. "/code" → "code", "/" → "chat", "/unknown" → "chat"
+ */
+function pathToTab(pathname) {
+  const seg = pathname.replace(/^\//, '').toLowerCase().split('/')[0];
+  return VALID_TABS.includes(seg) ? seg : 'chat';
+}
+
+/**
+ * Activate a tab without pushing to history.
+ * Used internally by the router.
+ */
+function _switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tab)
   );
@@ -18,21 +33,55 @@ function activateTab(tab) {
     p.classList.toggle('active', p.id === `panel-${tab}`)
   );
 
-  // CodeMirror must refresh AFTER its panel is visible (display:flex)
+  // Update page title
+  const titles = { chat: 'Chat', code: 'Code IDE', image: 'Image', voice: 'Voice' };
+  document.title = `${titles[tab] || 'Chat'} — AI Studio | NeuralDock`;
+
+  // CodeMirror needs a repaint after its panel becomes visible
   if (tab === 'code' && typeof IDE !== 'undefined' && IDE.cm) {
-    // rAF ensures the browser has painted the tab as visible
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        IDE.cm.refresh();
-      });
-    });
+    requestAnimationFrame(() => requestAnimationFrame(() => IDE.cm.refresh()));
   }
 
-  // Refresh image models when switching to image tab
+  // Refresh image model caps when entering the image tab
   if (tab === 'image' && typeof updateImageModels === 'function') {
     updateImageModels();
   }
 }
+
+/**
+ * Navigate to a tab — updates the URL and activates the panel.
+ * Call this everywhere you want to switch tabs programmatically.
+ */
+function activateTab(tab) {
+  if (!VALID_TABS.includes(tab)) tab = 'chat';
+  const newPath = `/${tab}`;
+  if (window.location.pathname !== newPath) {
+    history.pushState({ tab }, '', newPath);
+  }
+  _switchTab(tab);
+}
+
+/**
+ * Read the current URL and activate the matching tab.
+ * Called on page load and after successful auth.
+ */
+function initRouter() {
+  const tab = pathToTab(window.location.pathname);
+  // Replace current history entry so back-button works correctly
+  history.replaceState({ tab }, '', `/${tab}`);
+  _switchTab(tab);
+}
+
+// Handle browser back / forward buttons
+window.addEventListener('popstate', e => {
+  const tab = (e.state && e.state.tab) ? e.state.tab : pathToTab(window.location.pathname);
+  _switchTab(tab);
+});
+
+// Tab button clicks push to history
+document.querySelectorAll('.tab-btn').forEach(btn =>
+  btn.addEventListener('click', () => activateTab(btn.dataset.tab))
+);
 
 // ── Sidebar toggle ─────────────────────────────────────────────────────────
 document.getElementById('hamburger-btn').addEventListener('click', toggleSidebar);
@@ -379,8 +428,8 @@ document.addEventListener('keydown', e => {
   if      (e.key === 'k') { e.preventDefault(); if (typeof newChat === 'function') newChat(); }
   else if (e.key === '/') { e.preventDefault(); toggleSidebar(); }
   else if (e.key === '.') { e.preventDefault(); openSettings(); }
-  else if (e.key === '1') { e.preventDefault(); activateTab('chat'); }
-  else if (e.key === '2') { e.preventDefault(); activateTab('code'); }
+  else if (e.key === '1') { e.preventDefault(); activateTab('chat');  }
+  else if (e.key === '2') { e.preventDefault(); activateTab('code');  }
   else if (e.key === '3') { e.preventDefault(); activateTab('image'); }
   else if (e.key === '4') { e.preventDefault(); activateTab('voice'); }
 });

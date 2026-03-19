@@ -1,63 +1,68 @@
 /**
- * state.js — Application state (S) and localStorage persistence
- * Depends on: nothing
+ * state.js — Application state (S) and persistence
+ * Hybrid: localStorage (instant) + Supabase (cloud sync, debounced)
+ * Depends on: nothing (db.js functions called conditionally after load)
  */
 
 'use strict';
 
-/** Global application state */
 const S = {
+  // Auth
+  currentUser: null,   // Supabase user object once authed
+
   // Conversations
   conversations: JSON.parse(localStorage.getItem('aistudio_convs') || '{}'),
-  activeConvId: null,
-  chatMessages: [],
+  activeConvId:  null,
+  chatMessages:  [],
 
   // Model + generation
-  currentModel: 'gpt-4o',
-  deepThink: false,
-  webSearch: false,
-  temperature: 0.7,
+  currentModel:   'gpt-4o',
+  deepThink:      false,
+  webSearch:      false,
+  temperature:    0.7,
   responseLength: 'balanced',
 
   // Memory / system
-  memoryEnabled: true,
-  systemPrompt: '',
+  memoryEnabled:      true,
+  systemPrompt:       '',
   customInstructions: '',
 
   // Voice
   speakResponses: false,
-  speakSpeed: 1.0,
+  speakSpeed:     1.0,
 
   // UI
-  fontSize: 'medium',
+  fontSize:    'medium',
   pinnedConvs: [],
 
   // Runtime (never persisted)
-  busy: false,
+  busy:        false,
   abortStream: false,
   activeStyle: '',
-  attachments: [],  // pending file attachments: [{name, type, dataUrl?, content?}]
+  attachments: [],
 };
 
-// Restore persisted settings (runtime-only fields stay at defaults above)
+// Restore persisted settings from localStorage on startup
 try {
   const saved = localStorage.getItem('aistudio_settings');
   if (saved) {
     const cfg = JSON.parse(saved);
-    const PERSIST_KEYS = [
+    const KEYS = [
       'currentModel', 'memoryEnabled', 'speakResponses', 'speakSpeed',
       'systemPrompt', 'customInstructions', 'temperature', 'fontSize',
       'responseLength', 'pinnedConvs',
     ];
-    for (const key of PERSIST_KEYS) {
-      if (key in cfg) S[key] = cfg[key];
+    for (const k of KEYS) {
+      if (k in cfg) S[k] = cfg[k];
     }
   }
 } catch (e) {
   console.warn('[state] Failed to restore settings:', e);
 }
 
-/** Persist user preferences to localStorage (non-sensitive keys only) */
+/**
+ * Save settings to localStorage immediately, then sync to Supabase (debounced).
+ */
 function saveSettings() {
   const cfg = {
     currentModel:       S.currentModel,
@@ -71,19 +76,23 @@ function saveSettings() {
     responseLength:     S.responseLength,
     pinnedConvs:        S.pinnedConvs,
   };
-  try {
-    localStorage.setItem('aistudio_settings', JSON.stringify(cfg));
-  } catch (e) {
-    console.warn('[state] saveSettings failed:', e);
-  }
+  try { localStorage.setItem('aistudio_settings', JSON.stringify(cfg)); } catch (e) {}
+  // Sync to Supabase if available
+  if (typeof dbSaveSettings === 'function') dbSaveSettings();
 }
 
-/** Persist all conversations to localStorage */
-function saveConvs() {
-  try {
-    localStorage.setItem('aistudio_convs', JSON.stringify(S.conversations));
-  } catch (e) {
-    console.warn('[state] saveConvs failed:', e);
+/**
+ * Save all conversations to localStorage immediately, then sync active conv to Supabase.
+ * @param {string} [convId]  If provided, only syncs that conversation to Supabase.
+ */
+function saveConvs(convId) {
+  try { localStorage.setItem('aistudio_convs', JSON.stringify(S.conversations)); } catch (e) {}
+  // Sync to Supabase
+  if (typeof dbSaveConversation === 'function') {
+    const target = convId
+      ? S.conversations[convId]
+      : S.activeConvId ? S.conversations[S.activeConvId] : null;
+    if (target) dbSaveConversation(target);
   }
 }
 

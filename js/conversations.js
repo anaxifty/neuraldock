@@ -1,6 +1,8 @@
 /**
- * conversations.js — Conversation creation, loading, deletion, sidebar rendering
- * Depends on: utils.js, state.js, ui.js (getModelInfo, activateTab, toggleSidebar)
+ * conversations.js — CRUD + sidebar rendering
+ * Writes to localStorage (instant) and Supabase (debounced via db.js).
+ *
+ * Depends on: utils.js, state.js, ui.js, db.js
  */
 
 'use strict';
@@ -28,7 +30,6 @@ function newChat() {
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
   activateTab('chat');
-  // Close sidebar on mobile after creating chat
   if (window.innerWidth <= 768) {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-overlay').classList.remove('active');
@@ -63,6 +64,8 @@ function deleteConv(id) {
     if (typeof renderChatMessages === 'function') renderChatMessages();
   }
   saveConvs();
+  // Sync deletion to Supabase
+  if (typeof dbDeleteConversation === 'function') dbDeleteConversation(id);
   renderSidebar();
   toast('Conversation deleted');
 }
@@ -71,14 +74,12 @@ function togglePinConv(id) {
   const conv = S.conversations[id];
   if (!conv) return;
   conv.pinned = !conv.pinned;
+  conv.updatedAt = Date.now();
   saveConvs();
+  if (typeof dbSaveConversation === 'function') dbSaveConversation(conv);
   renderSidebar();
 }
 
-/**
- * Persist the latest exchange to the active conversation.
- * Auto-generates a better title after the first exchange.
- */
 function persistConversation(userText, assistantText) {
   if (!S.activeConvId) newChat();
   const conv = S.conversations[S.activeConvId];
@@ -87,35 +88,36 @@ function persistConversation(userText, assistantText) {
   if (!conv.title && userText) {
     conv.title = userText.length > 42 ? userText.substring(0, 42) + '…' : userText;
   }
-  conv.messages  = S.chatMessages.map(m => ({ ...m, timestamp: Date.now() }));
+  conv.messages  = S.chatMessages.map(m => ({ ...m }));
   conv.model     = S.currentModel;
   conv.updatedAt = Date.now();
+
   saveConvs();
+  // Save to Supabase (debounced)
+  if (typeof dbSaveConversation === 'function') dbSaveConversation(conv);
   renderSidebar();
 
-  // Generate a smarter AI title after the first user message
   const userMsgCount = conv.messages.filter(m => m.role === 'user').length;
   if (userMsgCount === 1 && userText) {
-    autoTitleConv(S.activeConvId, userText, assistantText);
+    autoTitleConv(S.activeConvId, userText);
   }
 }
 
-async function autoTitleConv(convId, userText, assistantText) {
+async function autoTitleConv(convId, userText) {
   try {
-    const prompt =
-      `Generate a very short (3–6 words) title for a conversation that started with: ` +
-      `"${userText.slice(0, 300)}". Reply with ONLY the title, no quotes or punctuation.`;
-    const resp  = await puter.ai.chat([{ role: 'user', content: prompt }], { model: 'gpt-4o-mini', stream: false });
-    const title = (typeof resp === 'string' ? resp : resp?.message?.content || '').trim().slice(0, 60);
+    const prompt = `Generate a very short (3-6 words) title for a conversation that started with: "${userText.slice(0, 300)}". Reply with ONLY the title, no quotes or punctuation.`;
+    const resp   = await puter.ai.chat([{ role: 'user', content: prompt }], { model: 'gpt-4o-mini', stream: false });
+    const title  = (typeof resp === 'string' ? resp : resp?.message?.content || '').trim().slice(0, 60);
     if (title && S.conversations[convId]) {
       S.conversations[convId].title = title;
       saveConvs();
+      if (typeof dbSaveConversation === 'function') dbSaveConversation(S.conversations[convId]);
       renderSidebar();
     }
-  } catch (e) { /* silent fail — title stays as first words */ }
+  } catch (e) {}
 }
 
-/** Render the conversation sidebar with search, pins, and time-grouped sections */
+// ── Sidebar rendering ──────────────────────────────────────────────────────
 function renderSidebar(searchQuery = '') {
   const container = document.getElementById('sidebar-conversations');
   container.innerHTML = '';
@@ -138,12 +140,11 @@ function renderSidebar(searchQuery = '') {
     pinned.forEach(c => container.appendChild(makeConvEl(c)));
   }
 
-  const now       = Date.now();
-  const todayMs   = new Date().setHours(0, 0, 0, 0);
-  const yestMs    = todayMs - 86_400_000;
-  const weekMs    = todayMs - 7 * 86_400_000;
+  const todayMs = new Date().setHours(0, 0, 0, 0);
+  const yestMs  = todayMs - 86_400_000;
+  const weekMs  = todayMs - 7 * 86_400_000;
+  const groups  = { 'Today': [], 'Yesterday': [], 'Last 7 Days': [], 'Older': [] };
 
-  const groups = { 'Today': [], 'Yesterday': [], 'Last 7 Days': [], 'Older': [] };
   for (const c of unpinned) {
     if      (c.updatedAt >= todayMs) groups['Today'].push(c);
     else if (c.updatedAt >= yestMs)  groups['Yesterday'].push(c);
@@ -160,7 +161,7 @@ function renderSidebar(searchQuery = '') {
 
 function appendGroupLabel(container, text) {
   const el = document.createElement('div');
-  el.className = 'conv-group-label';
+  el.className   = 'conv-group-label';
   el.textContent = text;
   container.appendChild(el);
 }
@@ -183,13 +184,7 @@ function makeConvEl(c) {
     `</div>`;
 
   el.addEventListener('click', () => loadConv(c.id));
-  el.querySelector('.conv-item-pin').addEventListener('click', ev => {
-    ev.stopPropagation();
-    togglePinConv(c.id);
-  });
-  el.querySelector('.conv-item-delete').addEventListener('click', ev => {
-    ev.stopPropagation();
-    deleteConv(c.id);
-  });
+  el.querySelector('.conv-item-pin').addEventListener('click', ev => { ev.stopPropagation(); togglePinConv(c.id); });
+  el.querySelector('.conv-item-delete').addEventListener('click', ev => { ev.stopPropagation(); deleteConv(c.id); });
   return el;
 }
