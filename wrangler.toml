@@ -1,0 +1,7 @@
+# NeuralDock — Cloudflare Pages config
+# This file is used when deploying via Cloudflare Pages (not Workers)
+name = "neuraldock"
+compatibility_date = "2025-01-01"
+
+[site]
+bucket = "."
