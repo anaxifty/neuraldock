@@ -15,8 +15,9 @@
 'use strict';
 
 // ── State ──────────────────────────────────────────────────────────────────
-let authPollInterval = null;
-let _puterAuthed     = false;
+let authPollInterval  = null;
+let _puterAuthed      = false;
+let _appBootstrapped  = false;   // guard: prevent onFullyAuthed from running twice
 
 // ══════════════════════════════════════════════════════════════════════════
 //  ENTRY POINT — run on page load
@@ -45,24 +46,20 @@ window.addEventListener('load', async () => {
 
   const sb = await getSupabase();
 
-  // Listen for auth state changes (handles OAuth redirects automatically)
+  // Listen for auth state changes — handles both initial load and OAuth redirects.
+  // INITIAL_SESSION fires once on page load; SIGNED_IN fires on OAuth redirect.
+  // No separate getSession() call needed — that caused double-bootstrapping.
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
+    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
       await handleSupabaseUser(session.user);
-    } else if (event === 'SIGNED_OUT') {
+    } else if (event === 'INITIAL_SESSION' && !session) {
       showLoginScreen();
-    } else if (event === 'TOKEN_REFRESHED') {
-      // Session refreshed silently — nothing to do
+    } else if (event === 'SIGNED_OUT') {
+      _appBootstrapped = false;
+      showLoginScreen();
     }
+    // TOKEN_REFRESHED — nothing to do
   });
-
-  // Check for existing session
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user) {
-    await handleSupabaseUser(session.user);
-  } else {
-    showLoginScreen();
-  }
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -259,9 +256,9 @@ function showPuterBanner() {
 function onFullyAuthed(user) {
   if (authPollInterval) clearInterval(authPollInterval);
 
-  // Apply all saved theme/font/density settings
-  if (typeof applyAllThemeSettings === 'function') applyAllThemeSettings();
-  if (typeof buildAppearanceUI     === 'function') buildAppearanceUI();
+  // Guard: prevent double-bootstrapping when Supabase fires multiple events
+  if (_appBootstrapped) return;
+  _appBootstrapped = true;
 
   document.getElementById('login-screen').style.display = 'none';
 

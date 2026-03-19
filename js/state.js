@@ -1,50 +1,7 @@
 /**
- * STATE.JS PATCH
- * ─────────────────────────────────────────────────────────────────────────
- * In js/state.js, make TWO small edits:
- *
- * EDIT 1 — Add new fields to the S object (around line 30, after fontSize):
- *
- *   // Add these 6 lines alongside the existing S = { ... } block:
- *   theme:        'dark-gold',
- *   fontUi:       'dm-mono',
- *   fontHead:     'fraunces',
- *   density:      'comfortable',
- *   radius:       'default',
- *   bgTexture:    'grid',
- *   bubbleStyle:  'default',
- *
- *
- * EDIT 2 — Add new keys to the KEYS array in the "Restore persisted settings"
- *           block (around line 50):
- *
- *   Replace this line:
- *     'currentModel', 'memoryEnabled', 'speakResponses', 'speakSpeed',
- *     'systemPrompt', 'customInstructions', 'temperature', 'fontSize',
- *     'responseLength', 'pinnedConvs',
- *
- *   With:
- *     'currentModel', 'memoryEnabled', 'speakResponses', 'speakSpeed',
- *     'systemPrompt', 'customInstructions', 'temperature', 'fontSize',
- *     'responseLength', 'pinnedConvs',
- *     'theme', 'fontUi', 'fontHead', 'density', 'radius', 'bgTexture', 'bubbleStyle',
- *
- *
- * EDIT 3 — Add new keys to the cfg object in saveSettings() (around line 70):
- *
- *   Add these lines inside the cfg = { ... } object in saveSettings():
- *   theme:        S.theme,
- *   fontUi:       S.fontUi,
- *   fontHead:     S.fontHead,
- *   density:      S.density,
- *   radius:       S.radius,
- *   bgTexture:    S.bgTexture,
- *   bubbleStyle:  S.bubbleStyle,
- *
- * ─────────────────────────────────────────────────────────────────────────
- * Below is a copy of the COMPLETE updated state.js for reference.
- * You can replace js/state.js entirely with this file.
- * ─────────────────────────────────────────────────────────────────────────
+ * state.js — Application state (S) and persistence
+ * Hybrid: localStorage (instant) + Supabase (cloud sync, debounced)
+ * Depends on: nothing (db.js functions called conditionally after load)
  */
 
 'use strict';

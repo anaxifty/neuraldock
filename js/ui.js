@@ -260,27 +260,7 @@ async function fetchAndMergeModels() {
   }
 }
 
-// ── Feature toggles ────────────────────────────────────────────────────────
-document.getElementById('deepthink-toggle').addEventListener('click', toggleDeepThink);
-document.getElementById('search-toggle').addEventListener('click', toggleWebSearch);
-
-function toggleDeepThink() {
-  S.deepThink = !S.deepThink;
-  document.getElementById('deepthink-toggle').classList.toggle('active', S.deepThink);
-  if (S.deepThink) {
-    S.webSearch = false;
-    document.getElementById('search-toggle').classList.remove('active');
-  }
-}
-
-function toggleWebSearch() {
-  S.webSearch = !S.webSearch;
-  document.getElementById('search-toggle').classList.toggle('active', S.webSearch);
-  if (S.webSearch) {
-    S.deepThink = false;
-    document.getElementById('deepthink-toggle').classList.remove('active');
-  }
-}
+// ── Feature toggles (bound once below, near line ~460) ─────────────────────
 
 // ── Response length ────────────────────────────────────────────────────────
 document.querySelectorAll('.length-btn').forEach(btn => {
