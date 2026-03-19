@@ -306,26 +306,57 @@ function getLengthSysPrompt() {
   return '';
 }
 
-// ── Settings drawer ────────────────────────────────────────────────────────
+// ── Settings page ─────────────────────────────────────────────────────────
 document.getElementById('settings-open-btn').addEventListener('click', openSettings);
 document.getElementById('settings-close-btn').addEventListener('click', closeSettings);
 document.getElementById('settings-overlay').addEventListener('click', closeSettings);
 
-function openSettings() {
+function openSettings(sectionId) {
   document.getElementById('settings-overlay').classList.add('open');
   document.getElementById('settings-drawer').classList.add('open');
+  refreshSettingsStats();
+  refreshAccountPanel();
+  if (sectionId) switchSettingsSection(sectionId);
 }
 function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
   document.getElementById('settings-drawer').classList.remove('open');
 }
 
+// Section navigation
+document.querySelectorAll('.sp-nav-item').forEach(btn => {
+  btn.addEventListener('click', () => switchSettingsSection(btn.dataset.section));
+});
+
+function switchSettingsSection(id) {
+  document.querySelectorAll('.sp-nav-item').forEach(b =>
+    b.classList.toggle('active', b.dataset.section === id)
+  );
+  document.querySelectorAll('.sp-section').forEach(s =>
+    s.classList.toggle('active', s.id === `sp-${id}`)
+  );
+  // Scroll content to top on section switch
+  document.querySelector('.sp-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Font size ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.sp-font-btn').forEach(btn => {
+  btn.addEventListener('click', () => setFontSize(btn.dataset.size));
+});
+// Keep old .size-option elements working if any remain
 document.querySelectorAll('.size-option').forEach(btn =>
   btn.addEventListener('click', () => setFontSize(btn.dataset.size))
 );
+
 function setFontSize(size) {
   S.fontSize = size;
-  document.querySelectorAll('.size-option').forEach(b => b.classList.toggle('active', b.dataset.size === size));
+  // Update both old and new buttons
+  document.querySelectorAll('.size-option').forEach(b =>
+    b.classList.toggle('active', b.dataset.size === size)
+  );
+  document.querySelectorAll('.sp-font-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.size === size)
+  );
   applyFontSize(size);
   saveSettings();
 }
@@ -333,16 +364,7 @@ function applyFontSize(size) {
   document.documentElement.setAttribute('data-font-size', size);
 }
 
-document.getElementById('speak-toggle').addEventListener('click', () => {
-  S.speakResponses = !S.speakResponses;
-  document.getElementById('speak-toggle').classList.toggle('active', S.speakResponses);
-  saveSettings();
-});
-document.getElementById('memory-toggle').addEventListener('click', () => {
-  S.memoryEnabled = !S.memoryEnabled;
-  document.getElementById('memory-toggle').classList.toggle('active', S.memoryEnabled);
-  saveSettings();
-});
+// ── Model + temperature ───────────────────────────────────────────────────
 document.getElementById('settings-default-model').addEventListener('change', function () {
   S.currentModel = this.value;
   updateModelDisplay();
@@ -354,11 +376,78 @@ document.getElementById('settings-temperature').addEventListener('input', functi
   document.getElementById('temperature-value').textContent = S.temperature.toFixed(1);
   saveSettings();
 });
-document.getElementById('speak-speed').addEventListener('input', function () {
-  S.speakSpeed = this.value / 100;
-  document.getElementById('speed-value').textContent = S.speakSpeed.toFixed(1) + 'x';
+
+// ── Response length ───────────────────────────────────────────────────────
+// New sp-resp-card buttons
+document.querySelectorAll('.sp-resp-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sp-resp-card').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.responseLength = btn.dataset.len;
+    // Also sync old length-btn if any
+    document.querySelectorAll('.length-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.len === S.responseLength)
+    );
+    saveSettings();
+  });
+});
+// Old length-btn (still in chat toolbar)
+document.querySelectorAll('.length-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.length-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.responseLength = btn.dataset.len;
+    document.querySelectorAll('.sp-resp-card').forEach(b =>
+      b.classList.toggle('active', b.dataset.len === S.responseLength)
+    );
+    saveSettings();
+  });
+});
+
+function applyLengthUI() {
+  document.querySelectorAll('.length-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.len === S.responseLength)
+  );
+  document.querySelectorAll('.sp-resp-card').forEach(b =>
+    b.classList.toggle('active', b.dataset.len === S.responseLength)
+  );
+}
+
+function getLengthSysPrompt() {
+  if (S.responseLength === 'concise')
+    return 'Be concise. Keep responses short and to the point.';
+  if (S.responseLength === 'detailed')
+    return 'Be thorough and detailed. Explain concepts fully, provide examples.';
+  return '';
+}
+
+// ── Chat settings: toggles + textareas ───────────────────────────────────
+// Speak toggle
+document.getElementById('speak-toggle').addEventListener('click', () => {
+  S.speakResponses = !S.speakResponses;
+  document.getElementById('speak-toggle').classList.toggle('active', S.speakResponses);
   saveSettings();
 });
+// Memory toggle
+document.getElementById('memory-toggle').addEventListener('click', () => {
+  S.memoryEnabled = !S.memoryEnabled;
+  document.getElementById('memory-toggle').classList.toggle('active', S.memoryEnabled);
+  saveSettings();
+});
+// Web search toggle (new in settings page)
+document.getElementById('sp-websearch-toggle')?.addEventListener('click', () => {
+  S.webSearch = !S.webSearch;
+  document.getElementById('sp-websearch-toggle').classList.toggle('active', S.webSearch);
+  document.getElementById('search-toggle')?.classList.toggle('active', S.webSearch);
+});
+
+// Speak speed slider
+document.getElementById('speak-speed').addEventListener('input', function () {
+  S.speakSpeed = this.value / 100;
+  document.getElementById('speed-value').textContent = S.speakSpeed.toFixed(1) + '×';
+  saveSettings();
+});
+// System prompt + custom instructions
 document.getElementById('settings-system-prompt').addEventListener('change', function () {
   S.systemPrompt = this.value;
   saveSettings();
@@ -368,13 +457,38 @@ document.getElementById('settings-custom-instructions').addEventListener('change
   saveSettings();
 });
 
+// ── Feature toggles in toolbar (deepthink / search) ─────────────────────
+document.getElementById('deepthink-toggle').addEventListener('click', toggleDeepThink);
+document.getElementById('search-toggle').addEventListener('click', toggleWebSearch);
+
+function toggleDeepThink() {
+  S.deepThink = !S.deepThink;
+  document.getElementById('deepthink-toggle').classList.toggle('active', S.deepThink);
+  if (S.deepThink) {
+    S.webSearch = false;
+    document.getElementById('search-toggle').classList.remove('active');
+    document.getElementById('sp-websearch-toggle')?.classList.remove('active');
+  }
+}
+function toggleWebSearch() {
+  S.webSearch = !S.webSearch;
+  document.getElementById('search-toggle').classList.toggle('active', S.webSearch);
+  document.getElementById('sp-websearch-toggle')?.classList.toggle('active', S.webSearch);
+  if (S.webSearch) {
+    S.deepThink = false;
+    document.getElementById('deepthink-toggle').classList.remove('active');
+  }
+}
+
+// ── Data actions ──────────────────────────────────────────────────────────
 document.getElementById('export-btn').addEventListener('click', () => {
-  const d = JSON.stringify(S.conversations, null, 2);
+  const d    = JSON.stringify(S.conversations, null, 2);
   const blob = new Blob([d], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `ai-studio-export-${new Date().toISOString().slice(0, 10)}.json`;
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `neuraldock-export-${new Date().toISOString().slice(0, 10)}.json`;
   a.click();
+  URL.revokeObjectURL(a.href);
   toast('Conversations exported');
 });
 
@@ -389,32 +503,175 @@ document.getElementById('clear-btn').addEventListener('click', async () => {
   saveConvs();
   if (typeof renderSidebar === 'function')      renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
+  refreshSettingsStats();
   toast('All history cleared');
 });
 
+// ── Account sign-out ──────────────────────────────────────────────────────
+document.getElementById('sp-signout-btn')?.addEventListener('click', async () => {
+  const ok = typeof ideModal === 'function'
+    ? await ideModal({ title: 'Sign Out', message: 'Sign out of NeuralDock?', confirmLabel: 'Sign Out', cancelLabel: 'Cancel' })
+    : confirm('Sign out of NeuralDock?');
+  if (!ok) return;
+  if (typeof dbSignOut === 'function') await dbSignOut();
+  try { puter.auth.signOut?.(); } catch (e) {}
+  S.currentUser   = null;
+  S.conversations = {};
+  S.chatMessages  = [];
+  S.activeConvId  = null;
+  localStorage.clear();
+  window.location.reload();
+});
+
+// ── Stats refresh ──────────────────────────────────────────────────────────
+function refreshSettingsStats() {
+  const convs    = Object.values(S.conversations);
+  const msgCount = convs.reduce((n, c) => n + (c.messages?.length || 0), 0);
+  const raw      = localStorage.getItem('aistudio_convs') || '{}';
+  const kb       = (new Blob([raw]).size / 1024).toFixed(1);
+
+  document.getElementById('sp-conv-count').textContent = convs.length || '0';
+  document.getElementById('sp-msg-count').textContent  = msgCount    || '0';
+  document.getElementById('sp-storage-size').textContent = kb + ' KB';
+
+  const syncBadge = document.getElementById('sp-sync-badge');
+  if (syncBadge) {
+    if (typeof supabaseConfigured === 'function' && supabaseConfigured()) {
+      syncBadge.textContent = 'Cloud';
+      syncBadge.className = 'sp-badge sp-badge-green';
+    } else {
+      syncBadge.textContent = 'Local only';
+      syncBadge.className = 'sp-badge';
+    }
+  }
+}
+
+// ── Account panel refresh ─────────────────────────────────────────────────
+function refreshAccountPanel() {
+  const user = S.currentUser;
+
+  const avatarEl = document.getElementById('sp-acct-avatar');
+  const nameEl   = document.getElementById('sp-acct-name');
+  const emailEl  = document.getElementById('sp-acct-email');
+
+  if (user) {
+    const name  = user.username || user.user_metadata?.user_name || user.email?.split('@')[0] || 'User';
+    const email = user.email || '';
+    const av    = user.user_metadata?.avatar_url;
+
+    if (nameEl)  nameEl.textContent = name;
+    if (emailEl) emailEl.textContent = email;
+    if (avatarEl) {
+      if (av) {
+        avatarEl.style.backgroundImage = `url(${av})`;
+        avatarEl.style.backgroundSize  = 'cover';
+        avatarEl.textContent = '';
+      } else {
+        avatarEl.textContent = name[0].toUpperCase();
+        avatarEl.style.backgroundImage = '';
+      }
+    }
+  }
+
+  // Puter status
+  const puterBadge = document.getElementById('sp-puter-status');
+  if (puterBadge) {
+    try {
+      if (puter.auth.isSignedIn()) {
+        puterBadge.textContent = 'Connected';
+        puterBadge.className   = 'sp-badge sp-badge-green';
+      } else {
+        puterBadge.textContent = 'Not connected';
+        puterBadge.className   = 'sp-badge';
+      }
+    } catch (e) {
+      puterBadge.textContent = 'Not connected';
+      puterBadge.className   = 'sp-badge';
+    }
+  }
+
+  // Supabase status
+  const sbBadge = document.getElementById('sp-supabase-status');
+  if (sbBadge) {
+    if (typeof supabaseConfigured === 'function' && supabaseConfigured() && user) {
+      sbBadge.textContent = 'Signed in';
+      sbBadge.className   = 'sp-badge sp-badge-green';
+    } else {
+      sbBadge.textContent = 'Not connected';
+      sbBadge.className   = 'sp-badge';
+    }
+  }
+}
+
+// ── applySettingsUI — syncs all controls to S state on open ──────────────
 function applySettingsUI() {
-  document.getElementById('settings-temperature').value           = S.temperature * 100;
-  document.getElementById('temperature-value').textContent        = S.temperature.toFixed(1);
-  document.getElementById('settings-system-prompt').value         = S.systemPrompt || '';
-  document.getElementById('settings-custom-instructions').value   = S.customInstructions || '';
-  document.getElementById('speak-speed').value                    = S.speakSpeed * 100;
-  document.getElementById('speed-value').textContent              = S.speakSpeed.toFixed(1) + 'x';
-  document.getElementById('speak-toggle').classList.toggle('active', S.speakResponses);
-  document.getElementById('memory-toggle').classList.toggle('active', S.memoryEnabled);
+  // Temperature
+  const tempEl = document.getElementById('settings-temperature');
+  if (tempEl) tempEl.value = S.temperature * 100;
+  const tempVal = document.getElementById('temperature-value');
+  if (tempVal) tempVal.textContent = S.temperature.toFixed(1);
+
+  // Textareas
+  const sysPEl = document.getElementById('settings-system-prompt');
+  if (sysPEl) sysPEl.value = S.systemPrompt || '';
+  const custEl = document.getElementById('settings-custom-instructions');
+  if (custEl) custEl.value = S.customInstructions || '';
+
+  // Speed
+  const speedEl = document.getElementById('speak-speed');
+  if (speedEl) speedEl.value = S.speakSpeed * 100;
+  const speedVal = document.getElementById('speed-value');
+  if (speedVal) speedVal.textContent = S.speakSpeed.toFixed(1) + '×';
+
+  // Toggles
+  document.getElementById('speak-toggle')?.classList.toggle('active', S.speakResponses);
+  document.getElementById('memory-toggle')?.classList.toggle('active', S.memoryEnabled);
+  document.getElementById('sp-websearch-toggle')?.classList.toggle('active', S.webSearch);
+
+  // Font buttons
+  document.querySelectorAll('.sp-font-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.size === S.fontSize)
+  );
   document.querySelectorAll('.size-option').forEach(b =>
     b.classList.toggle('active', b.dataset.size === S.fontSize)
   );
+
+  // Response length
+  document.querySelectorAll('.sp-resp-card').forEach(b =>
+    b.classList.toggle('active', b.dataset.len === S.responseLength)
+  );
+  document.querySelectorAll('.length-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.len === S.responseLength)
+  );
 }
 
-// ── Keyboard shortcuts ─────────────────────────────────────────────────────
-document.getElementById('shortcuts-btn').addEventListener('click', openShortcuts);
-document.getElementById('shortcuts-close').addEventListener('click', closeShortcuts);
-document.getElementById('shortcuts-overlay').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeShortcuts();
+function populateSettingsModel() {
+  const sel = document.getElementById('settings-default-model');
+  if (!sel) return;
+  sel.innerHTML = '';
+  for (const g of MODELS) {
+    for (const m of g.models) {
+      const o = document.createElement('option');
+      o.value = m.id;
+      o.textContent = `${g.provider}: ${m.name}`;
+      if (m.id === S.currentModel) o.selected = true;
+      sel.appendChild(o);
+    }
+  }
+}
+
+// ── Keyboard shortcuts button → opens settings shortcuts section ──────────
+document.getElementById('shortcuts-btn').addEventListener('click', () => {
+  openSettings('shortcuts');
+});
+// Legacy shortcuts modal close (if it still exists)
+document.getElementById('shortcuts-close')?.addEventListener('click', closeSettings);
+document.getElementById('shortcuts-overlay')?.addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeSettings();
 });
 
-function openShortcuts()  { document.getElementById('shortcuts-overlay').style.display = 'flex'; }
-function closeShortcuts() { document.getElementById('shortcuts-overlay').style.display = 'none'; }
+function openShortcuts()  { openSettings('shortcuts'); }
+function closeShortcuts() { closeSettings(); }
 
 document.addEventListener('keydown', e => {
   const tag = document.activeElement?.tagName;
