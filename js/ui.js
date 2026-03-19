@@ -37,9 +37,14 @@ function _switchTab(tab) {
   const titles = { chat: 'Chat', code: 'Code IDE', image: 'Image', voice: 'Voice' };
   document.title = `${titles[tab] || 'Chat'} — AI Studio | NeuralDock`;
 
-  // CodeMirror needs a repaint after its panel becomes visible
-  if (tab === 'code' && typeof IDE !== 'undefined' && IDE.cm) {
-    requestAnimationFrame(() => requestAnimationFrame(() => IDE.cm.refresh()));
+  // CodeMirror needs to measure its container AFTER the tab is visible
+  if (tab === 'code') {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (typeof IDE !== 'undefined') {
+        if (IDE.cm) IDE.cm.refresh();
+        else if (typeof ideOnTabActivated === 'function') ideOnTabActivated();
+      }
+    }));
   }
 
   // Refresh image model caps when entering the image tab
@@ -373,8 +378,11 @@ document.getElementById('export-btn').addEventListener('click', () => {
   toast('Conversations exported');
 });
 
-document.getElementById('clear-btn').addEventListener('click', () => {
-  if (!confirm('Delete all conversations? This cannot be undone.')) return;
+document.getElementById('clear-btn').addEventListener('click', async () => {
+  const ok = typeof ideModal === 'function'
+    ? await ideModal({ title: 'Clear History', message: 'Delete all conversations? This cannot be undone.', confirmLabel: 'Delete All', cancelLabel: 'Cancel' })
+    : confirm('Delete all conversations? This cannot be undone.');
+  if (!ok) return;
   S.conversations = {};
   S.activeConvId  = null;
   S.chatMessages  = [];
