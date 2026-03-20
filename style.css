@@ -4276,415 +4276,22 @@ header {
   .sp-stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .sp-font-picker { flex-wrap: wrap; }
 }
-/* ════════════════════════════════════════════════════════════════════════
-   THEME ADDITIONS — append this entire file to the bottom of style.css
-   Zero risk: all rules use data-* attribute selectors and CSS variables.
-   Existing rules are not modified.
-   ════════════════════════════════════════════════════════════════════════ */
-
-
-/* ── 1. NEW CSS CUSTOM PROPERTIES on :root ─────────────────────────────── */
-/* Add these alongside the existing :root block, or let them be set inline
-   by theme.js. These are fallback declarations only. */
-:root {
-  --font-ui:   'DM Mono', monospace;
-  --font-head: 'Fraunces', serif;
-}
-
-/* ── 2. FONT VARIABLE APPLICATION ─────────────────────────────────────── */
-/* Applied after all existing rules so specificity wins. */
-html,
-body,
-button,
-input,
-textarea,
-select,
-.msg-body,
-.hint,
-.conv-item-title,
-.conv-item-meta,
-.model-option,
-.tab-btn,
-.sidebar-settings-btn,
-.ide-tool-btn,
-.ide-ai-chip,
-.ide-tab,
-.sp-nav-item,
-.sp-card-label > span,
-.sp-card-label > small,
-.sp-textarea,
-.sp-action-btn,
-.img-ctrl-label,
-.img-prov-btn,
-.input-toggle,
-.msg-action-btn,
-.new-chat-btn,
-.gen-btn,
-.speak-btn,
-.send-btn,
-.login-btn,
-#ide-ai-input,
-.ide-ai-msg,
-.lv-user,
-.lv-ai,
-.v-tag,
-.voice-controls textarea,
-.img-prompt-ta {
-  font-family: var(--font-ui) !important;
-}
-
-/* CodeMirror editor font */
-.CodeMirror,
-.cm-s-aistudio.CodeMirror {
-  font-family: var(--font-ui) !important;
-}
-
-/* Heading font */
-header h1,
-header h1 span,
-.sidebar-logo,
-.sidebar-logo span,
-.login-logo,
-.login-logo span,
-.sp-section-header h2,
-.sp-about-logo,
-.sp-about-logo span,
-.sp-logo-name,
-.sp-logo-name span,
-.canvas-title,
-.settings-title,
-.live-voice-title,
-.share-modal-title,
-.shortcuts-header > span,
-.ide-welcome h3,
-.empty-state h3,
-.tip h4,
-.ide-modal-title,
-.sp-account-name,
-.sp-stat-value,
-.sp-resp-card strong,
-h1, h2, h3, h4 {
-  font-family: var(--font-head) !important;
-}
-
-
-/* ── 3. DENSITY SYSTEM ─────────────────────────────────────────────────── */
-
-/* compact: tighten padding throughout */
-[data-density="compact"] .chat-area            { padding: 14px; gap: 12px; }
-[data-density="compact"] .msg-body             { padding: 10px 14px; }
-[data-density="compact"] .input-area           { padding: 8px 14px 12px; }
-[data-density="compact"] .input-row            { padding: 5px 8px; }
-[data-density="compact"] .tab-btn              { padding: 8px 12px; }
-[data-density="compact"] .sp-card-row          { padding: 10px 16px; }
-[data-density="compact"] .conv-item            { padding: 5px 8px; }
-[data-density="compact"] .new-chat-btn         { padding: 7px 10px; }
-[data-density="compact"] .sidebar-settings-btn { padding: 6px 8px; }
-[data-density="compact"] .msg-meta             { margin-bottom: -2px; }
-[data-density="compact"] .sp-shortcut-group    { margin-bottom: 10px; }
-[data-density="compact"] .sp-sc-row            { padding: 8px 16px; }
-[data-density="compact"] header                { padding: 10px 16px; }
-[data-density="compact"] .ide-file-item        { padding: 4px 8px 4px 12px; }
-[data-density="compact"] .img-ctrl-scroll      { gap: 10px; }
-
-/* spacious: expand padding throughout */
-[data-density="spacious"] .chat-area            { padding: 32px 36px; gap: 26px; }
-[data-density="spacious"] .msg-body             { padding: 18px 24px; }
-[data-density="spacious"] .input-area           { padding: 16px 28px 24px; }
-[data-density="spacious"] .input-row            { padding: 12px 14px; }
-[data-density="spacious"] .tab-btn              { padding: 16px 22px; }
-[data-density="spacious"] .sp-card-row          { padding: 20px 24px; }
-[data-density="spacious"] .conv-item            { padding: 10px 14px; }
-[data-density="spacious"] .new-chat-btn         { padding: 11px 18px; }
-[data-density="spacious"] .sidebar-settings-btn { padding: 10px 14px; }
-[data-density="spacious"] header                { padding: 18px 28px; }
-[data-density="spacious"] .ide-file-item        { padding: 8px 12px 8px 18px; }
-[data-density="spacious"] .img-ctrl-scroll      { gap: 18px; }
-
-
-/* ── 4. BACKGROUND TEXTURE ─────────────────────────────────────────────── */
-
-/* dots */
-[data-bg-texture="dots"] body::before {
-  background-image: radial-gradient(var(--accent) 1px, transparent 1px);
-  background-size: 24px 24px;
-  opacity: 0.04;
-}
-
-/* cross */
-[data-bg-texture="cross"] body::before {
-  background-image:
-    linear-gradient(var(--accent) 1px, transparent 1px),
-    linear-gradient(90deg, var(--accent) 1px, transparent 1px),
-    linear-gradient(45deg, var(--accent) 0.5px, transparent 0.5px),
-    linear-gradient(-45deg, var(--accent) 0.5px, transparent 0.5px);
-  background-size: 32px 32px, 32px 32px, 16px 16px, 16px 16px;
-  opacity: 0.035;
-}
-
-/* none */
-[data-bg-texture="none"] body::before {
-  display: none;
-}
-
-
-/* ── 5. CHAT BUBBLE STYLES ─────────────────────────────────────────────── */
-
-/* minimal — no background, very faint left border on AI */
-[data-bubble="minimal"] .message.user .msg-body {
-  background: transparent;
-  border-color: var(--border);
-}
-[data-bubble="minimal"] .message.assistant .msg-body {
-  background: transparent;
-  border: none;
-  border-left: 2px solid var(--accent2);
-  border-radius: 0;
-  padding-left: 16px;
-}
-
-/* bordered — stronger borders, slight left accent on AI */
-[data-bubble="bordered"] .message.assistant .msg-body {
-  border-color: var(--border-focus);
-  border-left: 3px solid var(--accent2);
-}
-[data-bubble="bordered"] .message.user .msg-body {
-  border-color: var(--accent2);
-}
-
-
-/* ── 6. LIGHT THEME OVERRIDES ──────────────────────────────────────────── */
-
-[data-light-theme] body::before {
-  background-image:
-    linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-[data-light-theme] header {
-  background: linear-gradient(180deg, rgba(250,248,245,.98) 0%, rgba(250,248,245,.92) 100%);
-  border-bottom-color: var(--border);
-}
-
-[data-light-theme] .sidebar {
-  background: var(--surface);
-  border-right-color: var(--border);
-}
-
-[data-light-theme] .chat-area { background: var(--bg); }
-
-[data-light-theme] .model-selector-btn,
-[data-light-theme] .model-dropdown,
-[data-light-theme] .input-row {
-  background: var(--surface);
-  border-color: var(--border);
-  color: var(--text);
-}
-
-[data-light-theme] .input-area {
-  background: rgba(245,242,238,.85);
-}
-
-[data-light-theme] .conv-item:hover   { background: var(--surface2); }
-[data-light-theme] .conv-item.active  { background: var(--accent-dim); }
-
-[data-light-theme] #login-screen {
-  background: var(--bg);
-}
-
-[data-light-theme] .login-card {
-  background: var(--surface);
-  border-color: var(--border);
-}
-
-[data-light-theme] .sp-page,
-[data-light-theme] .sp-nav {
-  background: var(--surface);
-  border-color: var(--border);
-}
-
-[data-light-theme] .sp-topbar {
-  background: var(--surface2);
-}
-
-[data-light-theme] .tab-nav {
-  background: var(--surface);
-}
-
-[data-light-theme] .model-group-label { color: var(--muted); }
-
-[data-light-theme] .msg-body {
-  color: var(--text);
-}
-
-[data-light-theme] .message.user .msg-body    { background: var(--surface2); }
-[data-light-theme] .message.assistant .msg-body { background: var(--surface); }
-
-[data-light-theme] .msg-body.md pre {
-  background: var(--surface2);
-  border-color: var(--border);
-}
-
-[data-light-theme] .msg-body.md :not(pre) > code {
-  background: var(--surface2);
-  color: var(--accent2);
-}
-
-[data-light-theme] .ide-editor-col { background: #f8f6f2; }
-[data-light-theme] .cm-s-aistudio.CodeMirror { background: #f8f6f2; color: #2a2520; }
-[data-light-theme] .cm-s-aistudio .CodeMirror-gutters { background: #f0ece6; border-right-color: var(--border); }
-[data-light-theme] .cm-s-aistudio .CodeMirror-linenumber { color: var(--muted); }
-[data-light-theme] .cm-s-aistudio .cm-comment { color: #8a7e72; }
-[data-light-theme] .cm-s-aistudio .cm-string  { color: #2d6a27; }
-[data-light-theme] .cm-s-aistudio .cm-number  { color: #1a5c9c; }
-[data-light-theme] .cm-s-aistudio .cm-keyword { color: var(--accent2); }
-
-[data-light-theme] #login-particles { opacity: 0.4; }
-
-
-/* ── 7. APPEARANCE SETTINGS UI COMPONENTS ──────────────────────────────── */
-
-/* Theme grid */
-.nd-theme-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1px;
-  background: var(--border);
-  padding: 0;
-  overflow: hidden;
-}
-
-@media (max-width: 700px) {
-  .nd-theme-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-.nd-theme-swatch {
-  display: flex;
-  flex-direction: column;
-  border: none;
-  cursor: pointer;
-  background: var(--surface);
-  padding: 0 0 10px;
-  transition: background .15s;
-  outline: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.nd-theme-swatch:hover { background: var(--surface2); }
-
-.nd-theme-swatch.active::after {
-  content: '✓';
-  position: absolute;
-  top: 6px; right: 6px;
-  width: 16px; height: 16px;
-  background: var(--accent);
-  color: var(--bg);
-  border-radius: 50%;
-  font-size: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 16px;
-  text-align: center;
-}
-
-.nd-ts-colors {
-  display: flex;
-  height: 50px;
-  gap: 0;
-  margin-bottom: 8px;
-}
-
-.nd-ts-accent {
-  flex: 0 0 6px;
-}
-
-.nd-ts-label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 0 10px;
-  font-size: 10px;
-  color: var(--muted);
-  font-family: var(--font-ui);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.nd-ts-emoji {
-  color: var(--accent);
-  font-size: 9px;
-  flex-shrink: 0;
-}
-
-.nd-theme-swatch.active .nd-ts-label {
-  color: var(--text);
-  font-weight: 500;
-}
-
-/* Font grid */
-.nd-font-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--border);
-}
-
-@media (max-width: 700px) {
-  .nd-font-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-.nd-font-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background .15s;
-  position: relative;
-  overflow: hidden;
-}
-
-.nd-font-card:hover { background: var(--surface2); }
-
-.nd-font-card.active {
-  background: var(--accent-dim);
-}
-
-.nd-font-card.active::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--accent);
+  width: 2px; background: var(--accent);
 }
-
 .nd-fc-sample {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
+  font-size: 13px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
 }
-
 .nd-fc-label {
-  font-size: 9px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-family: var(--font-ui);
+  font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); font-family: var(--font-ui);
 }
 
-/* Option row (density, radius, texture, bubble) */
+
+/* ── 11. OPTION ROWS (density / radius / texture / bubble) ─────────────── */
 .nd-option-row {
   display: flex;
   background: var(--border);
@@ -4696,8 +4303,8 @@ h1, h2, h3, h4 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 16px 10px;
+  gap: 8px;
+  padding: 14px 8px;
   background: var(--surface);
   border: none;
   cursor: pointer;
@@ -4705,128 +4312,74 @@ h1, h2, h3, h4 {
   font-family: var(--font-ui);
   font-size: 10px;
   color: var(--muted);
-  letter-spacing: .06em;
+  letter-spacing: .05em;
 }
-
 .nd-option-btn:hover { background: var(--surface2); }
-
-.nd-option-btn.active {
-  background: var(--accent-dim);
-  color: var(--accent);
-}
+.nd-option-btn.active { background: var(--accent-dim); color: var(--accent); }
 
 /* Density previews */
 .nd-density-preview {
-  display: flex;
-  flex-direction: column;
-  width: 48px;
-  gap: 0;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
+  display: flex; flex-direction: column;
+  width: 44px; gap: 0;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
 }
-
 .nd-density-preview span {
-  display: block;
-  background: var(--border-focus);
-  border-bottom: 1px solid var(--border);
+  display: block; background: var(--border-focus); border-bottom: 1px solid var(--border);
 }
-
-.nd-preview-compact  span { height: 5px; }
-.nd-preview-comfortable span { height: 8px; }
-.nd-preview-spacious span { height: 12px; }
-
-.nd-preview-compact  span:last-child,
-.nd-preview-comfortable span:last-child,
-.nd-preview-spacious span:last-child { border-bottom: none; }
+.nd-density-preview span:last-child { border-bottom: none; }
+.nd-preview-compact      span { height: 5px; }
+.nd-preview-comfortable  span { height: 8px; }
+.nd-preview-spacious     span { height: 12px; }
 
 /* Radius preview */
 .nd-radius-preview {
-  width: 36px;
-  height: 26px;
-  background: var(--border-focus);
-  border: 1px solid var(--accent2);
+  width: 36px; height: 24px;
+  background: var(--border-focus); border: 1px solid var(--accent2);
 }
 
 /* Texture previews */
 .nd-texture-preview {
-  width: 48px;
-  height: 36px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg);
+  width: 46px; height: 34px; border-radius: 3px;
+  border: 1px solid var(--border); background: var(--bg);
 }
-
 .nd-tex-grid {
   background-image:
     linear-gradient(var(--border-focus) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-focus) 1px, transparent 1px);
   background-size: 8px 8px;
 }
-
 .nd-tex-dots {
   background-image: radial-gradient(var(--border-focus) 1px, transparent 1px);
   background-size: 6px 6px;
 }
-
 .nd-tex-cross {
   background-image:
     linear-gradient(var(--border-focus) 1px, transparent 1px),
     linear-gradient(90deg, var(--border-focus) 1px, transparent 1px);
-  background-size: 10px 10px;
-  opacity: 0.7;
+  background-size: 10px 10px; opacity: .8;
 }
-
-.nd-tex-none {
-  background: var(--bg);
-}
+.nd-tex-none { background: var(--bg); }
 
 /* Bubble style previews */
 .nd-bubble-preview {
-  width: 64px;
-  height: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  justify-content: center;
-  padding: 4px;
+  width: 64px; height: 38px; display: flex; flex-direction: column;
+  gap: 3px; justify-content: center; padding: 3px;
 }
-
 .nd-bub-msg {
-  font-size: 7px;
-  padding: 2px 5px;
-  border-radius: 3px;
-  width: fit-content;
-  font-family: var(--font-ui);
-  letter-spacing: .04em;
-  color: var(--text);
+  font-size: 7px; padding: 2px 5px; border-radius: 3px;
+  width: fit-content; font-family: var(--font-ui); color: var(--text);
 }
-
-.nd-bub-user {
-  align-self: flex-end;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-}
-
-.nd-bub-ai {
-  align-self: flex-start;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-/* minimal bubble preview */
-.nd-bub-minimal .nd-bub-user { background: transparent; border-color: var(--border); }
-.nd-bub-minimal .nd-bub-ai   { background: transparent; border: none; border-left: 2px solid var(--accent2); border-radius: 0; padding-left: 3px; }
-
-/* bordered bubble preview */
-.nd-bub-bordered .nd-bub-ai { border-color: var(--accent2); border-left: 2px solid var(--accent); }
+.nd-bub-user { align-self: flex-end; background: var(--surface2); border: 1px solid var(--border); }
+.nd-bub-ai   { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); }
+.nd-bub-minimal .nd-bub-user  { background: transparent; }
+.nd-bub-minimal .nd-bub-ai    { background: transparent; border: none; border-left: 2px solid var(--accent2); border-radius: 0; padding-left: 3px; }
+.nd-bub-bordered .nd-bub-ai   { border-color: var(--accent2); border-left: 2px solid var(--accent); }
 
 
-/* ── 8. RESPONSIVE FIXES for appearance UI ──────────────────────────────── */
+/* ── 12. RESPONSIVE ─────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .nd-theme-grid   { grid-template-columns: repeat(2, 1fr); }
-  .nd-font-grid    { grid-template-columns: 1fr 1fr; }
+  .nd-theme-grid   { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
   .nd-option-row   { flex-wrap: wrap; }
-  .nd-option-btn   { min-width: 80px; }
+  .nd-option-btn   { min-width: 80px; flex: 1 1 80px; }
+  .nd-font-grid    { grid-template-columns: 1fr 1fr; }
 }
