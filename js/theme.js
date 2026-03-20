@@ -603,13 +603,10 @@ function _buildThemeGroups(activeId, filterQ = '') {
       btn.dataset.themeId = id;
       btn.title = t.label;
 
-      const isOklch = t.preview.bg && t.preview.bg.startsWith('oklch');
+      // Single inline-gradient div — avoids flex-child-in-button height collapse bug
+      const previewBg = `linear-gradient(to right, ${t.preview.bg} 55%, ${t.preview.sec} 82%, ${t.preview.accent} 100%)`;
       btn.innerHTML = `
-        <div class="nd-ts-preview">
-          <div class="nd-ts-bg"  style="background:${t.preview.bg}"></div>
-          <div class="nd-ts-sec" style="background:${t.preview.sec}"></div>
-          <div class="nd-ts-acc" style="background:${t.preview.accent}"></div>
-        </div>
+        <div class="nd-ts-preview" style="background:${previewBg}"></div>
         <div class="nd-ts-name">${t.label}</div>`;
 
       btn.addEventListener('click', () => {
