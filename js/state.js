@@ -8,7 +8,7 @@
 
 const S = {
   // Auth
-  currentUser: null,
+  currentUser: null,   // Supabase user object once authed
 
   // Conversations
   conversations: JSON.parse(localStorage.getItem('aistudio_convs') || '{}'),
@@ -35,7 +35,7 @@ const S = {
   fontSize:    'medium',
   pinnedConvs: [],
 
-  // ── NEW: Theme & appearance ──────────────────────────────────────────
+  // ── Theme & appearance (NEW — safe to remove with theme.js) ─────────────
   theme:       'dark-gold',
   fontUi:      'dm-mono',
   fontHead:    'fraunces',
@@ -43,7 +43,7 @@ const S = {
   radius:      'default',
   bgTexture:   'grid',
   bubbleStyle: 'default',
-  // ────────────────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────────────────────
 
   // Runtime (never persisted)
   busy:        false,
@@ -61,7 +61,7 @@ try {
       'currentModel', 'memoryEnabled', 'speakResponses', 'speakSpeed',
       'systemPrompt', 'customInstructions', 'temperature', 'fontSize',
       'responseLength', 'pinnedConvs',
-      // NEW keys ↓
+      // Theme keys — safe to remove alongside theme.js
       'theme', 'fontUi', 'fontHead', 'density', 'radius', 'bgTexture', 'bubbleStyle',
     ];
     for (const k of KEYS) {
@@ -72,6 +72,9 @@ try {
   console.warn('[state] Failed to restore settings:', e);
 }
 
+/**
+ * Save settings to localStorage immediately, then sync to Supabase (debounced).
+ */
 function saveSettings() {
   const cfg = {
     currentModel:       S.currentModel,
@@ -84,7 +87,7 @@ function saveSettings() {
     fontSize:           S.fontSize,
     responseLength:     S.responseLength,
     pinnedConvs:        S.pinnedConvs,
-    // NEW keys ↓
+    // Theme keys — safe to remove alongside theme.js
     theme:              S.theme,
     fontUi:             S.fontUi,
     fontHead:           S.fontHead,
@@ -94,11 +97,17 @@ function saveSettings() {
     bubbleStyle:        S.bubbleStyle,
   };
   try { localStorage.setItem('aistudio_settings', JSON.stringify(cfg)); } catch (e) {}
+  // Sync to Supabase if available
   if (typeof dbSaveSettings === 'function') dbSaveSettings();
 }
 
+/**
+ * Save all conversations to localStorage immediately, then sync active conv to Supabase.
+ * @param {string} [convId]  If provided, only syncs that conversation to Supabase.
+ */
 function saveConvs(convId) {
   try { localStorage.setItem('aistudio_convs', JSON.stringify(S.conversations)); } catch (e) {}
+  // Sync to Supabase
   if (typeof dbSaveConversation === 'function') {
     const target = convId
       ? S.conversations[convId]
@@ -107,4 +116,5 @@ function saveConvs(convId) {
   }
 }
 
+/** No-op stub — token counter was removed. Kept to avoid call-site errors. */
 function updateCtxIndicator() {}

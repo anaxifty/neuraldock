@@ -15,9 +15,8 @@
 'use strict';
 
 // ── State ──────────────────────────────────────────────────────────────────
-let authPollInterval  = null;
-let _puterAuthed      = false;
-let _appBootstrapped  = false;   // guard: prevent onFullyAuthed from running twice
+let authPollInterval = null;
+let _puterAuthed     = false;
 
 // ══════════════════════════════════════════════════════════════════════════
 //  ENTRY POINT — run on page load
@@ -46,20 +45,24 @@ window.addEventListener('load', async () => {
 
   const sb = await getSupabase();
 
-  // Listen for auth state changes — handles both initial load and OAuth redirects.
-  // INITIAL_SESSION fires once on page load; SIGNED_IN fires on OAuth redirect.
-  // No separate getSession() call needed — that caused double-bootstrapping.
+  // Listen for auth state changes (handles OAuth redirects automatically)
   sb.auth.onAuthStateChange(async (event, session) => {
-    if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
+    if (event === 'SIGNED_IN' && session?.user) {
       await handleSupabaseUser(session.user);
-    } else if (event === 'INITIAL_SESSION' && !session) {
-      showLoginScreen();
     } else if (event === 'SIGNED_OUT') {
-      _appBootstrapped = false;
       showLoginScreen();
+    } else if (event === 'TOKEN_REFRESHED') {
+      // Session refreshed silently — nothing to do
     }
-    // TOKEN_REFRESHED — nothing to do
   });
+
+  // Check for existing session
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    await handleSupabaseUser(session.user);
+  } else {
+    showLoginScreen();
+  }
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -256,9 +259,8 @@ function showPuterBanner() {
 function onFullyAuthed(user) {
   if (authPollInterval) clearInterval(authPollInterval);
 
-  // Guard: prevent double-bootstrapping when Supabase fires multiple events
-  if (_appBootstrapped) return;
-  _appBootstrapped = true;
+  // ── Apply saved theme & appearance settings FIRST (before rendering UI) ──
+  if (typeof applyAllThemeSettings === 'function') applyAllThemeSettings();
 
   document.getElementById('login-screen').style.display = 'none';
 
@@ -303,7 +305,6 @@ function onFullyAuthed(user) {
 
 function setupSupabaseUI() {
   // Puter button — also show as primary login when Supabase configured
-  // (user can sign in with Puter first, then optionally link social account)
   document.getElementById('login-btn')?.addEventListener('click', startPuterLogin);
   document.getElementById('login-fallback')?.addEventListener('click', manualPuterCheck);
 

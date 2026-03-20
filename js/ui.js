@@ -6,25 +6,13 @@
 'use strict';
 
 // ── Client-side router ────────────────────────────────────────────────────
-/**
- * Valid tab names and their URL paths.
- * / and /chat both map to the chat tab.
- */
 const VALID_TABS = ['chat', 'code', 'image', 'voice'];
 
-/**
- * Map a URL pathname to a tab name.
- * e.g. "/code" → "code", "/" → "chat", "/unknown" → "chat"
- */
 function pathToTab(pathname) {
   const seg = pathname.replace(/^\//, '').toLowerCase().split('/')[0];
   return VALID_TABS.includes(seg) ? seg : 'chat';
 }
 
-/**
- * Activate a tab without pushing to history.
- * Used internally by the router.
- */
 function _switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tab)
@@ -33,11 +21,9 @@ function _switchTab(tab) {
     p.classList.toggle('active', p.id === `panel-${tab}`)
   );
 
-  // Update page title
   const titles = { chat: 'Chat', code: 'Code IDE', image: 'Image', voice: 'Voice' };
   document.title = `${titles[tab] || 'Chat'} — AI Studio | NeuralDock`;
 
-  // CodeMirror needs to measure its container AFTER the tab is visible
   if (tab === 'code') {
     requestAnimationFrame(() => requestAnimationFrame(() => {
       if (typeof IDE !== 'undefined') {
@@ -47,16 +33,11 @@ function _switchTab(tab) {
     }));
   }
 
-  // Refresh image model caps when entering the image tab
   if (tab === 'image' && typeof updateImageModels === 'function') {
     updateImageModels();
   }
 }
 
-/**
- * Navigate to a tab — updates the URL and activates the panel.
- * Call this everywhere you want to switch tabs programmatically.
- */
 function activateTab(tab) {
   if (!VALID_TABS.includes(tab)) tab = 'chat';
   const newPath = `/${tab}`;
@@ -66,24 +47,17 @@ function activateTab(tab) {
   _switchTab(tab);
 }
 
-/**
- * Read the current URL and activate the matching tab.
- * Called on page load and after successful auth.
- */
 function initRouter() {
   const tab = pathToTab(window.location.pathname);
-  // Replace current history entry so back-button works correctly
   history.replaceState({ tab }, '', `/${tab}`);
   _switchTab(tab);
 }
 
-// Handle browser back / forward buttons
 window.addEventListener('popstate', e => {
   const tab = (e.state && e.state.tab) ? e.state.tab : pathToTab(window.location.pathname);
   _switchTab(tab);
 });
 
-// Tab button clicks push to history
 document.querySelectorAll('.tab-btn').forEach(btn =>
   btn.addEventListener('click', () => activateTab(btn.dataset.tab))
 );
@@ -106,7 +80,6 @@ function toggleSidebar() {
 }
 
 // ── Model selector ─────────────────────────────────────────────────────────
-/** Look up model metadata by ID. Falls back gracefully for unknown models. */
 function getModelInfo(id) {
   for (const g of MODELS) {
     for (const m of g.models) {
@@ -117,7 +90,6 @@ function getModelInfo(id) {
   return { id, name, provider: 'Unknown', color: '#888', tag: '' };
 }
 
-/** Render the model dropdown list, optionally filtered by a query string */
 function renderModelList(filter = '') {
   const list = document.getElementById('model-list');
   if (!list) return;
@@ -211,6 +183,7 @@ function updateModelDisplay() {
 
 function populateSettingsModel() {
   const sel = document.getElementById('settings-default-model');
+  if (!sel) return;
   sel.innerHTML = '';
   for (const g of MODELS) {
     for (const m of g.models) {
@@ -223,7 +196,6 @@ function populateSettingsModel() {
   }
 }
 
-/** Fetch additional models from Puter and merge into MODELS */
 async function fetchAndMergeModels() {
   try {
     const fetched = await puter.ai.listModels();
@@ -260,20 +232,36 @@ async function fetchAndMergeModels() {
   }
 }
 
-// ── Feature toggles (bound once below, near line ~460) ─────────────────────
+// ── Feature toggles ────────────────────────────────────────────────────────
+function toggleDeepThink() {
+  S.deepThink = !S.deepThink;
+  document.getElementById('deepthink-toggle').classList.toggle('active', S.deepThink);
+  if (S.deepThink) {
+    S.webSearch = false;
+    document.getElementById('search-toggle').classList.remove('active');
+    document.getElementById('sp-websearch-toggle')?.classList.remove('active');
+  }
+}
+
+function toggleWebSearch() {
+  S.webSearch = !S.webSearch;
+  document.getElementById('search-toggle').classList.toggle('active', S.webSearch);
+  document.getElementById('sp-websearch-toggle')?.classList.toggle('active', S.webSearch);
+  if (S.webSearch) {
+    S.deepThink = false;
+    document.getElementById('deepthink-toggle').classList.remove('active');
+  }
+}
+
+document.getElementById('deepthink-toggle').addEventListener('click', toggleDeepThink);
+document.getElementById('search-toggle').addEventListener('click', toggleWebSearch);
 
 // ── Response length ────────────────────────────────────────────────────────
-document.querySelectorAll('.length-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.length-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    S.responseLength = btn.dataset.len;
-    saveSettings();
-  });
-});
-
 function applyLengthUI() {
   document.querySelectorAll('.length-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.len === S.responseLength)
+  );
+  document.querySelectorAll('.sp-resp-card').forEach(b =>
     b.classList.toggle('active', b.dataset.len === S.responseLength)
   );
 }
@@ -286,6 +274,30 @@ function getLengthSysPrompt() {
   return '';
 }
 
+document.querySelectorAll('.sp-resp-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sp-resp-card').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.responseLength = btn.dataset.len;
+    document.querySelectorAll('.length-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.len === S.responseLength)
+    );
+    saveSettings();
+  });
+});
+
+document.querySelectorAll('.length-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.length-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    S.responseLength = btn.dataset.len;
+    document.querySelectorAll('.sp-resp-card').forEach(b =>
+      b.classList.toggle('active', b.dataset.len === S.responseLength)
+    );
+    saveSettings();
+  });
+});
+
 // ── Settings page ─────────────────────────────────────────────────────────
 document.getElementById('settings-open-btn').addEventListener('click', openSettings);
 document.getElementById('settings-close-btn').addEventListener('click', closeSettings);
@@ -296,9 +308,11 @@ function openSettings(sectionId) {
   document.getElementById('settings-drawer').classList.add('open');
   refreshSettingsStats();
   refreshAccountPanel();
+  // ── Build the Appearance tab with the full theme picker ──────────────────
   if (typeof buildAppearanceUI === 'function') buildAppearanceUI();
   if (sectionId) switchSettingsSection(sectionId);
 }
+
 function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
   document.getElementById('settings-drawer').classList.remove('open');
@@ -316,7 +330,6 @@ function switchSettingsSection(id) {
   document.querySelectorAll('.sp-section').forEach(s =>
     s.classList.toggle('active', s.id === `sp-${id}`)
   );
-  // Scroll content to top on section switch
   document.querySelector('.sp-content')?.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -324,14 +337,12 @@ function switchSettingsSection(id) {
 document.querySelectorAll('.sp-font-btn').forEach(btn => {
   btn.addEventListener('click', () => setFontSize(btn.dataset.size));
 });
-// Keep old .size-option elements working if any remain
 document.querySelectorAll('.size-option').forEach(btn =>
   btn.addEventListener('click', () => setFontSize(btn.dataset.size))
 );
 
 function setFontSize(size) {
   S.fontSize = size;
-  // Update both old and new buttons
   document.querySelectorAll('.size-option').forEach(b =>
     b.classList.toggle('active', b.dataset.size === size)
   );
@@ -341,6 +352,7 @@ function setFontSize(size) {
   applyFontSize(size);
   saveSettings();
 }
+
 function applyFontSize(size) {
   document.documentElement.setAttribute('data-font-size', size);
 }
@@ -352,114 +364,47 @@ document.getElementById('settings-default-model').addEventListener('change', fun
   buildModelDropdown();
   saveSettings();
 });
+
 document.getElementById('settings-temperature').addEventListener('input', function () {
   S.temperature = this.value / 100;
   document.getElementById('temperature-value').textContent = S.temperature.toFixed(1);
   saveSettings();
 });
 
-// ── Response length ───────────────────────────────────────────────────────
-// New sp-resp-card buttons
-document.querySelectorAll('.sp-resp-card').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.sp-resp-card').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    S.responseLength = btn.dataset.len;
-    // Also sync old length-btn if any
-    document.querySelectorAll('.length-btn').forEach(b =>
-      b.classList.toggle('active', b.dataset.len === S.responseLength)
-    );
-    saveSettings();
-  });
-});
-// Old length-btn (still in chat toolbar)
-document.querySelectorAll('.length-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.length-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    S.responseLength = btn.dataset.len;
-    document.querySelectorAll('.sp-resp-card').forEach(b =>
-      b.classList.toggle('active', b.dataset.len === S.responseLength)
-    );
-    saveSettings();
-  });
-});
-
-function applyLengthUI() {
-  document.querySelectorAll('.length-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.len === S.responseLength)
-  );
-  document.querySelectorAll('.sp-resp-card').forEach(b =>
-    b.classList.toggle('active', b.dataset.len === S.responseLength)
-  );
-}
-
-function getLengthSysPrompt() {
-  if (S.responseLength === 'concise')
-    return 'Be concise. Keep responses short and to the point.';
-  if (S.responseLength === 'detailed')
-    return 'Be thorough and detailed. Explain concepts fully, provide examples.';
-  return '';
-}
-
 // ── Chat settings: toggles + textareas ───────────────────────────────────
-// Speak toggle
 document.getElementById('speak-toggle').addEventListener('click', () => {
   S.speakResponses = !S.speakResponses;
   document.getElementById('speak-toggle').classList.toggle('active', S.speakResponses);
   saveSettings();
 });
-// Memory toggle
+
 document.getElementById('memory-toggle').addEventListener('click', () => {
   S.memoryEnabled = !S.memoryEnabled;
   document.getElementById('memory-toggle').classList.toggle('active', S.memoryEnabled);
   saveSettings();
 });
-// Web search toggle (new in settings page)
+
 document.getElementById('sp-websearch-toggle')?.addEventListener('click', () => {
   S.webSearch = !S.webSearch;
   document.getElementById('sp-websearch-toggle').classList.toggle('active', S.webSearch);
   document.getElementById('search-toggle')?.classList.toggle('active', S.webSearch);
 });
 
-// Speak speed slider
 document.getElementById('speak-speed').addEventListener('input', function () {
   S.speakSpeed = this.value / 100;
   document.getElementById('speed-value').textContent = S.speakSpeed.toFixed(1) + '×';
   saveSettings();
 });
-// System prompt + custom instructions
+
 document.getElementById('settings-system-prompt').addEventListener('change', function () {
   S.systemPrompt = this.value;
   saveSettings();
 });
+
 document.getElementById('settings-custom-instructions').addEventListener('change', function () {
   S.customInstructions = this.value;
   saveSettings();
 });
-
-// ── Feature toggles in toolbar (deepthink / search) ─────────────────────
-document.getElementById('deepthink-toggle').addEventListener('click', toggleDeepThink);
-document.getElementById('search-toggle').addEventListener('click', toggleWebSearch);
-
-function toggleDeepThink() {
-  S.deepThink = !S.deepThink;
-  document.getElementById('deepthink-toggle').classList.toggle('active', S.deepThink);
-  if (S.deepThink) {
-    S.webSearch = false;
-    document.getElementById('search-toggle').classList.remove('active');
-    document.getElementById('sp-websearch-toggle')?.classList.remove('active');
-  }
-}
-function toggleWebSearch() {
-  S.webSearch = !S.webSearch;
-  document.getElementById('search-toggle').classList.toggle('active', S.webSearch);
-  document.getElementById('sp-websearch-toggle')?.classList.toggle('active', S.webSearch);
-  if (S.webSearch) {
-    S.deepThink = false;
-    document.getElementById('deepthink-toggle').classList.remove('active');
-  }
-}
 
 // ── Data actions ──────────────────────────────────────────────────────────
 document.getElementById('export-btn').addEventListener('click', () => {
@@ -554,7 +499,6 @@ function refreshAccountPanel() {
     }
   }
 
-  // Puter status
   const puterBadge = document.getElementById('sp-puter-status');
   if (puterBadge) {
     try {
@@ -571,7 +515,6 @@ function refreshAccountPanel() {
     }
   }
 
-  // Supabase status
   const sbBadge = document.getElementById('sp-supabase-status');
   if (sbBadge) {
     if (typeof supabaseConfigured === 'function' && supabaseConfigured() && user) {
@@ -586,33 +529,25 @@ function refreshAccountPanel() {
 
 // ── applySettingsUI — syncs all controls to S state on open ──────────────
 function applySettingsUI() {
-  // NEW: apply theme settings
-  if (typeof applyAllThemeSettings === 'function') applyAllThemeSettings();
-
-  // Temperature
   const tempEl = document.getElementById('settings-temperature');
   if (tempEl) tempEl.value = S.temperature * 100;
   const tempVal = document.getElementById('temperature-value');
   if (tempVal) tempVal.textContent = S.temperature.toFixed(1);
 
-  // Textareas
   const sysPEl = document.getElementById('settings-system-prompt');
   if (sysPEl) sysPEl.value = S.systemPrompt || '';
   const custEl = document.getElementById('settings-custom-instructions');
   if (custEl) custEl.value = S.customInstructions || '';
 
-  // Speed
   const speedEl = document.getElementById('speak-speed');
   if (speedEl) speedEl.value = S.speakSpeed * 100;
   const speedVal = document.getElementById('speed-value');
   if (speedVal) speedVal.textContent = S.speakSpeed.toFixed(1) + '×';
 
-  // Toggles
   document.getElementById('speak-toggle')?.classList.toggle('active', S.speakResponses);
   document.getElementById('memory-toggle')?.classList.toggle('active', S.memoryEnabled);
   document.getElementById('sp-websearch-toggle')?.classList.toggle('active', S.webSearch);
 
-  // Font buttons
   document.querySelectorAll('.sp-font-btn').forEach(b =>
     b.classList.toggle('active', b.dataset.size === S.fontSize)
   );
@@ -620,35 +555,14 @@ function applySettingsUI() {
     b.classList.toggle('active', b.dataset.size === S.fontSize)
   );
 
-  // Response length
-  document.querySelectorAll('.sp-resp-card').forEach(b =>
-    b.classList.toggle('active', b.dataset.len === S.responseLength)
-  );
-  document.querySelectorAll('.length-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.len === S.responseLength)
-  );
+  applyLengthUI();
+  populateSettingsModel();
 }
 
-function populateSettingsModel() {
-  const sel = document.getElementById('settings-default-model');
-  if (!sel) return;
-  sel.innerHTML = '';
-  for (const g of MODELS) {
-    for (const m of g.models) {
-      const o = document.createElement('option');
-      o.value = m.id;
-      o.textContent = `${g.provider}: ${m.name}`;
-      if (m.id === S.currentModel) o.selected = true;
-      sel.appendChild(o);
-    }
-  }
-}
-
-// ── Keyboard shortcuts button → opens settings shortcuts section ──────────
+// ── Keyboard shortcuts ─────────────────────────────────────────────────────
 document.getElementById('shortcuts-btn').addEventListener('click', () => {
   openSettings('shortcuts');
 });
-// Legacy shortcuts modal close (if it still exists)
 document.getElementById('shortcuts-close')?.addEventListener('click', closeSettings);
 document.getElementById('shortcuts-overlay')?.addEventListener('click', e => {
   if (e.target === e.currentTarget) closeSettings();
@@ -698,7 +612,6 @@ document.getElementById('canvas-clear-output').addEventListener('click', () => {
   document.getElementById('canvas-run-output').style.display = 'none';
 });
 
-/** Open a code block from a chat message in the canvas panel */
 function openCanvas(btn) {
   const pre  = btn.closest('pre');  if (!pre)  return;
   const code = pre.querySelector('code'); if (!code) return;
@@ -758,7 +671,6 @@ function runCanvasCode(code, lang) {
     } catch (err) {
       outPre.textContent = '⚠ Error: ' + err.message;
     }
-
   } else if (l === 'html') {
     outPre.style.display = 'none';
     let iframe = outDiv.querySelector('.canvas-html-preview');
@@ -769,14 +681,12 @@ function runCanvasCode(code, lang) {
     }
     iframe.style.display = '';
     iframe.srcdoc = code;
-
   } else if (l === 'python' || l === 'py') {
     outPre.textContent = 'Loading Python runtime…';
     loadPyodide(code, outPre);
   }
 }
 
-// Lazy-load Pyodide for Python execution
 let _pyodide = null, _pyodideLoading = false, _pyodideQueue = [];
 
 async function loadPyodide(code, outPre) {
