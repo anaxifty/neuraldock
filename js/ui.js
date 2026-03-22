@@ -25,10 +25,17 @@ function _switchTab(tab) {
   document.title = `${titles[tab] || 'Chat'} — AI Studio | NeuralDock`;
 
   if (tab === 'code') {
+    // FIX: Always delegate to ideOnTabActivated instead of branching on
+    // IDE.cm. The old code did:
+    //   if (IDE.cm) IDE.cm.refresh();
+    //   else ideOnTabActivated();
+    // …which meant that when CM was already initialised the active file's
+    // content was never pushed into CM after an upload / file-switch that
+    // happened while on another tab. ideOnTabActivated() now handles both
+    // cases: flush + refresh when CM exists, create when it doesn't.
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (typeof IDE !== 'undefined') {
-        if (IDE.cm) IDE.cm.refresh();
-        else if (typeof ideOnTabActivated === 'function') ideOnTabActivated();
+      if (typeof ideOnTabActivated === 'function') {
+        ideOnTabActivated();
       }
     }));
   }
@@ -308,7 +315,6 @@ function openSettings(sectionId) {
   document.getElementById('settings-drawer').classList.add('open');
   refreshSettingsStats();
   refreshAccountPanel();
-  // ── Build the Appearance tab with the full theme picker ──────────────────
   if (typeof buildAppearanceUI === 'function') buildAppearanceUI();
   if (sectionId) switchSettingsSection(sectionId);
 }

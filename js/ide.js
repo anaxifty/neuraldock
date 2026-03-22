@@ -1,7 +1,19 @@
 /**
  * ide.js — Project IDE: file management, CodeMirror editor, AI assistant
  *
- * BUGS FIXED:
+ * BUGS FIXED (this revision):
+ * - CRITICAL: initCM used CodeMirror.fromTextArea() with a textarea element
+ *   that does not exist in index.html (<textarea id="ide-editor-ta"> was never
+ *   added). fromTextArea(null, …) throws a TypeError before IDE.cm is ever
+ *   assigned, so the editor was permanently blank for every uploaded / created
+ *   file. Fixed by switching to the CodeMirror(element, config) constructor
+ *   which appends the editor directly into the container div.
+ * - ideOnTabActivated now distinguishes "CM already initialised" (just
+ *   refresh + focus, do NOT overwrite unsaved content) from "CM not yet
+ *   created" (create it with stored content). Previously both paths called
+ *   initCM which would setValue() on every tab-switch, losing unsaved edits.
+ *
+ * Original bugs (kept from prior revision):
  * - Delete button click propagating to openFile (e.target check was wrong)
  * - Uploaded file not showing: openFile called before tab visible → CM measures 0px
  * - Uploaded file not in AI context: readFileAsText failure, content not stored
@@ -29,7 +41,6 @@ const IDE = {
 // ── Themed modal (replaces native confirm/prompt) ─────────────────────────
 function ideModal({ title, message, input = null, confirmLabel = 'OK', cancelLabel = 'Cancel' }) {
   return new Promise(resolve => {
-    // Remove any existing modal
     document.getElementById('ide-modal-overlay')?.remove();
 
     const overlay = document.createElement('div');
@@ -81,14 +92,25 @@ function ideModal({ title, message, input = null, confirmLabel = 'OK', cancelLab
 }
 
 // ── CodeMirror initialisation ─────────────────────────────────────────────
+/**
+ * Create or update the CodeMirror instance.
+ *
+ * FIX: The original code used CodeMirror.fromTextArea(ta, …) where `ta` was
+ * fetched via getElementById('ide-editor-ta').  That element does not exist in
+ * index.html, so `ta` was always null and fromTextArea() threw a TypeError,
+ * meaning IDE.cm was never assigned and the editor was always blank.
+ *
+ * We now use the CodeMirror(container, config) constructor which appends the
+ * editor directly into the #ide-monaco div — no textarea required.
+ */
 function initCM(content = '', lang = 'null') {
   const container = document.getElementById('ide-monaco');
-  const ta        = document.getElementById('ide-editor-ta');
 
   if (IDE.cm) {
+    // Already initialised — just update content + mode
     IDE.cm.setValue(content);
     IDE.cm.setOption('mode', lang || 'null');
-    // Double rAF ensures the panel is painted before CM measures
+    // Double rAF ensures the panel is painted before CM measures its height
     requestAnimationFrame(() => requestAnimationFrame(() => {
       IDE.cm.refresh();
       IDE.cm.focus();
@@ -98,7 +120,8 @@ function initCM(content = '', lang = 'null') {
 
   container.style.display = '';
 
-  IDE.cm = CodeMirror.fromTextArea(ta, {
+  // Use CodeMirror(element, config) — works without a <textarea> in the DOM
+  IDE.cm = CodeMirror(container, {
     value:             content,
     mode:              lang || 'null',
     theme:             'aistudio',
@@ -117,8 +140,6 @@ function initCM(content = '', lang = 'null') {
       'Tab':    cm  => cm.execCommand('insertSoftTab'),
     },
   });
-
-  IDE.cm.setValue(content);
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
     IDE.cm.refresh();
@@ -272,8 +293,8 @@ function _openFile(id) {
   const isVisible = panel && panel.classList.contains('active');
 
   if (!isVisible) {
-    // Tab is hidden — don't init CM yet. ui.js activateTab will call IDE.cm.refresh()
-    // when the tab becomes active. Just update the header breadcrumb.
+    // Tab is hidden — don't init CM yet. ideOnTabActivated() will be called
+    // by ui.js when the tab becomes active.
     document.getElementById('ide-welcome').style.display = 'none';
     document.getElementById('ide-monaco').style.display  = '';
     return;
@@ -304,14 +325,12 @@ function renderFileTree() {
   const ids   = Object.keys(IDE.files);
 
   if (!ids.length) {
-    // Remove all file items, show empty state
     Array.from(list.children).forEach(c => { if (c.id !== 'ide-empty-tree') c.remove(); });
     empty.style.display = '';
     return;
   }
 
   empty.style.display = 'none';
-  // Remove old file items (keep ide-empty-tree in place)
   Array.from(list.children).forEach(c => { if (c.id !== 'ide-empty-tree') c.remove(); });
 
   ids.forEach(id => {
@@ -326,7 +345,6 @@ function renderFileTree() {
       (f.saved ? '' : `<span class="ide-file-modified" title="Unsaved changes">●</span>`) +
       `<button class="ide-file-del" data-id="${id}" title="Delete file">✕</button>`;
 
-    // Use pointer-events on the del button and check dataset instead of classList
     el.addEventListener('click', e => {
       const delBtn = e.target.closest('.ide-file-del');
       if (delBtn) {
@@ -730,12 +748,34 @@ document.getElementById('ide-project-name')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); e.target.blur(); }
 });
 
-// ── Called from ui.js activateTab('code') to init CM after tab becomes visible ──
+// ── Called from ui.js _switchTab('code') when the code tab becomes visible ──
+/**
+ * FIX: Previously this function always called initCM(f.content, f.language)
+ * even when CM was already initialised, which would call setValue() and
+ * overwrite any unsaved content the user had typed.
+ *
+ * New behaviour:
+ *  - CM already exists → flush live content to store, then just refresh the
+ *    layout so CodeMirror measures its size correctly.
+ *  - CM does not exist → create it now with the stored file content.
+ */
 function ideOnTabActivated() {
   if (IDE.activeFile && IDE.files[IDE.activeFile]) {
     const f = IDE.files[IDE.activeFile];
     document.getElementById('ide-welcome').style.display = 'none';
     document.getElementById('ide-monaco').style.display  = '';
-    initCM(f.content, f.language);
+
+    if (IDE.cm) {
+      // CM is already initialised — flush live edits back to the file store
+      // so they are not lost, then just fix the layout measurement.
+      IDE.files[IDE.activeFile].content = IDE.cm.getValue();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        IDE.cm.refresh();
+        IDE.cm.focus();
+      }));
+    } else {
+      // First time — create the editor with whatever content is stored.
+      initCM(f.content, f.language);
+    }
   }
 }
