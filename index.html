@@ -257,6 +257,18 @@
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   AI Help
                 </button>
+                <button class="ide-tool-btn" id="ide-terminal-btn" title="Open terminal">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+                  </svg>
+                  Terminal
+                </button>
+                <button class="ide-tool-btn" id="ide-project-btn" title="Switch / create project">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  Project
+                </button>
               </div>
             </div>
             <div class="ide-editor-body" id="ide-editor-body">
@@ -301,6 +313,20 @@
                 <pre id="ide-output-pre" style="display:none;"></pre>
               </div>
             </div>
+            <!-- Terminal Panel -->
+            <div class="ide-terminal-panel" id="ide-terminal-panel">
+              <div class="ide-term-resize-handle" id="ide-term-resize"></div>
+              <div class="ide-term-header">
+                <span class="ide-term-title">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+                  </svg>
+                  Terminal
+                </span>
+                <button class="ide-hdr-btn" id="ide-terminal-close" title="Close terminal">✕</button>
+              </div>
+              <div class="ide-term-body" id="ide-term-body"></div>
+            </div>
           </div>
 
           <!-- RIGHT: AI Panel -->
@@ -322,23 +348,17 @@
                 <p>Write, debug, refactor, explain, or deploy. I can read your current file and make changes directly.</p>
               </div>
               <div class="ide-ai-chips">
-                <button class="ide-ai-chip" data-p="Explain this code step by step">Explain code</button>
-                <button class="ide-ai-chip" data-p="Find and fix all bugs in this code. Show me the corrected version.">Fix bugs</button>
-                <button class="ide-ai-chip" data-p="Refactor and optimize this code for performance and readability. Return the improved version.">Optimize</button>
-                <button class="ide-ai-chip" data-p="Add detailed JSDoc/docstring comments to all functions and classes">Add comments</button>
-                <button class="ide-ai-chip" data-p="Write comprehensive unit tests for this code">Write tests</button>
-                <button class="ide-ai-chip" data-p="Convert this to TypeScript with proper types and interfaces">→ TypeScript</button>
-                <button class="ide-ai-chip" data-p="How do I push this project to GitHub? Give me exact step-by-step git terminal commands including git init, add remote, push.">Push to GitHub</button>
-                <button class="ide-ai-chip" data-p="How do I deploy this project? Cover Vercel, Netlify, GitHub Pages, and Railway with step-by-step instructions for each.">Deploy options</button>
-                <button class="ide-ai-chip" data-p="Write a detailed README.md for this project with setup, usage, features, and contributing sections">Write README</button>
-                <button class="ide-ai-chip" data-p="Create a .gitignore file appropriate for this project">.gitignore</button>
               </div>
             </div>
             <div class="ide-ai-input-row">
               <div class="ide-ai-ctx-row">
                 <label class="ide-ctx-label">
                   <input type="checkbox" id="ide-include-code" checked>
-                  <span>Send current file as context</span>
+                  <span>Current file</span>
+                </label>
+                <label class="ide-ctx-label">
+                  <input type="checkbox" id="ide-include-all-files" checked>
+                  <span>All files</span>
                 </label>
               </div>
               <div class="ide-ai-bottom-row">
