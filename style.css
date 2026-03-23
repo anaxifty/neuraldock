@@ -5470,6 +5470,155 @@ body.ide-dragging-y * { cursor:row-resize !important; user-select:none !importan
 .ide-apply-btn { position:absolute; top:6px; right:6px; padding:3px 8px; background:var(--surface); border:1px solid var(--accent2); border-radius:4px; color:var(--accent); font-family:var(--font-ui,'DM Mono',monospace); font-size:9px; cursor:pointer; transition:background .15s; z-index:10; }
 .ide-apply-btn:hover { background:var(--accent-dim); }
 
+/* ═══════════════════════════════════════════════════════════════
+   SINGLE-BAR TOOLBAR  — add to bottom of style.css
+   (Overrides the two-row layout from ide-v4.css)
+   ═══════════════════════════════════════════════════════════════
+
+   Layout of the single bar:
+   [ tabs ············ ] [ sep ] [ icons ] [ sep ] [ Files | Output | AI ]
+        flex: 1                  compact           right-aligned toggles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Kill the second row entirely ─────────────────────────────── */
+.ide-actionbar {
+  display: none !important;
+}
+
+/* ── Single unified bar ────────────────────────────────────────── */
+.ide-topbar {
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* Tabs get all leftover space */
+.ide-tabs-list {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.ide-tabs-list::-webkit-scrollbar { display: none; }
+
+/* ── Inline action buttons (icon-only, 26×26) ─────────────────── */
+.ide-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+}
+
+.ide-tba-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color .12s, background .12s, border-color .12s;
+  position: relative;
+}
+.ide-tba-btn:hover {
+  color: var(--text);
+  background: var(--surface2);
+  border-color: var(--border);
+}
+.ide-tba-btn.ide-tba-run:hover  { color: var(--ok);    background: rgba(76,175,130,.1);  border-color: var(--ok); }
+.ide-tba-btn.ide-tba-save:hover { color: var(--accent); background: var(--accent-dim);   border-color: var(--accent2); }
+.ide-tba-btn.ide-ab-active      { color: var(--accent); background: var(--accent-dim);   border-color: var(--accent2); }
+
+/* CSS tooltips — above the button */
+.ide-tba-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1c1e;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  letter-spacing: .03em;
+}
+
+/* Separator between button groups */
+.ide-tba-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  flex-shrink: 0;
+  margin: 0 3px;
+  align-self: center;
+}
+
+/* ── Panel toggles — right side ───────────────────────────────── */
+.ide-panel-toggles {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 4px 6px;
+  border-left: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.ide-ptoggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 40px;
+  height: 28px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--muted);
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  font-size: 7.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.ide-ptoggle:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+.ide-ptoggle.ide-panel-btn-active {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--accent2);
+}
+.ide-ptoggle svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
 .ide-file-btn {
   background: none;
   border: none;
