@@ -4989,3 +4989,207 @@ header h1, header h1 span, .sidebar-logo, .sidebar-logo span,
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
+/* ═══════════════════════════════════════════════════════════════════════
+   IDE PANEL RESIZE & TOGGLE  — append to bottom of style.css
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Global dragging cursors ───────────────────────────────────────────── */
+body.ide-dragging-x * { cursor: col-resize !important; user-select: none !important; }
+body.ide-dragging-y * { cursor: row-resize !important; user-select: none !important; }
+
+/* ── Resize handles ────────────────────────────────────────────────────── */
+.ide-resize-handle-x {
+  width: 5px;
+  flex-shrink: 0;
+  background: transparent;
+  cursor: col-resize;
+  position: relative;
+  z-index: 20;
+  transition: background .15s;
+}
+.ide-resize-handle-x:hover,
+.ide-resize-handle-x:active {
+  background: var(--accent2);
+}
+.ide-resize-handle-x::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -3px; right: -3px; /* wider hit area */
+}
+
+.ide-resize-handle-y {
+  height: 5px;
+  flex-shrink: 0;
+  background: transparent;
+  cursor: row-resize;
+  position: relative;
+  z-index: 20;
+  transition: background .15s;
+}
+.ide-resize-handle-y:hover,
+.ide-resize-handle-y:active {
+  background: var(--accent2);
+}
+.ide-resize-handle-y::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: -3px; bottom: -3px; /* wider hit area */
+}
+
+/* ── Panel hidden state ────────────────────────────────────────────────── */
+.ide-panel-hidden {
+  display: none !important;
+}
+
+/* ── Panel toggle buttons in the toolbar ──────────────────────────────── */
+.ide-panel-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  padding-right: 8px;
+  margin-right: 4px;
+}
+
+.ide-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--muted);
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.ide-toggle-btn:hover {
+  color: var(--text);
+  background: var(--surface2);
+  border-color: var(--border);
+}
+.ide-toggle-btn.ide-panel-btn-active {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-color: var(--accent2);
+}
+.ide-toggle-btn svg {
+  flex-shrink: 0;
+  opacity: .7;
+  transition: opacity .15s;
+}
+.ide-toggle-btn.ide-panel-btn-active svg {
+  opacity: 1;
+}
+
+/* ── Explorer — collapsed state ────────────────────────────────────────── */
+#ide-explorer {
+  transition: width .2s ease, min-width .2s ease;
+  overflow: hidden;
+}
+
+/* ── AI panel — collapsed state ────────────────────────────────────────── */
+#ide-ai-panel {
+  transition: width .2s ease, min-width .2s ease;
+  overflow: hidden;
+}
+
+/* ── Output panel ──────────────────────────────────────────────────────── */
+#ide-output {
+  transition: height .15s ease;
+}
+
+/* ── Terminal panel ────────────────────────────────────────────────────── */
+#ide-terminal-panel {
+  overflow: hidden;
+  transition: height .15s ease;
+}
+.ide-terminal-panel {
+  display: none;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: #0a0b0c;
+  min-height: 120px;
+}
+.ide-term-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ide-term-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ide-term-body {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  background: #0a0b0c;
+}
+
+/* ── xterm overrides ───────────────────────────────────────────────────── */
+.xterm {
+  height: 100%;
+  padding: 6px 10px;
+}
+.xterm-viewport { scrollbar-width: thin; scrollbar-color: #2a2c2e transparent; }
+.xterm-viewport::-webkit-scrollbar { width: 5px; }
+.xterm-viewport::-webkit-scrollbar-thumb { background: #2a2c2e; border-radius: 3px; }
+
+/* ── Terminal placeholder (before xterm loads) ─────────────────────────── */
+.ide-term-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.ide-term-ph-icon { font-size: 1.8rem; opacity: .4; }
+.ide-term-ph-path {
+  font-size: 10px;
+  color: var(--muted);
+}
+.ide-term-ph-path code {
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  font-size: 10px;
+}
+.ide-term-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Responsive: hide AI panel on narrow viewports ─────────────────────── */
+@media (max-width: 900px) {
+  #ide-ai-panel.ide-panel-hidden {
+    display: none !important;
+  }
+  .ide-panel-toggle-row { display: none; } /* too cramped on mobile */
+}
