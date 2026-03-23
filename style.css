@@ -4659,6 +4659,300 @@ header h1, header h1 span, .sidebar-logo, .sidebar-logo span,
   .nd-option-btn   { min-width: 80px; flex: 1 1 80px; }
   .nd-font-grid    { grid-template-columns: 1fr 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   IDE v3 ADDITIONS  —  append to the bottom of style.css
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Status bar ───────────────────────────────────────────────── */
+.ide-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 22px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0 8px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .03em;
+  overflow: hidden;
+  user-select: none;
+}
+.ide-sb-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  height: 100%;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.ide-sb-item.ide-sb-lang-btn,
+.ide-sb-item.ide-sb-file {
+  cursor: pointer;
+}
+.ide-sb-item.ide-sb-lang-btn:hover,
+.ide-sb-item.ide-sb-file:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+.ide-sb-sep {
+  color: var(--border-focus);
+  padding: 0 2px;
+}
+.ide-sb-dot {
+  font-size: 8px;
+}
+.ide-sb-saved   { color: var(--ok); }
+.ide-sb-unsaved { color: var(--accent); }
+.ide-sb-lang    { color: var(--accent2); font-weight: 500; }
+
+/* ── Word wrap & new toolbar buttons ──────────────────────────── */
+.ide-wrap-btn,
+.ide-tool-btn.ide-panel-btn-active {
+  color: var(--accent) !important;
+  background: var(--accent-dim) !important;
+  border-color: var(--accent2) !important;
+}
+
+/* ── Search across files panel ────────────────────────────────── */
+.ide-search-panel {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  max-height: 260px;
+  animation: fadeUp .18s ease both;
+}
+.ide-search-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ide-search-title {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+.ide-search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ide-search-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  font-size: 12px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color .2s;
+}
+.ide-search-input:focus { border-color: var(--accent2); }
+.ide-search-opt-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: all .15s;
+  user-select: none;
+}
+.ide-search-opt-label:hover { border-color: var(--accent2); color: var(--accent); }
+.ide-search-opt-label input { accent-color: var(--accent); }
+
+.ide-search-results {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.ide-search-hint {
+  padding: 14px 14px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+.ide-search-group {
+  border-bottom: 1px solid var(--border);
+}
+.ide-search-file-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+  background: var(--surface2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.ide-search-count {
+  margin-left: auto;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent2);
+  color: var(--accent);
+  border-radius: 10px;
+  font-size: 9px;
+  padding: 1px 7px;
+}
+.ide-search-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 12px 4px 20px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: background .1s;
+}
+.ide-search-row:hover { background: var(--surface2); }
+.ide-search-lineno {
+  color: var(--muted);
+  font-size: 10px;
+  flex-shrink: 0;
+  min-width: 26px;
+  text-align: right;
+}
+.ide-search-text {
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ide-search-hl {
+  background: rgba(212,168,83,.35);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.ide-search-more {
+  padding: 3px 20px 6px;
+  font-size: 10px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ── Language picker ──────────────────────────────────────────── */
+.ide-lang-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.ide-lang-picker {
+  background: var(--surface);
+  border: 1px solid var(--border-focus);
+  border-radius: 10px;
+  padding: 16px;
+  min-width: 220px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.6);
+  animation: fadeUp .15s ease both;
+}
+.ide-lang-picker-title {
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.ide-lang-opt {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-ui, 'DM Mono', monospace);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s;
+  margin-bottom: 2px;
+}
+.ide-lang-opt:hover { background: var(--surface2); border-color: var(--border); }
+.ide-lang-cancel { color: var(--muted); }
+.ide-lang-cancel:hover { color: var(--err); border-color: var(--err); }
+
+/* ── Live preview button (only shown for HTML) ────────────────── */
+.ide-tool-btn[id="ide-preview-btn"] {
+  color: var(--ok);
+}
+.ide-tool-btn[id="ide-preview-btn"]:hover {
+  border-color: var(--ok);
+  color: var(--ok);
+  background: rgba(76,175,130,.1);
+}
+
+/* ── Fold / go-to-line button ─────────────────────────────────── */
+.ide-tool-btn[id="ide-fold-btn"],
+.ide-tool-btn[id="ide-gotoline-btn"] {
+  color: var(--muted);
+}
+
+/* ── Tab icon (small, before filename) ───────────────────────── */
+.ide-tab-icon { font-size: 11px; flex-shrink: 0; }
+
+/* ── Unsaved dot more prominent ──────────────────────────────── */
+.ide-tab-dot {
+  color: var(--accent);
+  font-size: 10px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Editor column — status bar at very bottom ───────────────── */
+.ide-editor-col {
+  display: flex;
+  flex-direction: column;
+}
+/* Push statusbar to the absolute bottom, above output */
+.ide-editor-col > .ide-statusbar {
+  order: 99;
+}
+
+/* ── Context-menu style file-tree tooltip ───────────────────── */
+.ide-file-item .ide-file-actions {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.ide-file-item:hover .ide-file-actions { display: flex; }
+
+/* ── Search & format buttons in toolbar separator ────────────── */
+.ide-toolbar-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
 /* ── File tree: rename + delete actions ──────────────────────────── */
 .ide-file-actions {
   display: none;

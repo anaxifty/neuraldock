@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="ide-panels.css">
+  <link rel="stylesheet" href="ide-v3-additions.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -241,62 +242,111 @@
           <!-- CENTER: Editor -->
           <div class="ide-editor-col">
             <div class="ide-topbar">
-              <div class="ide-tabs-list" id="ide-tabs-list"></div>
-              <div class="ide-toolbar">
+      <div class="ide-tabs-list" id="ide-tabs-list"></div>
+      <div class="ide-toolbar">
 
-        <!-- Panel toggle buttons -->
+        <!-- Panel toggles -->
         <div class="ide-panel-toggle-row">
           <button class="ide-toggle-btn" id="ide-toggle-explorer" title="Toggle file explorer">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
             </svg>
-            Files
+            <span class="ide-panel-btn-label">Files</span>
           </button>
           <button class="ide-toggle-btn" id="ide-toggle-output" title="Toggle output panel">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
             </svg>
-            Output
+            <span class="ide-panel-btn-label">Output</span>
           </button>
           <button class="ide-toggle-btn" id="ide-toggle-ai" title="Toggle AI assistant">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
-            AI
+            <span class="ide-panel-btn-label">AI</span>
           </button>
         </div>
 
-        <!-- Existing action buttons (keep exactly as-is) -->
-                <button class="ide-tool-btn" id="ide-save-btn" title="Save (Ctrl+S)">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                  Save
-                </button>
-                <button class="ide-tool-btn" id="ide-dl-btn" title="Download current file">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Download
-                </button>
-                <button class="ide-tool-btn" id="ide-run-btn" title="Run code">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  Run
-                </button>
-                <button class="ide-tool-btn ide-ai-toggle" id="ide-ai-toggle">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  AI Help
-                </button>
-                <button class="ide-tool-btn" id="ide-terminal-btn" title="Open terminal">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
-                  </svg>
-                  Terminal
-                </button>
-                <button class="ide-tool-btn" id="ide-project-btn" title="Switch / create project">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                  </svg>
-                  Project
-                </button>
-              </div>
-            </div>
+        <div class="ide-toolbar-sep"></div>
+
+        <!-- Core actions -->
+        <button class="ide-tool-btn" id="ide-save-btn" title="Save (Ctrl+S)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Save
+        </button>
+        <button class="ide-tool-btn" id="ide-run-btn" title="Run code">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          Run
+        </button>
+        <button class="ide-tool-btn" id="ide-preview-btn" title="Open HTML in new tab">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+          Preview
+        </button>
+
+        <div class="ide-toolbar-sep"></div>
+
+        <!-- Code actions -->
+        <button class="ide-tool-btn" id="ide-format-btn" title="Format code with Prettier">⌥ Format</button>
+        <button class="ide-tool-btn" id="ide-wrap-btn" title="Toggle word wrap">↵ Wrap</button>
+        <button class="ide-tool-btn" id="ide-search-btn" title="Search across all files (Ctrl+Shift+F)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Search
+        </button>
+        <button class="ide-tool-btn" id="ide-gotoline-btn" title="Go to line (Ctrl+G)">:# Line</button>
+        <button class="ide-tool-btn" id="ide-fold-btn" title="Fold all blocks">⊟ Fold</button>
+
+        <div class="ide-toolbar-sep"></div>
+
+        <!-- Downloads -->
+        <button class="ide-tool-btn" id="ide-dl-btn" title="Download current file">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          File
+        </button>
+        <button class="ide-tool-btn" id="ide-zip-btn" title="Download all files as ZIP">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          ZIP
+        </button>
+
+        <div class="ide-toolbar-sep"></div>
+
+        <!-- Shell & project -->
+        <button class="ide-tool-btn" id="ide-terminal-btn" title="Toggle terminal">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          Terminal
+        </button>
+        <button class="ide-tool-btn" id="ide-project-btn" title="Switch / create project">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+          </svg>
+          Project
+        </button>
+
+      </div>
+    </div>
             <div class="ide-editor-body" id="ide-editor-body">
               <div class="ide-welcome" id="ide-welcome">
                 <div class="ide-welcome-icon">⌘</div>
@@ -322,6 +372,7 @@
               </div>
               <div id="ide-monaco" style="display:none;height:100%;width:100%;"></div>
             </div>
+            <div class="ide-statusbar" id="ide-statusbar"></div>
             <div class="ide-resize-handle-y" id="ide-output-handle" title="Drag to resize output"></div>
     <div class="ide-output" id="ide-output" style="display:none">
       <div class="ide-output-hdr">
