@@ -25,6 +25,11 @@ function newChat() {
   S.conversations[conv.id] = conv;
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
+
+  // Clear search on new chat for fresh start
+  const searchInp = document.getElementById('sidebar-search');
+  if (searchInp) searchInp.value = '';
+
   saveConvs();
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
@@ -152,10 +157,19 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let anyResults = pinned.length > 0;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    anyResults = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!anyResults && q) {
+    const empty = document.createElement('div');
+    empty.className = 'sidebar-no-results';
+    empty.textContent = 'No matches found';
+    container.appendChild(empty);
   }
 }
 

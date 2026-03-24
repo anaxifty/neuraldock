@@ -1,0 +1,3 @@
+## 2025-05-14 - [Sidebar Search UX & Accessibility]
+**Learning:** Providing immediate feedback when a search yields no results is a fundamental micro-UX pattern that prevents user confusion in data-heavy sidebars. Additionally, ensuring a clean slate by clearing search queries when initiating a "New Chat" reduces cognitive load and maintains interaction flow. Accessibility (ARIA labels) should always be integrated into these interaction points.
+**Action:** Always implement "Empty State" feedback for search components and manage input lifecycle during state transitions (like creating new items).
