@@ -1,82 +1,94 @@
 /**
- * utils.js — Shared utility functions
- * No dependencies. Must be loaded first.
+ * utils.js — Shared helper functions
  */
 
 'use strict';
 
-// ── HTML escaping ──────────────────────────────────────────────────────────
-/** Safely escape a string for HTML insertion */
 function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = String(s ?? '');
-  return d.innerHTML;
+  if (!s) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
-// ── Toast notifications ────────────────────────────────────────────────────
-/**
- * Show a brief notification toast.
- * @param {string} msg
- * @param {'success'|'error'|'info'} type
- */
-function toast(msg, type = 'success') {
-  const container = document.getElementById('toast-container');
-  if (!container) return;
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  container.appendChild(el);
-  // Remove after animation completes
-  setTimeout(() => el.remove(), 3200);
+function md(s) {
+  if (typeof marked === 'undefined') return s;
+  return marked.parse(s);
 }
 
-// ── Time formatting ────────────────────────────────────────────────────────
-/** Convert a timestamp to a human-readable relative time string */
-function relativeTime(ts) {
-  const seconds = (Date.now() - ts) / 1000;
-  if (seconds < 60)    return 'just now';
-  if (seconds < 3600)  return Math.floor(seconds / 60)    + 'm ago';
-  if (seconds < 86400) return Math.floor(seconds / 3600)  + 'h ago';
-  return Math.floor(seconds / 86400) + 'd ago';
+function relativeTime(ms) {
+  const d = new Date(ms);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return d.toLocaleDateString();
 }
 
-// ── Textarea auto-resize ───────────────────────────────────────────────────
-/** Expand a textarea to fit its content, capped at 160px */
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 160) + 'px';
-}
-
-// Wire up auto-resize to all textareas on input
-document.addEventListener('input', e => {
-  if (e.target && e.target.tagName === 'TEXTAREA') autoResize(e.target);
-});
-
-// ── File reading helpers ───────────────────────────────────────────────────
-/** Read a file as a base64 data URL */
-function readFileAsDataURL(file) {
+async function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result);
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-/** Read a file as plain text */
-function readFileAsText(file) {
+async function readFileAsText(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result);
+    reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
     reader.readAsText(file);
   });
 }
 
-// ── Code block actions ─────────────────────────────────────────────────────
-/** Copy the content of a code block to clipboard (called from inline onclick) */
-function copyCodeBlock(btn) {
-  const code = btn.closest('pre')?.querySelector('code');
-  if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+function saveState() {
+    if (typeof saveSettings === 'function') saveSettings();
 }
+
+function applyAllThemeSettings() {
+    document.documentElement.classList.add('dark');
+}
+
+// Full MODELS registry from old config.js
+const MODELS = [
+  {
+    provider: 'OpenAI',
+    color: '#10a37f',
+    models: [
+      { id: 'gpt-4o', name: 'GPT-4o Production' },
+      { id: 'gpt-4o-mini', name: 'GPT-4o Mini' },
+      { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
+      { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' },
+    ]
+  },
+  {
+    provider: 'Anthropic',
+    color: '#d97706',
+    models: [
+      { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet' },
+      { id: 'claude-3-opus', name: 'Claude 3 Opus' },
+    ]
+  },
+  {
+    provider: 'Google',
+    color: '#4285f4',
+    models: [
+      { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+      { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+    ]
+  }
+];
+
+// Full VOICE_REGISTRY from old config.js
+const VOICE_REGISTRY = {
+  'openai': {
+    voices: [['alloy','Alloy'],['ash','Ash'],['ballad','Ballad'],['coral','Coral'],['echo','Echo'],['fable','Fable'],['nova','Nova'],['onyx','Onyx'],['sage','Sage'],['shimmer','Shimmer']],
+  },
+  'aws-polly': {
+    voices: [['Joanna','Joanna'],['Matthew','Matthew'],['Salli','Salli'],['Ivy','Ivy'],['Kendra','Kendra'],['Kimberly','Kimberly']],
+  },
+  'elevenlabs': {
+    voices: [['21m00Tcm4TlvDq8ikWAM','Rachel'],['EXAVITQu4vr4xnSDxMaL','Bella'],['MF3mGyEYCl7XYWbV9V6O','Elli']],
+  }
+};
