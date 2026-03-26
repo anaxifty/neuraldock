@@ -80,3 +80,17 @@ function copyCodeBlock(btn) {
   if (!code) return;
   navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
 }
+
+// ── Performance helpers ────────────────────────────────────────────────────
+/**
+ * Limits the rate at which a function can fire.
+ * @param {Function} fn - The function to debounce
+ * @param {number} delay - Delay in ms
+ */
+function debounce(fn, delay = 300) {
+  let timer = null;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}

@@ -159,8 +159,9 @@ document.getElementById('model-selector-btn').addEventListener('click', () => {
   }
 });
 
+const debouncedRenderModelList = debounce(renderModelList, 200);
 document.addEventListener('input', e => {
-  if (e.target?.id === 'model-search') renderModelList(e.target.value);
+  if (e.target?.id === 'model-search') debouncedRenderModelList(e.target.value);
 });
 document.addEventListener('click', e => {
   if (e.target?.id === 'model-search') e.stopPropagation();

@@ -544,7 +544,7 @@ function populatePicker(q) {
   if (!count) list.innerHTML = '<div class="model-no-results">No models match</div>';
 }
 
-document.getElementById('_pickerInput')?.addEventListener('input', function () { populatePicker(this.value); });
+document.getElementById('_pickerInput')?.addEventListener('input', debounce(function () { populatePicker(this.value); }, 200));
 document.getElementById('_pickerInput')?.addEventListener('click', e => e.stopPropagation());
 _pickerEl.addEventListener('click', e => e.stopPropagation());
 _menuEl.addEventListener('click',   e => e.stopPropagation());

@@ -8,9 +8,9 @@
 'use strict';
 
 document.getElementById('new-chat-btn').addEventListener('click', newChat);
-document.getElementById('sidebar-search').addEventListener('input', function () {
+document.getElementById('sidebar-search').addEventListener('input', debounce(function () {
   renderSidebar(this.value);
-});
+}, 250));
 
 function newChat() {
   const conv = {
