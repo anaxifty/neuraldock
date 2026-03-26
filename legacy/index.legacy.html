@@ -1,0 +1,1187 @@
+<!-- DEPRECATED: Replaced by new UI in index.html. Kept for reference only. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>AI Studio — Free Chat, Code, Image & Voice | Puter.js</title>
+  <meta name="description" content="Access free AI models for chat, coding, image generation, and text-to-speech — all powered by Puter.js with no API keys.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="ide-panels.css">
+  <link rel="stylesheet" href="ide-v3-additions.css">
+  <link rel="stylesheet" href="ide-v4.css">
+  <link rel="stylesheet" href="ide-singlebar.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <div id="login-screen">
+    <canvas id="login-particles"></canvas>
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-logo">Neural<span>Dock</span></div>
+      <div class="login-tagline">Access the world's best AI models — free, no API keys.</div>
+
+      <!-- Primary: Puter (always shown) -->
+      <button class="login-btn" id="login-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign in with Puter
+      </button>
+      <button class="login-fallback" id="login-fallback">Already signed in → continue</button>
+
+      <!-- Divider -->
+      <div class="login-divider-line"><span>or save your data with</span></div>
+
+      <!-- Social: GitHub + Google side by side -->
+      <div class="login-social-row">
+        <button class="login-social-sm" id="login-github-btn" title="Continue with GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </button>
+        <button class="login-social-sm" id="login-google-btn" title="Continue with Google">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google
+        </button>
+        <button class="login-social-sm login-email-sm-btn" id="login-email-toggle" title="Sign in with Email">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </button>
+      </div>
+
+      <!-- Email form (collapsed by default) -->
+      <div class="login-email-form" id="login-email-form" style="display:none">
+        <input type="email"    id="login-email-input"    class="login-input" placeholder="Email address" autocomplete="email">
+        <input type="password" id="login-password-input" class="login-input" placeholder="Password" autocomplete="current-password">
+        <button class="login-btn" id="login-email-submit">Sign In</button>
+        <div class="login-form-footer">
+          <button class="login-text-btn" id="login-mode-toggle" data-mode="signin">No account? Sign up</button>
+          <button class="login-text-btn" id="login-forgot-btn">Forgot password?</button>
+        </div>
+      </div>
+
+      <div class="login-status" id="login-status"></div>
+
+      <div class="login-footer">Free forever · No ads · Powered by <a href="https://puter.com" target="_blank" rel="noopener">Puter</a></div>
+    </div>
+  </div>
+
+  <div id="app-wrapper">
+    <div class="sidebar-mobile-overlay" id="sidebar-overlay"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">AI <span>Studio</span></div>
+        <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Collapse">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 19l-7-7 7-7"/><path d="M18 19l-7-7 7-7" opacity="0.4"/></svg>
+        </button>
+      </div>
+      <button class="new-chat-btn" id="new-chat-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Chat
+      </button>
+      <div class="sidebar-search-wrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="sidebar-search" placeholder="Search chats…" autocomplete="off" />
+      </div>
+      <div class="sidebar-conversations" id="sidebar-conversations"></div>
+      <div class="sidebar-footer">
+        <button class="sidebar-settings-btn" id="settings-open-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="sidebar-settings-btn" id="shortcuts-btn" title="Keyboard shortcuts">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12"/></svg>
+          Shortcuts
+        </button>
+        <div class="sidebar-user" id="sidebar-user">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <span class="user-name" id="user-name">Not signed in</span>
+        </div>
+      </div>
+    </aside>
+
+    <div id="app">
+      <header>
+        <button class="hamburger-btn" id="hamburger-btn" title="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="logo-dot"></div>
+        <h1>AI <span>Studio</span></h1>
+        <div class="header-right">
+          <div class="model-selector" id="model-selector">
+            <button class="model-selector-btn" id="model-selector-btn">
+              <span class="model-dot" id="active-model-dot"></span>
+              <span id="active-model-name">gpt-4o</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div class="model-dropdown" id="model-dropdown">
+              <div class="model-search-wrap">
+                <svg class="model-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="model-search" class="model-search-input" placeholder="Search models…" autocomplete="off" />
+              </div>
+              <div id="model-list"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="chat"><span class="tab-icon">💬</span><span class="tab-label">Chat</span></button>
+        <button class="tab-btn" data-tab="code"><span class="tab-icon">⌨</span><span class="tab-label">Code</span></button>
+        <button class="tab-btn" data-tab="image"><span class="tab-icon">✦</span><span class="tab-label">Image</span></button>
+        <button class="tab-btn" data-tab="voice"><span class="tab-icon">♪</span><span class="tab-label">Voice</span></button>
+      </nav>
+
+      <!-- CHAT TAB -->
+      <div class="tab-panel active" id="panel-chat">
+        <div class="chat-area" id="chatMessages">
+          <div class="empty-state" id="chatEmpty">
+            <div class="icon">◎</div>
+            <h3>Start a Conversation</h3>
+            <p>Chat with powerful AI models for free — no API keys, no limits.</p>
+            <div class="tips">
+              <div class="tip" data-prompt="Explain quantum computing in simple terms"><div class="t-icon">⟡</div><h4>Learn</h4><p>Explain quantum computing simply</p></div>
+              <div class="tip" data-prompt="Write a short story about a time-traveling librarian"><div class="t-icon">✎</div><h4>Create</h4><p>Write a short story</p></div>
+              <div class="tip" data-prompt="What are 5 tips for better productivity?"><div class="t-icon">◆</div><h4>Advise</h4><p>Give productivity tips</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="input-area">
+          <div class="attachment-strip" id="attachment-strip"></div>
+          <div class="input-toggles">
+            <button class="input-toggle" id="deepthink-toggle">🧠 DeepThink</button>
+            <button class="input-toggle" id="search-toggle">🔍 Search</button>
+            <div class="length-btns" title="Response length">
+              <button class="length-btn" data-len="concise" title="Concise">—</button>
+              <button class="length-btn active" data-len="balanced" title="Balanced">≈</button>
+              <button class="length-btn" data-len="detailed" title="Detailed">≡</button>
+            </div>
+          </div>
+          <div class="input-row">
+            <input type="file" id="file-input" multiple accept="image/*,.pdf,.txt,.md,.csv,.js,.py,.ts,.html,.css,.json" style="display:none">
+            <button class="attach-btn" id="attach-btn" title="Attach file or image (images, PDFs, text)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <button class="mic-btn" id="voice-input-btn" title="Voice input">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <textarea id="chatInput" rows="1" placeholder="Send a message…"></textarea>
+            <button class="send-btn" id="chatSendBtn">➤</button>
+            <button class="stop-btn" id="chatStopBtn" title="Stop generation">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            </button>
+          </div>
+          <p class="hint">Ctrl+Enter to send · Shift+Enter for newline · ? for shortcuts</p>
+        </div>
+      </div>
+
+      <!-- CODE TAB — Full IDE -->
+      <div class="tab-panel" id="panel-code">
+        <div class="ide-layout">
+
+          <!-- LEFT: File Explorer -->
+          <div class="ide-explorer" id="ide-explorer">
+    <!-- Project header -->
+    <div class="ide-proj-header">
+      <div class="ide-proj-name-row">
+        <svg class="ide-proj-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        <span class="ide-proj-name" id="ide-project-name" contenteditable="true" spellcheck="false">my-project</span>
+        <button class="ide-proj-menu-btn" id="ide-proj-menu-btn" title="Project menu">⋮</button>
+      </div>
+    </div>
+
+    <!-- File tree -->
+    <div class="ide-filetree" id="ide-file-list">
+      <div class="ide-empty-tree" id="ide-empty-tree">
+        <p>No files yet</p>
+        <button class="ide-empty-btn" id="ide-tree-new-btn">+ New File</button>
+        <button class="ide-empty-btn" id="ide-tree-upload-btn">↑ Upload</button>
+      </div>
+    </div>
+
+    <!-- Quick action row -->
+    <div class="ide-explorer-actions">
+      <button class="ide-exp-act-btn" id="ide-tree-new-btn" title="New File">+ File</button>
+      <button class="ide-exp-act-btn" id="ide-tree-new-folder-btn" title="New Folder">📁 Folder</button>
+      <button class="ide-exp-act-btn" id="ide-upload-btn" title="Upload Files">↑ Upload</button>
+    </div>
+
+    <!-- Templates -->
+    <div class="ide-explorer-footer">
+      <div class="ide-tpl-label">Templates</div>
+      <div class="ide-tpl-grid">
+        <button class="ide-tpl-chip" data-tpl="html">🌐 Web</button>
+        <button class="ide-tpl-chip" data-tpl="react">⚛ React</button>
+        <button class="ide-tpl-chip" data-tpl="node">🟩 Node</button>
+        <button class="ide-tpl-chip" data-tpl="python">🐍 Python</button>
+      </div>
+    </div>
+          </div>
+            <div class="ide-resize-handle-x" id="ide-explorer-handle" title="Drag to resize"></div>
+
+          <!-- CENTER: Editor -->
+          <div class="ide-editor-col">
+      <!-- ── Row 1: tabs + panel toggles ── -->
+      <div class="ide-topbar">
+
+  <!-- Tabs — fills remaining space -->
+  <div class="ide-tabs-list" id="ide-tabs-list"></div>
+
+  <!-- Action buttons — compact icon row -->
+  <div class="ide-topbar-actions">
+
+    <!-- File ops -->
+    <button class="ide-tba-btn ide-tba-save" id="ide-save-btn" title="Save (Ctrl+S)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/>
+        <polyline points="7 3 7 8 15 8"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn ide-tba-run" id="ide-run-btn" title="Run Code (F5)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polygon points="5 3 19 12 5 21 5 3"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-preview-btn" title="Live Preview">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/>
+        <line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+    </button>
+
+    <div class="ide-tba-sep"></div>
+
+    <!-- Editor tools -->
+    <button class="ide-tba-btn" id="ide-format-btn" title="Format (Prettier)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/>
+        <line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-wrap-btn" title="Toggle Word Wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="17 10 21 10 21 19"/><line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M21 14H9"/><polyline points="9 10 5 14 9 18"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-search-btn" title="Search in Files (Ctrl+Shift+F)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-fold-btn" title="Fold All">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="16" x2="21" y2="16"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-gotoline-btn" title="Go to Line (Ctrl+G)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/>
+        <polyline points="10 9 7 12 10 15"/>
+      </svg>
+    </button>
+
+    <div class="ide-tba-sep"></div>
+
+    <!-- Download + Terminal -->
+    <button class="ide-tba-btn" id="ide-dl-btn" title="Download File">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
+    <button class="ide-tba-btn" id="ide-terminal-btn" title="Toggle Terminal">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+      </svg>
+    </button>
+
+  </div>
+
+  <!-- Panel toggles — far right -->
+  <div class="ide-panel-toggles">
+    <button class="ide-ptoggle" id="ide-toggle-explorer" title="Toggle Files">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+      </svg>
+      Files
+    </button>
+    <button class="ide-ptoggle" id="ide-toggle-output" title="Toggle Output">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+      </svg>
+      Output
+    </button>
+    <button class="ide-ptoggle" id="ide-toggle-ai" title="Toggle AI">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      AI
+    </button>
+  </div>
+
+</div>
+            <div class="ide-editor-body" id="ide-editor-body">
+              <div class="ide-welcome" id="ide-welcome">
+                <div class="ide-welcome-icon">⌘</div>
+                <h3>Project IDE</h3>
+                <p>Build full projects, get AI assistance, and deploy your code.</p>
+                <div class="ide-welcome-cards">
+                  <button class="ide-wlc-card" data-tpl="html"><span>🌐</span><strong>Web App</strong><small>HTML + CSS + JS</small></button>
+                  <button class="ide-wlc-card" data-tpl="react"><span>⚛</span><strong>React App</strong><small>JSX + CSS</small></button>
+                  <button class="ide-wlc-card" data-tpl="node"><span>🟩</span><strong>Node.js</strong><small>Express server</small></button>
+                  <button class="ide-wlc-card" data-tpl="python"><span>🐍</span><strong>Python</strong><small>Script + utils</small></button>
+                </div>
+                <div class="ide-welcome-or">— or —</div>
+                <div class="ide-welcome-row">
+                  <button class="ide-welcome-btn" id="ide-wlc-new">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                    New File
+                  </button>
+                  <button class="ide-welcome-btn" id="ide-wlc-upload">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload Files
+                  </button>
+                </div>
+              </div>
+              <div id="ide-monaco" style="display:none;height:100%;width:100%;"></div>
+            </div>
+            <div class="ide-statusbar" id="ide-statusbar"></div>
+            <div class="ide-resize-handle-y" id="ide-output-handle" title="Drag to resize output"></div>
+    <div class="ide-output" id="ide-output" style="display:none">
+      <div class="ide-output-hdr">
+        <div class="ide-out-tabs">
+          <button class="ide-out-tab active" data-out="preview">Preview</button>
+          <button class="ide-out-tab" data-out="console">Console</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="ide-hdr-btn" id="ide-output-rerun">▶ Rerun</button>
+          <button class="ide-hdr-btn" id="ide-output-clear">Clear</button>
+          <button class="ide-hdr-btn" id="ide-output-close">✕</button>
+        </div>
+      </div>
+      <div class="ide-output-body">
+        <iframe id="ide-html-frame" style="display:none;width:100%;height:100%;border:none;background:#fff;"></iframe>
+        <pre id="ide-output-pre" style="display:none;"></pre>
+      </div>
+    </div>
+            <!-- Terminal Panel -->
+    <div class="ide-terminal-panel" id="ide-terminal-panel" style="display:none">
+      <div class="ide-resize-handle-y" id="ide-term-resize" title="Drag to resize"></div>
+      <div class="ide-term-header">
+        <span class="ide-term-title">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          Terminal
+        </span>
+        <button class="ide-hdr-btn" id="ide-terminal-close" title="Close">✕</button>
+      </div>
+      <div class="ide-term-body" id="ide-term-body"></div>
+    </div>
+          </div>
+
+          <!-- RIGHT: AI Panel -->
+          <div class="ide-resize-handle-x" id="ide-ai-handle" title="Drag to resize"></div>
+          <div class="ide-ai-panel" id="ide-ai-panel">
+            <div class="ide-ai-hdr">
+              <span class="ide-ai-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                AI Assistant
+              </span>
+              <button class="ide-hdr-btn" id="ide-ai-clear" title="Clear chat">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>
+              </button>
+              <button class="ide-hdr-btn" id="ide-ai-close">✕</button>
+            </div>
+            <div class="ide-ai-msgs" id="ide-ai-msgs">
+              <div class="ide-ai-welcome-msg">
+                <div class="ide-ai-welcome-icon">🤖</div>
+                <strong>AI Code Assistant</strong>
+                <p>Write, debug, refactor, explain, or deploy. I can read your current file and make changes directly.</p>
+              </div>
+              <div class="ide-ai-chips">
+              </div>
+            </div>
+            <div class="ide-ai-input-row">
+              <div class="ide-ai-ctx-row">
+                <label class="ide-ctx-label">
+                  <input type="checkbox" id="ide-include-code" checked>
+                  <span>Current file</span>
+                </label>
+                <label class="ide-ctx-label">
+                  <input type="checkbox" id="ide-include-all-files" checked>
+                  <span>All files</span>
+                </label>
+              </div>
+              <div class="ide-ai-bottom-row">
+                <textarea id="ide-ai-input" rows="2" placeholder="Ask about code, deployment, tools…"></textarea>
+                <div class="ide-ai-btns">
+                  <button class="ide-ai-send-btn" id="ide-ai-send">➤</button>
+                  <button class="ide-ai-stop-btn" id="ide-ai-stop" style="display:none">■</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- .ide-layout -->
+        <input type="file" id="ide-file-input" multiple style="display:none">
+      </div>
+
+      <!-- IMAGE TAB -->
+      <div class="tab-panel" id="panel-image">
+        <div class="img-layout">
+
+          <!-- LEFT: Controls Sidebar -->
+          <div class="img-ctrl-sidebar">
+            <div class="img-ctrl-scroll">
+
+              <!-- Provider selection -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Provider</div>
+                <div class="img-provider-tabs" id="img-provider-tabs">
+                  <button class="img-prov-btn active" data-provider="openai-image-generation">
+                    <span class="img-prov-dot" style="background:#10a37f"></span>OpenAI
+                  </button>
+                  <button class="img-prov-btn" data-provider="together">
+                    <span class="img-prov-dot" style="background:#ff6b35"></span>Together AI
+                  </button>
+                  <button class="img-prov-btn" data-provider="xai">
+                    <span class="img-prov-dot" style="background:#d4d4d4"></span>xAI / Grok
+                  </button>
+                </div>
+              </div>
+
+              <!-- Model -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Model</div>
+                <select id="imageModel" class="img-select"></select>
+                <div class="img-model-info" id="img-model-info"></div>
+              </div>
+
+              <!-- Prompt -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label-row">
+                  <span class="img-ctrl-label">Prompt</span>
+                  <button class="img-enhance-btn" id="img-enhance-btn" title="Enhance prompt with AI">✨ Enhance</button>
+                </div>
+                <textarea id="imagePrompt" class="img-prompt-ta" placeholder="Describe the image you want to generate…" rows="4" maxlength="2000"></textarea>
+              </div>
+
+              <!-- Negative Prompt (SD models) -->
+              <div class="img-ctrl-section" id="negPromptWrap" style="display:none">
+                <div class="img-ctrl-label">Negative Prompt</div>
+                <textarea id="imageNegPrompt" class="img-prompt-ta img-neg-ta" placeholder="What to avoid — blurry, watermark, low quality…" rows="2"></textarea>
+              </div>
+
+              <!-- Style Presets -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Style Preset</div>
+                <div class="style-presets" id="style-presets">
+                  <button class="style-preset active" data-style="">None</button>
+                  <button class="style-preset" data-style="photorealistic, 8k ultra detailed, hyperrealistic">Photorealistic</button>
+                  <button class="style-preset" data-style="anime style, vibrant colors, detailed line art">Anime</button>
+                  <button class="style-preset" data-style="oil painting on canvas, textured brushstrokes, masterpiece">Oil Painting</button>
+                  <button class="style-preset" data-style="pixel art, 16-bit retro style, sharp pixels">Pixel Art</button>
+                  <button class="style-preset" data-style="pencil sketch, hand-drawn, black and white, detailed">Sketch</button>
+                  <button class="style-preset" data-style="cinematic lighting, dramatic atmosphere, film grain, movie still">Cinematic</button>
+                  <button class="style-preset" data-style="watercolor painting, soft edges, pastel colors, artistic">Watercolor</button>
+                  <button class="style-preset" data-style="3D render, octane render, highly detailed, volumetric lighting">3D Render</button>
+                  <button class="style-preset" data-style="fantasy art, ethereal, magical glowing particles, epic scene">Fantasy</button>
+                  <button class="style-preset" data-style="minimalist, clean lines, flat design, simple geometric">Minimalist</button>
+                  <button class="style-preset" data-style="cyberpunk, neon lights, futuristic city, rain-soaked streets">Cyberpunk</button>
+                </div>
+              </div>
+
+              <!-- Aspect Ratio -->
+              <div class="img-ctrl-section" id="cap-aspectRatio">
+                <div class="img-ctrl-label">Aspect Ratio</div>
+                <div class="img-ar-grid" id="img-ar-grid">
+                  <button class="img-ar-btn active" data-ar="1:1" title="Square (1:1)">
+                    <div class="ar-preview ar-1-1"></div><span>1:1</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="16:9" title="Landscape (16:9)">
+                    <div class="ar-preview ar-16-9"></div><span>16:9</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="9:16" title="Portrait (9:16)">
+                    <div class="ar-preview ar-9-16"></div><span>9:16</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="4:3" title="Standard (4:3)">
+                    <div class="ar-preview ar-4-3"></div><span>4:3</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="3:4" title="Portrait (3:4)">
+                    <div class="ar-preview ar-3-4"></div><span>3:4</span>
+                  </button>
+                  <button class="img-ar-btn" data-ar="3:2" title="Photo (3:2)">
+                    <div class="ar-preview ar-3-2"></div><span>3:2</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Resolution -->
+              <div class="img-ctrl-section" id="imageSizeField">
+                <div class="img-ctrl-label">Resolution</div>
+                <select id="imageSize" class="img-select"></select>
+              </div>
+
+              <!-- Quality -->
+              <div class="img-ctrl-section" id="imageQualityField" style="display:none">
+                <div class="img-ctrl-label">Quality</div>
+                <select id="imageQuality" class="img-select"></select>
+              </div>
+
+              <!-- DALL-E 3 Style Mode -->
+              <div class="img-ctrl-section" id="imgStyleModeField" style="display:none">
+                <div class="img-ctrl-label">Image Style</div>
+                <select id="imageStyleMode" class="img-select">
+                  <option value="vivid">Vivid (hyper-real)</option>
+                  <option value="natural">Natural (subtle)</option>
+                </select>
+              </div>
+
+              <!-- Output Format -->
+              <div class="img-ctrl-section" id="imgFormatField" style="display:none">
+                <div class="img-ctrl-label">Format</div>
+                <select id="imageFormat" class="img-select">
+                  <option value="png">PNG</option>
+                  <option value="jpeg">JPEG</option>
+                  <option value="webp">WebP</option>
+                </select>
+              </div>
+
+              <!-- Steps (diffusion models) -->
+              <div class="img-ctrl-section" id="cap-steps" style="display:none">
+                <div class="img-ctrl-label">Steps <span class="img-slider-val" id="stepsVal">28</span></div>
+                <input type="range" id="imageSteps" class="img-range" min="10" max="50" value="28">
+              </div>
+
+              <!-- Guidance Scale -->
+              <div class="img-ctrl-section" id="cap-guidance" style="display:none">
+                <div class="img-ctrl-label">Guidance Scale <span class="img-slider-val" id="guidanceVal">7.5</span></div>
+                <input type="range" id="imageGuidance" class="img-range" min="10" max="200" value="75">
+              </div>
+
+              <!-- Image Count -->
+              <div class="img-ctrl-section" id="imageCountField">
+                <div class="img-ctrl-label">Count</div>
+                <div class="img-count-row">
+                  <button class="img-count-btn active" data-count="1">1</button>
+                  <button class="img-count-btn" data-count="2">2</button>
+                  <button class="img-count-btn" data-count="4">4</button>
+                </div>
+              </div>
+
+              <!-- Seed -->
+              <div class="img-ctrl-section">
+                <div class="img-ctrl-label">Seed <span class="img-optional">(optional)</span></div>
+                <input type="number" id="imageSeed" class="img-input-sm" placeholder="Random" min="0" max="999999999">
+              </div>
+
+              <button class="gen-btn" id="genImgBtn" style="width:100%;margin-top:6px">✦ Generate Image</button>
+            </div>
+          </div>
+
+          <!-- RIGHT: Gallery -->
+          <div class="img-gallery-area">
+            <div class="img-gallery" id="imageGallery">
+              <div class="empty-state" id="imageEmpty">
+                <div class="icon">✦</div>
+                <h3>Generate Images</h3>
+                <p>Choose a model, describe your image, and let AI create it.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VOICE TAB -->
+      <div class="tab-panel" id="panel-voice">
+        <div class="voice-controls">
+          <div class="controls-row">
+            <div class="field"><label>provider</label><select id="voiceProvider"><option value="aws-polly">AWS Polly</option><option value="openai">OpenAI</option><option value="elevenlabs">ElevenLabs</option><option value="playht">PlayHT</option><option value="openai-fm">OpenAI FM</option></select></div>
+            <div class="field"><label>voice</label><select id="voiceSelect"></select></div>
+            <div class="field" id="engineField"><label>engine / model</label><select id="voiceEngine"></select></div>
+          </div>
+          <textarea id="voiceText" placeholder="Enter text to convert to speech (max 3000 chars)…" maxlength="3000"></textarea>
+          <div class="voice-bottom">
+            <button class="speak-btn" id="speakBtn">♪ Generate Speech</button>
+            <button class="speak-btn live-voice-btn-tab" id="live-voice-tab-btn">🎙 Live Chat</button>
+            <span class="char-count" id="voiceCharCount">0 / 3000</span>
+          </div>
+        </div>
+        <div class="voice-history" id="voiceHistory">
+          <div class="empty-state" id="voiceEmpty"><div class="icon">♪</div><h3>Text to Speech</h3><p>Convert any text into natural-sounding speech.</p></div>
+        </div>
+      </div>
+
+    </div><!-- #app -->
+  </div><!-- #app-wrapper -->
+
+  <!-- CANVAS PANEL -->
+  <div class="canvas-overlay" id="canvas-overlay"></div>
+  <div class="canvas-panel" id="canvas-panel">
+    <div class="canvas-header">
+      <span class="canvas-title" id="canvas-title">Artifact</span>
+      <div class="canvas-header-actions">
+        <button class="canvas-action-btn" id="canvas-copy-btn" title="Copy">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button class="canvas-action-btn" id="canvas-run-btn" title="Run code" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </button>
+        <button class="canvas-action-btn" id="canvas-close-btn" title="Close">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="canvas-body" id="canvas-body"></div>
+    <div class="canvas-run-output" id="canvas-run-output">
+      <div class="canvas-run-header">
+        <span>Output</span>
+        <button class="canvas-action-btn" id="canvas-clear-output">Clear</button>
+      </div>
+      <pre id="canvas-output-pre"></pre>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE (full-screen, like claude.ai/settings) -->
+  <div class="sp-overlay" id="settings-overlay"></div>
+  <div class="sp-page" id="settings-drawer">
+
+    <!-- Top bar -->
+    <div class="sp-topbar">
+      <div class="sp-topbar-left">
+        <div class="sp-logo-dot"></div>
+        <span class="sp-logo-name">Neural<span>Dock</span></span>
+      </div>
+      <button class="sp-close-btn" id="settings-close-btn" title="Close settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span>Close</span>
+      </button>
+    </div>
+
+    <!-- Body: sidebar nav + content -->
+    <div class="sp-body">
+
+      <!-- Left nav -->
+      <nav class="sp-nav">
+        <div class="sp-nav-section-label">General</div>
+        <button class="sp-nav-item active" data-section="appearance">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
+          Appearance
+        </button>
+        <button class="sp-nav-item" data-section="ai">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/></svg>
+          AI Models
+        </button>
+        <button class="sp-nav-item" data-section="chat">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Chat
+        </button>
+        <button class="sp-nav-item" data-section="voice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          Voice
+        </button>
+
+        <div class="sp-nav-section-label" style="margin-top:18px">Data</div>
+        <button class="sp-nav-item" data-section="memory">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          Memory & Data
+        </button>
+        <button class="sp-nav-item" data-section="shortcuts">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M6 16h12"/></svg>
+          Shortcuts
+        </button>
+
+        <div class="sp-nav-section-label" style="margin-top:18px">Account</div>
+        <button class="sp-nav-item" data-section="account">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Account
+        </button>
+        <button class="sp-nav-item" data-section="about">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          About
+        </button>
+      </nav>
+
+      <!-- Right content panels -->
+      <div class="sp-content">
+
+        <!-- ── Appearance ── -->
+        <section class="sp-section active" id="sp-appearance">
+          <div class="sp-section-header">
+            <h2>Appearance</h2>
+            <p>Customize how NeuralDock looks and feels.</p>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>Font Size</span>
+                <small>Controls text size across the app</small>
+              </div>
+              <div class="sp-font-picker">
+                <button class="sp-font-btn" data-size="small">
+                  <span style="font-size:10px">Aa</span>
+                  <span>Small</span>
+                </button>
+                <button class="sp-font-btn active" data-size="medium">
+                  <span style="font-size:14px">Aa</span>
+                  <span>Medium</span>
+                </button>
+                <button class="sp-font-btn" data-size="large">
+                  <span style="font-size:18px">Aa</span>
+                  <span>Large</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Theme</span>
+                <small>Dark mode — the only correct choice</small>
+              </div>
+              <div class="sp-theme-preview">
+                <div class="sp-theme-swatch active">
+                  <div class="sp-theme-dot" style="background:#0c0e0f;border:2px solid #d4a853"></div>
+                  <span>Dark</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── AI Models ── -->
+        <section class="sp-section" id="sp-ai">
+          <div class="sp-section-header">
+            <h2>AI Models</h2>
+            <p>Choose your default model and generation behaviour.</p>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>Default Model</span>
+                <small>Used for all new conversations</small>
+              </div>
+              <select id="settings-default-model" class="sp-select"></select>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Temperature</span>
+                <small>Higher = more creative, lower = more focused</small>
+              </div>
+              <div class="sp-slider-wrap">
+                <span class="sp-slider-label">Precise</span>
+                <input type="range" id="settings-temperature" min="0" max="100" value="70" class="sp-range">
+                <span class="sp-slider-label">Creative</span>
+                <span class="sp-range-val" id="temperature-value">0.7</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Response Length</div>
+          <div class="sp-card">
+            <div class="sp-response-grid">
+              <button class="sp-resp-card" data-len="concise">
+                <div class="sp-resp-icon">—</div>
+                <strong>Concise</strong>
+                <small>Short, direct answers. Less elaboration.</small>
+              </button>
+              <button class="sp-resp-card active" data-len="balanced">
+                <div class="sp-resp-icon">≈</div>
+                <strong>Balanced</strong>
+                <small>Natural length. The default.</small>
+              </button>
+              <button class="sp-resp-card" data-len="detailed">
+                <div class="sp-resp-icon">≡</div>
+                <strong>Detailed</strong>
+                <small>Thorough with examples and edge cases.</small>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Chat ── -->
+        <section class="sp-section" id="sp-chat">
+          <div class="sp-section-header">
+            <h2>Chat</h2>
+            <p>Control how the AI responds in conversations.</p>
+          </div>
+
+          <div class="sp-card-header-label">Custom Instructions</div>
+          <div class="sp-card sp-card-flush">
+            <div class="sp-textarea-wrap">
+              <div class="sp-textarea-label">Always say this to every conversation</div>
+              <textarea class="sp-textarea" id="settings-custom-instructions"
+                placeholder="e.g. Always respond in a professional tone. Use code examples when relevant. Prefer Python over other languages."></textarea>
+              <div class="sp-textarea-hint">Applied as a background instruction to every chat. The model may not follow every instruction perfectly.</div>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">System Prompt</div>
+          <div class="sp-card sp-card-flush">
+            <div class="sp-textarea-wrap">
+              <div class="sp-textarea-label">Current chat only</div>
+              <textarea class="sp-textarea" id="settings-system-prompt"
+                placeholder="Override the system prompt for the active conversation…"></textarea>
+              <div class="sp-textarea-hint">Only applies to the currently active conversation. Cleared when you start a new chat.</div>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Features</div>
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>Conversation Memory</span>
+                <small>Include previous messages in context window</small>
+              </div>
+              <div class="sp-toggle" id="memory-toggle"></div>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Web Search</span>
+                <small>Enable real-time web search by default</small>
+              </div>
+              <div class="sp-toggle" id="sp-websearch-toggle"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Voice ── -->
+        <section class="sp-section" id="sp-voice">
+          <div class="sp-section-header">
+            <h2>Voice</h2>
+            <p>Configure how the AI speaks and how you speak to it.</p>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>Speak AI Responses</span>
+                <small>Automatically read assistant replies aloud</small>
+              </div>
+              <div class="sp-toggle" id="speak-toggle"></div>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Speech Speed</span>
+                <small>Playback rate for spoken responses</small>
+              </div>
+              <div class="sp-slider-wrap">
+                <span class="sp-slider-label">0.75×</span>
+                <input type="range" id="speak-speed" min="75" max="150" value="100" class="sp-range">
+                <span class="sp-slider-label">1.5×</span>
+                <span class="sp-range-val" id="speed-value">1.0×</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-info-card">
+            <div class="sp-info-icon">♪</div>
+            <div>
+              <strong>Text-to-Speech providers</strong>
+              <p>Visit the <button class="sp-link-btn" onclick="openSettings(); document.querySelector('[data-section=appearance]')?.click();">Voice tab</button> to generate speech with AWS Polly, OpenAI, ElevenLabs, and more.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Memory & Data ── -->
+        <section class="sp-section" id="sp-memory">
+          <div class="sp-section-header">
+            <h2>Memory &amp; Data</h2>
+            <p>Manage your conversation history and data.</p>
+          </div>
+
+          <div class="sp-stat-grid">
+            <div class="sp-stat-card">
+              <div class="sp-stat-value" id="sp-conv-count">—</div>
+              <div class="sp-stat-label">Conversations</div>
+            </div>
+            <div class="sp-stat-card">
+              <div class="sp-stat-value" id="sp-msg-count">—</div>
+              <div class="sp-stat-label">Total Messages</div>
+            </div>
+            <div class="sp-stat-card">
+              <div class="sp-stat-value" id="sp-storage-size">—</div>
+              <div class="sp-stat-label">Storage Used</div>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Actions</div>
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>Export Conversations</span>
+                <small>Download all chats as a JSON file</small>
+              </div>
+              <button class="sp-action-btn" id="export-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export JSON
+              </button>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Clear All History</span>
+                <small>Permanently delete all conversations</small>
+              </div>
+              <button class="sp-action-btn sp-danger-btn" id="clear-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Clear All
+              </button>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Storage</div>
+          <div class="sp-card">
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Cloud Sync</span>
+                <small>Conversations synced to Supabase</small>
+              </div>
+              <span class="sp-badge" id="sp-sync-badge">—</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Shortcuts ── -->
+        <section class="sp-section" id="sp-shortcuts">
+          <div class="sp-section-header">
+            <h2>Keyboard Shortcuts</h2>
+            <p>Navigate NeuralDock faster with these shortcuts.</p>
+          </div>
+
+          <div class="sp-shortcut-group">
+            <div class="sp-shortcut-group-label">Navigation</div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>/</kbd></div><span>Toggle sidebar</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>1</kbd></div><span>Switch to Chat</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>2</kbd></div><span>Switch to Code IDE</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>3</kbd></div><span>Switch to Image</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>4</kbd></div><span>Switch to Voice</span></div>
+          </div>
+
+          <div class="sp-shortcut-group">
+            <div class="sp-shortcut-group-label">Chat</div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>Enter</kbd></div><span>Send message</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>K</kbd></div><span>New conversation</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>.</kbd></div><span>Open settings</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Esc</kbd></div><span>Stop generation</span></div>
+          </div>
+
+          <div class="sp-shortcut-group">
+            <div class="sp-shortcut-group-label">Code IDE</div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>S</kbd></div><span>Save file</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Ctrl</kbd><kbd>/</kbd></div><span>Toggle comment</span></div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>Tab</kbd></div><span>Indent (soft tab)</span></div>
+          </div>
+
+          <div class="sp-shortcut-group">
+            <div class="sp-shortcut-group-label">General</div>
+            <div class="sp-sc-row"><div class="sp-sc-keys"><kbd>?</kbd></div><span>Show this page</span></div>
+          </div>
+        </section>
+
+        <!-- ── Account ── -->
+        <section class="sp-section" id="sp-account">
+          <div class="sp-section-header">
+            <h2>Account</h2>
+            <p>Your NeuralDock account and connected services.</p>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-account-hero">
+              <div class="sp-account-avatar" id="sp-acct-avatar">?</div>
+              <div class="sp-account-info">
+                <div class="sp-account-name" id="sp-acct-name">Not signed in</div>
+                <div class="sp-account-email" id="sp-acct-email"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Connected Services</div>
+          <div class="sp-card">
+            <div class="sp-card-row">
+              <div class="sp-card-label">
+                <span>NeuralDock Account</span>
+                <small>GitHub / Google / Email via Supabase</small>
+              </div>
+              <span class="sp-badge sp-badge-green" id="sp-supabase-status">—</span>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Puter AI</span>
+                <small>Powers all AI model calls — free</small>
+              </div>
+              <span class="sp-badge" id="sp-puter-status">—</span>
+            </div>
+          </div>
+
+          <div class="sp-card-header-label">Session</div>
+          <div class="sp-card">
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label">
+                <span>Sign out</span>
+                <small>You'll need to sign in again to access your data</small>
+              </div>
+              <button class="sp-action-btn sp-danger-btn" id="sp-signout-btn">Sign Out</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── About ── -->
+        <section class="sp-section" id="sp-about">
+          <div class="sp-section-header">
+            <h2>About NeuralDock</h2>
+            <p>Version info, stack, and open-source credits.</p>
+          </div>
+
+          <div class="sp-card">
+            <div class="sp-about-brand">
+              <div class="sp-about-logo">Neural<span>Dock</span></div>
+              <div class="sp-about-version">AI Studio · v2.0</div>
+            </div>
+            <div class="sp-card-row">
+              <div class="sp-card-label"><span>AI Runtime</span><small>Puter.js — free model access</small></div>
+              <a href="https://puter.com" target="_blank" class="sp-link-badge">puter.com ↗</a>
+            </div>
+            <div class="sp-card-row">
+              <div class="sp-card-label"><span>Auth &amp; Database</span><small>Supabase — cloud sync</small></div>
+              <a href="https://supabase.com" target="_blank" class="sp-link-badge">supabase.com ↗</a>
+            </div>
+            <div class="sp-card-row">
+              <div class="sp-card-label"><span>Code Editor</span><small>CodeMirror 5</small></div>
+              <span class="sp-badge">CDN</span>
+            </div>
+            <div class="sp-card-row">
+              <div class="sp-card-label"><span>Hosting</span><small>Cloudflare Pages</small></div>
+              <a href="https://pages.cloudflare.com" target="_blank" class="sp-link-badge">pages.dev ↗</a>
+            </div>
+            <div class="sp-card-row sp-no-border">
+              <div class="sp-card-label"><span>Fonts</span><small>DM Mono &amp; Fraunces via Google Fonts</small></div>
+              <span class="sp-badge">Free</span>
+            </div>
+          </div>
+
+          <div class="sp-info-card">
+            <div class="sp-info-icon">✦</div>
+            <div>
+              <strong>Free forever</strong>
+              <p>NeuralDock uses your Puter account for AI calls, so you pay nothing. No ads. No tracking.</p>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- .sp-content -->
+    </div><!-- .sp-body -->
+  </div><!-- .sp-page -->
+
+
+  <!-- VOICE INPUT OVERLAY -->
+  <div class="voice-overlay" id="voice-overlay">
+    <div class="voice-visual"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="voice-status" id="voice-status">Listening…</div>
+    <button class="voice-cancel-btn" id="voice-cancel-btn">Cancel</button>
+  </div>
+
+  <!-- LIVE VOICE OVERLAY -->
+  <div class="live-voice-overlay" id="live-voice-overlay">
+    <div class="live-voice-card">
+      <div class="live-voice-title">Live Voice Chat</div>
+      <div class="live-voice-orb" id="live-voice-orb">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+      </div>
+      <div class="live-voice-status" id="live-voice-status">Hold the button to speak</div>
+      <div class="live-voice-controls">
+        <button class="live-voice-talk-btn" id="live-voice-talk-btn">Hold to Talk</button>
+        <button class="live-voice-end-btn" id="live-voice-end-btn">End</button>
+      </div>
+      <div class="live-voice-transcript" id="live-voice-transcript"></div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD SHORTCUTS MODAL -->
+  <div class="shortcuts-overlay" id="shortcuts-overlay">
+    <div class="shortcuts-modal">
+      <div class="shortcuts-header">
+        <span>Keyboard Shortcuts</span>
+        <button class="share-modal-close" id="shortcuts-close">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="shortcuts-grid">
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>Enter</kbd><span>Send message</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>K</kbd><span>New chat</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>/</kbd><span>Toggle sidebar</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>.</kbd><span>Open settings</span></div>
+        <div class="shortcut-row"><kbd>Esc</kbd><span>Stop generation / close panels</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>1–4</kbd><span>Switch tabs</span></div>
+        <div class="shortcut-row"><kbd>?</kbd><span>Show shortcuts</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE MODAL -->
+  <div class="share-modal-overlay" id="share-modal-overlay">
+    <div class="share-modal">
+      <div class="share-modal-title">Share Chat<button class="share-modal-close" id="share-modal-close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+      <div class="share-modal-preview" id="share-preview"></div>
+      <div class="share-modal-actions">
+        <button class="share-btn primary" id="share-copy-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy to Clipboard</button>
+        <button class="share-btn" id="share-download-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download .txt</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/markdown.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/conversations.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/image.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/ide.js"></script>
+  <script src="js/ide-panels.js"></script>
+  <script src="js/ide-terminal.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/effects.js"></script>
+</body>
+</html>

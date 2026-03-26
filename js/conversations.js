@@ -1,16 +1,9 @@
 /**
  * conversations.js — CRUD + sidebar rendering
- * Writes to localStorage (instant) and Supabase (debounced via db.js).
- *
- * Depends on: utils.js, state.js, ui.js, db.js
+ * Refactored for New UI
  */
 
 'use strict';
-
-document.getElementById('new-chat-btn').addEventListener('click', newChat);
-document.getElementById('sidebar-search').addEventListener('input', function () {
-  renderSidebar(this.value);
-});
 
 function newChat() {
   const conv = {
@@ -28,12 +21,8 @@ function newChat() {
   saveConvs();
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
-  document.getElementById('chatInput').focus();
+  document.getElementById('chatInput')?.focus();
   activateTab('chat');
-  if (window.innerWidth <= 768) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').classList.remove('active');
-  }
 }
 
 function loadConv(id) {
@@ -45,18 +34,14 @@ function loadConv(id) {
       .filter(m => m.role === 'user' || m.role === 'assistant')
       .map(m => ({ ...m }));
     updateModelDisplay();
-    buildModelDropdown();
   }
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   activateTab('chat');
-  if (window.innerWidth <= 768) {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').classList.remove('active');
-  }
 }
 
 function deleteConv(id) {
+  if (!confirm('Delete this conversation?')) return;
   delete S.conversations[id];
   if (S.activeConvId === id) {
     S.activeConvId = null;
@@ -64,20 +49,9 @@ function deleteConv(id) {
     if (typeof renderChatMessages === 'function') renderChatMessages();
   }
   saveConvs();
-  // Sync deletion to Supabase
   if (typeof dbDeleteConversation === 'function') dbDeleteConversation(id);
   renderSidebar();
   toast('Conversation deleted');
-}
-
-function togglePinConv(id) {
-  const conv = S.conversations[id];
-  if (!conv) return;
-  conv.pinned = !conv.pinned;
-  conv.updatedAt = Date.now();
-  saveConvs();
-  if (typeof dbSaveConversation === 'function') dbSaveConversation(conv);
-  renderSidebar();
 }
 
 function persistConversation(userText, assistantText) {
@@ -93,7 +67,6 @@ function persistConversation(userText, assistantText) {
   conv.updatedAt = Date.now();
 
   saveConvs();
-  // Save to Supabase (debounced)
   if (typeof dbSaveConversation === 'function') dbSaveConversation(conv);
   renderSidebar();
 
@@ -117,9 +90,9 @@ async function autoTitleConv(convId, userText) {
   } catch (e) {}
 }
 
-// ── Sidebar rendering ──────────────────────────────────────────────────────
 function renderSidebar(searchQuery = '') {
-  const container = document.getElementById('sidebar-conversations');
+  const container = document.getElementById('conv-list');
+  if (!container) return;
   container.innerHTML = '';
 
   const q   = searchQuery.toLowerCase().trim();
@@ -132,59 +105,33 @@ function renderSidebar(searchQuery = '') {
     );
   }
 
-  const pinned   = arr.filter(c =>  c.pinned);
-  const unpinned = arr.filter(c => !c.pinned);
-
-  if (pinned.length) {
-    appendGroupLabel(container, '📌 Pinned');
-    pinned.forEach(c => container.appendChild(makeConvEl(c)));
+  if (arr.length === 0) {
+      container.innerHTML = '<div class="px-4 py-2 text-[10px] text-on-surface-variant/20 font-mono italic">No history yet</div>';
+      return;
   }
 
-  const todayMs = new Date().setHours(0, 0, 0, 0);
-  const yestMs  = todayMs - 86_400_000;
-  const weekMs  = todayMs - 7 * 86_400_000;
-  const groups  = { 'Today': [], 'Yesterday': [], 'Last 7 Days': [], 'Older': [] };
+  arr.forEach(c => {
+    const info = getModelInfo(c.model || S.currentModel);
+    const btn = document.createElement('div');
+    btn.className = `group relative flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-surface-elevated transition-colors ${c.id === S.activeConvId ? 'bg-surface-elevated text-accent font-bold' : 'text-on-surface-variant/60'}`;
 
-  for (const c of unpinned) {
-    if      (c.updatedAt >= todayMs) groups['Today'].push(c);
-    else if (c.updatedAt >= yestMs)  groups['Yesterday'].push(c);
-    else if (c.updatedAt >= weekMs)  groups['Last 7 Days'].push(c);
-    else                             groups['Older'].push(c);
-  }
+    btn.innerHTML = `
+        <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background: ${info.color}"></span>
+        <span class="flex-1 truncate text-[11px]">${c.title || 'Untitled'}</span>
+        <button class="delete-conv-btn opacity-0 group-hover:opacity-100 p-1 text-on-surface-variant/20 hover:text-red-500 transition-all">
+            <span class="material-symbols-outlined text-[14px]">delete</span>
+        </button>
+    `;
 
-  for (const [label, items] of Object.entries(groups)) {
-    if (!items.length) continue;
-    appendGroupLabel(container, label);
-    items.forEach(c => container.appendChild(makeConvEl(c)));
-  }
-}
+    btn.onclick = (e) => {
+        if (e.target.closest('.delete-conv-btn')) {
+            e.stopPropagation();
+            deleteConv(c.id);
+        } else {
+            loadConv(c.id);
+        }
+    };
 
-function appendGroupLabel(container, text) {
-  const el = document.createElement('div');
-  el.className   = 'conv-group-label';
-  el.textContent = text;
-  container.appendChild(el);
-}
-
-function makeConvEl(c) {
-  const info = getModelInfo(c.model || S.currentModel);
-  const el   = document.createElement('div');
-  el.className = 'conv-item' + (c.id === S.activeConvId ? ' active' : '');
-  el.innerHTML =
-    `<span class="conv-item-dot" style="background:${info.color}"></span>` +
-    `<div class="conv-item-info">` +
-      `<div class="conv-item-title">${escHtml(c.title || 'New Chat')}</div>` +
-      `<div class="conv-item-meta">${info.name} · ${relativeTime(c.updatedAt)}</div>` +
-    `</div>` +
-    `<div class="conv-item-btns">` +
-      `<button class="conv-item-pin" title="${c.pinned ? 'Unpin' : 'Pin'}">${c.pinned ? '📌' : '⊙'}</button>` +
-      `<button class="conv-item-delete" title="Delete">` +
-        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>` +
-      `</button>` +
-    `</div>`;
-
-  el.addEventListener('click', () => loadConv(c.id));
-  el.querySelector('.conv-item-pin').addEventListener('click', ev => { ev.stopPropagation(); togglePinConv(c.id); });
-  el.querySelector('.conv-item-delete').addEventListener('click', ev => { ev.stopPropagation(); deleteConv(c.id); });
-  return el;
+    container.appendChild(btn);
+  });
 }
