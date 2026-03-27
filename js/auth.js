@@ -153,7 +153,7 @@ function triggerPuterAuth(supabaseUser) {
 
 function setupPuterOnlyUI() {
   // Puter button is always visible - just wire it up
-  document.getElementById('login-btn')?.addEventListener('click', startPuterLogin);
+  document.querySelector('.login-btn-primary')?.addEventListener('click', startPuterLogin);
   document.getElementById('login-fallback')?.addEventListener('click', manualPuterCheck);
   document.getElementById('login-fallback').style.display = '';
 
@@ -305,7 +305,7 @@ function onFullyAuthed(user) {
 
 function setupSupabaseUI() {
   // Puter button — also show as primary login when Supabase configured
-  document.getElementById('login-btn')?.addEventListener('click', startPuterLogin);
+  document.querySelector('.login-btn-primary')?.addEventListener('click', startPuterLogin);
   document.getElementById('login-fallback')?.addEventListener('click', manualPuterCheck);
 
   // GitHub button

@@ -1,3 +1,16 @@
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const tabId = item.getAttribute('data-tab');
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tabId)?.classList.add('active');
+        });
+    });
+});
 /**
  * ui.js — Tabs, sidebar, model selector, keyboard shortcuts, canvas panel, settings
  * Depends on: utils.js, config.js, state.js
