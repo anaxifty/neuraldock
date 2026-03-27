@@ -89,6 +89,14 @@ function renderMarkdown(text) {
     return before.includes('mermaid-wrap') ? `</code></pre></div>` : match;
   });
 
+  // 4. Sanitize with DOMPurify to prevent XSS
+  if (typeof DOMPurify !== 'undefined') {
+    return DOMPurify.sanitize(html, {
+      ADD_ATTR: ['target'],
+      USE_PROFILES: { html: true },
+    });
+  }
+
   return html;
 }
 

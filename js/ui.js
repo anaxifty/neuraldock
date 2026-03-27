@@ -668,6 +668,10 @@ function runCanvasCode(code, lang) {
   if (l === 'javascript' || l === 'js') {
     try {
       const iframe = document.createElement('iframe');
+      // Sandbox the iframe to prevent it from accessing the parent window
+      // 'allow-scripts' is required to run the JS code
+      // 'allow-same-origin' is required so the parent can access the iframe's contentWindow.console
+      iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
       iframe.style.display = 'none';
       document.body.appendChild(iframe);
       iframe.contentWindow.console = { log, warn: log, error: log, info: log };
@@ -683,6 +687,9 @@ function runCanvasCode(code, lang) {
     if (!iframe) {
       iframe = document.createElement('iframe');
       iframe.className = 'canvas-html-preview';
+      // Sandbox the iframe to prevent it from accessing the parent window
+      // 'allow-scripts' is required if the HTML contains scripts
+      iframe.setAttribute('sandbox', 'allow-scripts');
       outDiv.appendChild(iframe);
     }
     iframe.style.display = '';
