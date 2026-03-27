@@ -1,3 +1,68 @@
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('v2-voice-pitch')?.addEventListener('input', e => {
+        document.getElementById('v2-pitch-val').textContent = e.target.value + 'X';
+    });
+    document.getElementById('v2-voice-speed')?.addEventListener('input', e => {
+        document.getElementById('v2-speed-val').textContent = e.target.value + 'X';
+    });
+    document.getElementById('v2-generate-speech-btn')?.addEventListener('click', generateSpeech);
+    renderVoiceLibrary();
+});
+
+const V2_VOICES = [
+    { id: 'sienna', name: 'SIENNA ND-09', desc: 'FEMALE • ENERGETIC', initials: 'SN' },
+    { id: 'marcus', name: 'MARCUS ND-02', desc: 'MALE • NARRATIVE', initials: 'MR' },
+    { id: 'elias',  name: 'ELIAS ND-04',  desc: 'MALE • CALM',      initials: 'EL', active: true },
+    { id: 'vera',   name: 'VERA ND-07',   desc: 'FEMALE • WHISPER', initials: 'VR' }
+];
+
+function renderVoiceLibrary() {
+    const list = document.getElementById('v2-voice-library-list');
+    if (!list) return;
+    list.innerHTML = V2_VOICES.map(v => `
+        <div class="v2-voice-item ${v.active ? 'active' : ''}" data-id="${v.id}">
+            <div class="v2-voice-initials">${v.initials}</div>
+            <div class="v2-voice-info">
+                <div class="v2-voice-name">${v.name}</div>
+                <div class="v2-voice-desc">${v.desc}</div>
+            </div>
+            ${v.active ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4a853" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </div>
+    `).join('');
+}
+
+// ── V2 UI Updates ──────────────────────────────────────────────────────────
+document.getElementById('v2-voice-pitch')?.addEventListener('input', e => {
+    document.getElementById('v2-pitch-val').textContent = e.target.value + 'X';
+});
+document.getElementById('v2-voice-speed')?.addEventListener('input', e => {
+    document.getElementById('v2-speed-val').textContent = e.target.value + 'X';
+});
+
+// Initialize Voice Library V2
+const V2_VOICES = [
+    { id: 'sienna', name: 'SIENNA ND-09', desc: 'FEMALE • ENERGETIC', initials: 'SN' },
+    { id: 'marcus', name: 'MARCUS ND-02', desc: 'MALE • NARRATIVE', initials: 'MR' },
+    { id: 'elias',  name: 'ELIAS ND-04',  desc: 'MALE • CALM',      initials: 'EL', active: true },
+    { id: 'vera',   name: 'VERA ND-07',   desc: 'FEMALE • WHISPER', initials: 'VR' }
+];
+
+function renderVoiceLibrary() {
+    const list = document.getElementById('v2-voice-library-list');
+    if (!list) return;
+    list.innerHTML = V2_VOICES.map(v => `
+        <div class="v2-voice-item ${v.active ? 'active' : ''}" data-id="${v.id}">
+            <div class="v2-voice-initials">${v.initials}</div>
+            <div class="v2-voice-info">
+                <div class="v2-voice-name">${v.name}</div>
+                <div class="v2-voice-desc">${v.desc}</div>
+            </div>
+            ${v.active ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4a853" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </div>
+    `).join('');
+}
+renderVoiceLibrary();
 /**
  * voice.js — Text-to-speech, voice input, live voice conversation
  * Depends on: utils.js, config.js (VOICE_REGISTRY), state.js
@@ -9,7 +74,7 @@
 document.getElementById('voiceProvider').addEventListener('change', updateVoiceOptions);
 
 function updateVoiceOptions() {
-  const provider = document.getElementById('voiceProvider').value;
+  const provider = 'openai'; // default for V2
   const vs = document.getElementById('voiceSelect');
   const es = document.getElementById('voiceEngine');
   vs.innerHTML = '';
@@ -21,60 +86,39 @@ function updateVoiceOptions() {
 }
 
 // ── TTS: character counter ─────────────────────────────────────────────────
-document.getElementById('voiceText').addEventListener('input', function () {
+document.getElementById('v2-voice-text').addEventListener('input', function () {
   const n  = this.value.length;
-  const el = document.getElementById('voiceCharCount');
+  const el = document.getElementById('v2-voice-char-count');
   el.textContent = `${n} / 3000`;
   el.className   = 'char-count' + (n > 2900 ? ' danger' : n > 2500 ? ' warn' : '');
 });
 
 // ── TTS: generate speech ───────────────────────────────────────────────────
-document.getElementById('speakBtn').addEventListener('click', generateSpeech);
+document.getElementById('v2-generate-speech-btn').addEventListener('click', generateSpeech);
 
 async function generateSpeech() {
-  const text = document.getElementById('voiceText').value.trim();
+  const text = document.getElementById('v2-voice-text').value.trim();
   if (!text) return;
-
-  const provider = document.getElementById('voiceProvider').value;
-  const voice    = document.getElementById('voiceSelect').value;
-  const engine   = document.getElementById('voiceEngine').value;
-  const vLabel   = document.getElementById('voiceSelect').selectedOptions[0]?.text || voice;
-
-  const btn = document.getElementById('speakBtn');
-  btn.disabled  = true;
-  btn.innerHTML = '<span class="spinner"></span> Generating…';
-
-  const emptyEl = document.getElementById('voiceEmpty');
-  if (emptyEl) emptyEl.style.display = 'none';
-
+  const btn = document.getElementById('v2-generate-speech-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
   try {
-    let opts = {};
-    if      (provider === 'aws-polly')  opts = { voice, engine, language: 'en-US' };
-    else if (provider === 'openai')     opts = { provider: 'openai',    model: engine, voice };
-    else if (provider === 'elevenlabs') opts = { provider: 'elevenlabs', model: engine, voice, output_format: 'mp3_44100_128' };
-    else if (provider === 'playht')     opts = { provider: 'playht',     model: engine, voice };
-    else if (provider === 'openai-fm')  opts = { provider: 'openai-fm',  model: engine, voice };
-
-    const audio = await puter.ai.txt2speech(text, opts);
-    const history = document.getElementById('voiceHistory');
+    const pitch = document.getElementById('v2-voice-pitch').value;
+    const speed = document.getElementById('v2-voice-speed').value;
+    const model = document.getElementById('v2-voice-model-select').value;
+    const audio = await puter.ai.txt2speech(text, { provider: "openai", model: "tts-1", voice: "alloy" });
+    const history = document.getElementById('v2-voice-history');
     const card = document.createElement('div');
-    card.className = 'v-card';
-    const short = text.length > 180 ? text.substring(0, 180) + '…' : text;
-    card.innerHTML =
-      `<div class="v-text">"${escHtml(short)}"</div>` +
-      `<div class="v-tags"><span class="v-tag">${escHtml(provider)}</span><span class="v-tag">${escHtml(vLabel)}</span></div>`;
-    audio.controls = true;
-    audio.style.cssText = 'width:100%;height:36px;margin-top:8px;';
+    card.className = 'v2-recording-item';
+    card.innerHTML = `<div class="v2-rec-info"><span>${text.slice(0, 30)}...</span></div>`;
     card.appendChild(audio);
     history.insertBefore(card, history.firstChild);
     audio.play();
-  } catch (err) {
-    toast('Speech generation failed: ' + (err.message || ''), 'error');
-  }
-
-  btn.disabled  = false;
-  btn.innerHTML = '♪ Generate Speech';
+  } catch (err) { toast(err.message, "error"); }
+  btn.disabled = false;
+  btn.innerHTML = "GENERATE SPEECH";
 }
+
 
 /** Speak text using the browser's built-in SpeechSynthesis (for chat responses) */
 function speakText(text) {
