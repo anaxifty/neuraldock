@@ -6,7 +6,8 @@
 
 async function dbSaveConversation(conv) {
   if (!supabaseConfigured() || !S.currentUser) return;
-  const { error } = await supabase.from('conversations').upsert({
+  const client = getSupabaseClient();
+  const { error } = await client.from('conversations').upsert({
     id: conv.id,
     user_id: S.currentUser.id,
     title: conv.title,
@@ -19,7 +20,8 @@ async function dbSaveConversation(conv) {
 
 async function dbDeleteConversation(id) {
   if (!supabaseConfigured() || !S.currentUser) return;
-  const { error } = await supabase.from('conversations').delete().eq('id', id);
+  const client = getSupabaseClient();
+  const { error } = await client.from('conversations').delete().eq('id', id);
   if (error) console.error('DB Error:', error);
 }
 

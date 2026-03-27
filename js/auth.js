@@ -10,14 +10,15 @@ let authPollInterval = null;
 
 async function initAuth() {
   if (supabaseConfigured()) {
-    const { data: { session } } = await supabase.auth.getSession();
+    const client = getSupabaseClient();
+    const { data: { session } } = await client.auth.getSession();
     if (session) {
       triggerPuterAuth(session.user);
     } else {
       setupSupabaseUI();
     }
     // Listen for auth changes
-    supabase.auth.onAuthStateChange((event, session) => {
+    client.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) triggerPuterAuth(session.user);
       if (event === 'SIGNED_OUT') window.location.reload();
     });
