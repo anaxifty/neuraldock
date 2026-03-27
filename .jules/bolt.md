@@ -1,0 +1,3 @@
+## 2025-05-14 - [Search Filter Debouncing]
+**Learning:** Multiple high-frequency UI components (sidebar search, model selector, theme picker) were performing expensive DOM re-renders and full-list filtering on every single keystroke. In a vanilla JS app without a virtual DOM, this causes noticeable input lag as data (conversations, models) grows.
+**Action:** Always use the `debounce` utility from `js/utils.js` for input-driven filtering logic. For global delegated listeners, debounce the specific callback logic rather than the entire listener to avoid interference between different input elements.

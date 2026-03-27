@@ -521,9 +521,9 @@ function buildAppearanceUI() {
   _buildThemeGroups(cur.theme);
 
   // ── Search ────────────────────────────────────────────────────────────────
-  document.getElementById('nd-theme-search').addEventListener('input', function() {
+  document.getElementById('nd-theme-search').addEventListener('input', debounce(function() {
     _filterThemes(this.value.trim().toLowerCase(), cur.theme);
-  });
+  }, 200));
 
   // ── Font grids ────────────────────────────────────────────────────────────
   _buildFontGrid('nd-font-ui-grid',   UI_FONTS,      cur.fontUi,   'fontUi',   applyFontUi,   "'fn()→42'");
