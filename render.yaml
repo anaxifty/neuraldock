@@ -1,0 +1,13 @@
+services:
+  - type: static
+    name: neuraldock-v2
+    env: static
+    buildCommand: "echo 'NeuralDock V2 Build Started'"
+    publishPath: "."
+    headers:
+      - path: "/*"
+        name: "X-Frame-Options"
+        value: "DENY"
+      - path: "/*"
+        name: "X-Content-Type-Options"
+        value: "nosniff"
