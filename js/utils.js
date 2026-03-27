@@ -8,9 +8,13 @@
 // ── HTML escaping ──────────────────────────────────────────────────────────
 /** Safely escape a string for HTML insertion */
 function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = String(s ?? '');
-  return d.innerHTML;
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 // ── Toast notifications ────────────────────────────────────────────────────
