@@ -26,6 +26,8 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -138,6 +140,13 @@ function renderSidebar(searchQuery = '') {
   if (pinned.length) {
     appendGroupLabel(container, '📌 Pinned');
     pinned.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (q && arr.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.textContent = 'No conversations found';
+    container.appendChild(none);
   }
 
   const todayMs = new Date().setHours(0, 0, 0, 0);
