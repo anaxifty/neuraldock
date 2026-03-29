@@ -1,0 +1,3 @@
+## 2026-03-29 - [Search and Accessibility Enhancements]
+**Learning:** Common patterns in this app for empty states use the `.model-no-results` class. For icon-only buttons, descriptive `aria-label` attributes are often missing. In functional verification, bypassing the login screen is necessary, but `onFullyAuthed` in `js/auth.js` expects `#login-screen` to exist in the DOM to hide it.
+**Action:** Always provide empty states for search inputs using `.model-no-results`. Proactively add `aria-label` to icon-only buttons. When writing Playwright scripts, bypass login by setting `display: none` on `#login-screen` instead of removing it if calling `onFullyAuthed`.
