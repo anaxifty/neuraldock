@@ -14,6 +14,7 @@ document.getElementById('chatInput').addEventListener('keydown', e => {
     sendChat();
   }
 });
+document.getElementById('chatInput').addEventListener('input', updateSendButtonState);
 
 // ── Busy state ─────────────────────────────────────────────────────────────
 function setBusy(val) {
@@ -53,6 +54,7 @@ async function handleFileInput(e) {
     }
   }
   renderAttachmentStrip();
+  updateSendButtonState();
 }
 
 function renderAttachmentStrip() {
@@ -75,6 +77,7 @@ function renderAttachmentStrip() {
       renderAttachmentStrip();
     });
   });
+  updateSendButtonState();
 }
 
 // ── Tip cards ─────────────────────────────────────────────────────────────
@@ -114,6 +117,7 @@ async function sendChat() {
 
   input.value = '';
   input.style.height = 'auto';
+  updateSendButtonState();
   const pendingAtts = [...S.attachments];
   S.attachments = [];
   renderAttachmentStrip();
@@ -232,6 +236,21 @@ async function sendChatWith(text, attachments = []) {
   setBusy(false);
   S.abortStream = false;
 }
+
+/**
+ * Disable send button if input is empty and no attachments
+ */
+function updateSendButtonState() {
+  const input = document.getElementById('chatInput');
+  const btn = document.getElementById('chatSendBtn');
+  if (!input || !btn) return;
+  const hasText = input.value.trim().length > 0;
+  const hasAtts = (S.attachments || []).length > 0;
+  btn.disabled = !hasText && !hasAtts;
+}
+
+// Set initial state
+updateSendButtonState();
 
 // ── Message rendering ──────────────────────────────────────────────────────
 function renderChatMessages() {
