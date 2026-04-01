@@ -13,6 +13,11 @@ document.getElementById('sidebar-search').addEventListener('input', function () 
 });
 
 function newChat() {
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) {
+    searchInput.value = '';
+    renderSidebar(); // Ensure sidebar view is reset
+  }
   const conv = {
     id:        crypto.randomUUID(),
     title:     '',
