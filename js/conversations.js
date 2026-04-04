@@ -26,6 +26,8 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -47,6 +49,8 @@ function loadConv(id) {
     updateModelDisplay();
     buildModelDropdown();
   }
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   activateTab('chat');
@@ -130,6 +134,14 @@ function renderSidebar(searchQuery = '') {
       (c.title || '').toLowerCase().includes(q) ||
       (c.messages || []).some(m => (m.content || '').toLowerCase().includes(q))
     );
+  }
+
+  if (arr.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'model-no-results';
+    empty.textContent = q ? `No matches found for "${searchQuery}"` : 'No conversations yet';
+    container.appendChild(empty);
+    return;
   }
 
   const pinned   = arr.filter(c =>  c.pinned);
