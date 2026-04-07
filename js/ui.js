@@ -433,6 +433,10 @@ document.getElementById('clear-btn').addEventListener('click', async () => {
   S.activeConvId  = null;
   S.chatMessages  = [];
   saveConvs();
+
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
+
   if (typeof renderSidebar === 'function')      renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   refreshSettingsStats();
