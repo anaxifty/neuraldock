@@ -1,0 +1,81 @@
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /ide-v4.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /ide-v3-additions.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/config.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /ide-panels.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /ide-singlebar.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/markdown.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/state.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/supabase.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/conversations.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/db.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/chat.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/image.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/voice.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/ide.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/ide-terminal.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/ide-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/theme.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:50:09] "GET /js/effects.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /ide-panels.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /ide-singlebar.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /ide-v4.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /ide-v3-additions.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/markdown.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/supabase.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/state.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/config.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/db.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/conversations.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/voice.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/chat.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/ide.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/image.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/ide-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/ide-terminal.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:16] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:17] "GET /js/theme.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:17] "GET /js/effects.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:41] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /ide-panels.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /ide-v4.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /ide-v3-additions.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] code 404, message File not found
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /ide-singlebar.css HTTP/1.1" 404 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/config.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/markdown.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/db.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/state.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/supabase.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/voice.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/conversations.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/chat.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/ide.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/image.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/ide-panels.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/ide-terminal.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/theme.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [07/Apr/2026 20:51:41] "GET /js/effects.js HTTP/1.1" 200 -
