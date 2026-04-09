@@ -152,10 +152,21 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let hasResults = false;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    hasResults = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!hasResults && !pinned.length && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No chats match "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
