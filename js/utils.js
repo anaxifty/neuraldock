@@ -24,6 +24,8 @@ function toast(msg, type = 'success') {
   if (!container) return;
   const el = document.createElement('div');
   el.className = `toast ${type}`;
+  el.setAttribute('role', 'status');
+  el.setAttribute('aria-live', 'polite');
   el.textContent = msg;
   container.appendChild(el);
   // Remove after animation completes
@@ -78,5 +80,14 @@ function readFileAsText(file) {
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('active');
+    toast('Code copied');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('active');
+    }, 2000);
+  });
 }
