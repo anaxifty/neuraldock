@@ -13,6 +13,9 @@ document.getElementById('sidebar-search').addEventListener('input', function () 
 });
 
 function newChat() {
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
+
   const conv = {
     id:        crypto.randomUUID(),
     title:     '',
@@ -152,10 +155,21 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let anyVisible = false;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    anyVisible = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!pinned.length && !anyVisible) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = searchQuery ? `No chats match "${searchQuery}"` : 'No conversations yet';
+    container.appendChild(none);
   }
 }
 
