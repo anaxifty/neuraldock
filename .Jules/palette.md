@@ -1,0 +1,3 @@
+## 2026-04-13 - [Search Feedback & Accessibility]
+**Learning:** Dynamic UI updates like "No results" messages must be explicitly communicated to screen reader users using ARIA live regions and roles. Additionally, programmatic changes to input values (e.g., clearing an input) do not trigger 'input' events, necessitating manual re-renders.
+**Action:** Always include `role="status"` and `aria-live="polite"` for empty state feedback. When programmatically clearing search inputs, ensure the associated rendering logic is manually called. Use default parameters in rendering functions to sync with the current input state.
