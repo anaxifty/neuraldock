@@ -26,6 +26,10 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
+
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -118,7 +122,7 @@ async function autoTitleConv(convId, userText) {
 }
 
 // ── Sidebar rendering ──────────────────────────────────────────────────────
-function renderSidebar(searchQuery = '') {
+function renderSidebar(searchQuery = document.getElementById('sidebar-search')?.value || '') {
   const container = document.getElementById('sidebar-conversations');
   container.innerHTML = '';
 
@@ -130,6 +134,16 @@ function renderSidebar(searchQuery = '') {
       (c.title || '').toLowerCase().includes(q) ||
       (c.messages || []).some(m => (m.content || '').toLowerCase().includes(q))
     );
+  }
+
+  if (q && arr.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No chats match "${searchQuery}"`;
+    container.appendChild(none);
+    return;
   }
 
   const pinned   = arr.filter(c =>  c.pinned);
