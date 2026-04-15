@@ -77,8 +77,8 @@ function renderMarkdown(text) {
       + `<div class="code-block-header">`
       + `<span>${lang}</span>`
       + `<div class="code-block-btns">`
-      + `<button class="copy-code-btn" onclick="copyCodeBlock(this)">Copy</button>`
-      + `<button class="open-canvas-btn" onclick="openCanvas(this)" title="Open in canvas">⊞</button>`
+      + `<button class="copy-code-btn" onclick="copyCodeBlock(this)" aria-label="Copy code">Copy</button>`
+      + `<button class="open-canvas-btn" onclick="openCanvas(this)" title="Open in canvas" aria-label="Open in canvas">⊞</button>`
       + `</div></div>`
       + `<code${attrs}>`;
   });
