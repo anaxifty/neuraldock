@@ -78,5 +78,15 @@ function readFileAsText(file) {
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    const oldText = btn.textContent;
+    const oldAria = btn.getAttribute('aria-label');
+    btn.textContent = 'Copied!';
+    if (oldAria) btn.setAttribute('aria-label', 'Copied!');
+    setTimeout(() => {
+      btn.textContent = oldText;
+      if (oldAria) btn.setAttribute('aria-label', oldAria);
+    }, 2000);
+  });
 }
