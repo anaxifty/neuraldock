@@ -13,6 +13,12 @@ document.getElementById('sidebar-search').addEventListener('input', function () 
 });
 
 function newChat() {
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) {
+    searchInput.value = '';
+    renderSidebar();
+  }
+
   const conv = {
     id:        crypto.randomUUID(),
     title:     '',
@@ -152,10 +158,24 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let anyVisible = pinned.length > 0;
+  for (const items of Object.values(groups)) {
+    if (items.length) anyVisible = true;
+  }
+
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!anyVisible && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No conversations match "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
