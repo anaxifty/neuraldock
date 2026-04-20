@@ -130,6 +130,14 @@ function renderSidebar(searchQuery = '') {
       (c.title || '').toLowerCase().includes(q) ||
       (c.messages || []).some(m => (m.content || '').toLowerCase().includes(q))
     );
+    if (arr.length === 0) {
+      const none = document.createElement('div');
+      none.className = 'model-no-results';
+      none.textContent = 'No matches found';
+      none.setAttribute('role', 'status');
+      none.setAttribute('aria-live', 'polite');
+      container.appendChild(none);
+    }
   }
 
   const pinned   = arr.filter(c =>  c.pinned);
