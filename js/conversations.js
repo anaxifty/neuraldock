@@ -26,6 +26,10 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+
+  const searchInp = document.getElementById('sidebar-search');
+  if (searchInp) searchInp.value = '';
+
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -152,10 +156,19 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let hasAny = pinned.length > 0;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    hasAny = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!hasAny && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.textContent = 'No results found';
+    container.appendChild(none);
   }
 }
 
