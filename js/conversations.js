@@ -26,6 +26,8 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -156,6 +158,15 @@ function renderSidebar(searchQuery = '') {
     if (!items.length) continue;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (q && !arr.length) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
