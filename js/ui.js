@@ -607,10 +607,20 @@ document.addEventListener('keydown', e => {
 document.getElementById('canvas-close-btn').addEventListener('click', closeCanvas);
 document.getElementById('canvas-overlay').addEventListener('click', closeCanvas);
 
-document.getElementById('canvas-copy-btn').addEventListener('click', () => {
+document.getElementById('canvas-copy-btn').addEventListener('click', function() {
   const code = document.getElementById('canvas-body')?.querySelector('code');
-  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText);
-  toast('Copied to clipboard');
+  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText).then(() => {
+    toast('Copied to clipboard');
+    const btn = this;
+    const originalAria = btn.getAttribute('aria-label');
+    const originalTitle = btn.getAttribute('title');
+    btn.setAttribute('aria-label', 'Copied!');
+    btn.setAttribute('title', 'Copied!');
+    setTimeout(() => {
+      btn.setAttribute('aria-label', originalAria);
+      btn.setAttribute('title', originalTitle);
+    }, 2000);
+  });
 });
 
 document.getElementById('canvas-clear-output').addEventListener('click', () => {
