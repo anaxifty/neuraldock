@@ -78,5 +78,16 @@ function readFileAsText(file) {
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    const originalAria = btn.getAttribute('aria-label');
+    btn.setAttribute('aria-label', 'Copied!');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      if (originalAria) btn.setAttribute('aria-label', originalAria);
+      else btn.removeAttribute('aria-label');
+    }, 2000);
+  });
 }
