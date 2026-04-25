@@ -137,6 +137,8 @@ function renderModelList(filter = '') {
   if (!anyVisible) {
     const none = document.createElement('div');
     none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
     none.textContent = `No models match "${filter}"`;
     list.appendChild(none);
   }
@@ -607,10 +609,17 @@ document.addEventListener('keydown', e => {
 document.getElementById('canvas-close-btn').addEventListener('click', closeCanvas);
 document.getElementById('canvas-overlay').addEventListener('click', closeCanvas);
 
-document.getElementById('canvas-copy-btn').addEventListener('click', () => {
+document.getElementById('canvas-copy-btn').addEventListener('click', function() {
   const code = document.getElementById('canvas-body')?.querySelector('code');
-  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText);
-  toast('Copied to clipboard');
+  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText).then(() => {
+    toast('Copied to clipboard');
+    const btn = this;
+    const oldLabel = btn.getAttribute('aria-label');
+    btn.setAttribute('aria-label', 'Copied!');
+    setTimeout(() => {
+      btn.setAttribute('aria-label', oldLabel);
+    }, 2000);
+  });
 });
 
 document.getElementById('canvas-clear-output').addEventListener('click', () => {
