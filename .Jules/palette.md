@@ -1,0 +1,3 @@
+## 2025-05-14 - Accessibility Polish for Icon-Only Buttons
+**Learning:** Icon-only buttons (e.g., Sidebar collapse, Hamburger menu, Attachment, Voice input, Send/Stop) require explicit `aria-label` attributes for screen reader support, as `title` attributes alone are inconsistent across assistive technologies. Additionally, decorative SVGs inside these buttons should be marked with `aria-hidden="true"` to prevent redundant announcements.
+**Action:** Always add descriptive `aria-label` attributes to interactive elements that don't have visible text labels and hide decorative internal elements from the accessibility tree.
