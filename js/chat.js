@@ -384,11 +384,20 @@ function buildMsgActions(wrap, body, msg) {
   const actions = document.createElement('div');
   actions.className = 'msg-actions';
 
-  actions.appendChild(makeActionBtn('Copy', e => {
+  actions.appendChild(makeActionBtn('Copy', function (e) {
     e.stopPropagation();
-    navigator.clipboard.writeText(body.innerText || body.textContent);
-    toast('Copied');
-  }));
+    const btn = this;
+    navigator.clipboard.writeText(body.innerText || body.textContent).then(() => {
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.setAttribute('aria-label', 'Copied!');
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.setAttribute('aria-label', 'Copy message');
+      }, 2000);
+      toast('Copied');
+    });
+  }, 'Copy message'));
   actions.appendChild(makeActionBtn('↺ Rewrite', e => {
     e.stopPropagation();
     rewriteWithModel(wrap, body, msg, msg.model || S.currentModel);
@@ -433,10 +442,11 @@ function buildMsgActions(wrap, body, msg) {
   wrap.appendChild(actions);
 }
 
-function makeActionBtn(label, onClick) {
+function makeActionBtn(label, onClick, ariaLabel) {
   const btn = document.createElement('button');
   btn.className = 'msg-action-btn';
   btn.textContent = label;
+  if (ariaLabel) btn.setAttribute('aria-label', ariaLabel);
   btn.addEventListener('click', onClick);
   return btn;
 }
@@ -541,7 +551,9 @@ function populatePicker(q) {
       count++;
     }
   }
-  if (!count) list.innerHTML = '<div class="model-no-results">No models match</div>';
+  if (!count) {
+    list.innerHTML = '<div class="model-no-results" role="status" aria-live="polite">No models match</div>';
+  }
 }
 
 document.getElementById('_pickerInput')?.addEventListener('input', function () { populatePicker(this.value); });
