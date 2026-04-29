@@ -17,8 +17,7 @@ function newChat() {
     id:        crypto.randomUUID(),
     title:     '',
     model:     S.currentModel,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    createdAt: Date.now(),    updatedAt: Date.now(),
     messages:  [],
     pinned:    false,
   };
@@ -26,6 +25,11 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+
+  // Clear search input on new chat
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
+
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -118,9 +122,16 @@ async function autoTitleConv(convId, userText) {
 }
 
 // ── Sidebar rendering ──────────────────────────────────────────────────────
-function renderSidebar(searchQuery = '') {
+function renderSidebar(searchQuery = null) {
   const container = document.getElementById('sidebar-conversations');
+  if (!container) return;
   container.innerHTML = '';
+
+  // Default to current input value if no query provided
+  if (searchQuery === null) {
+    const input = document.getElementById('sidebar-search');
+    searchQuery = input ? input.value : '';
+  }
 
   const q   = searchQuery.toLowerCase().trim();
   let arr   = Object.values(S.conversations).sort((a, b) => b.updatedAt - a.updatedAt);
@@ -152,10 +163,27 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let anyVisible = false;
+  if (pinned.length) {
+    anyVisible = true;
+    appendGroupLabel(container, '📌 Pinned');
+    pinned.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    anyVisible = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!anyVisible && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results'; // Reuse existing styles
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No chats match "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
