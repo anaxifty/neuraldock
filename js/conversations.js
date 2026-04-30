@@ -13,6 +13,9 @@ document.getElementById('sidebar-search').addEventListener('input', function () 
 });
 
 function newChat() {
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) searchInput.value = '';
+
   const conv = {
     id:        crypto.randomUUID(),
     title:     '',
@@ -26,7 +29,7 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
-  renderSidebar();
+  renderSidebar('');
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
   activateTab('chat');
@@ -118,7 +121,10 @@ async function autoTitleConv(convId, userText) {
 }
 
 // ── Sidebar rendering ──────────────────────────────────────────────────────
-function renderSidebar(searchQuery = '') {
+function renderSidebar(searchQuery) {
+  if (searchQuery === undefined) {
+    searchQuery = document.getElementById('sidebar-search')?.value || '';
+  }
   const container = document.getElementById('sidebar-conversations');
   container.innerHTML = '';
 
@@ -130,6 +136,16 @@ function renderSidebar(searchQuery = '') {
       (c.title || '').toLowerCase().includes(q) ||
       (c.messages || []).some(m => (m.content || '').toLowerCase().includes(q))
     );
+  }
+
+  if (q && !arr.length) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
+    return;
   }
 
   const pinned   = arr.filter(c =>  c.pinned);
