@@ -26,7 +26,13 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
-  renderSidebar();
+
+  const searchInput = document.getElementById('sidebar-search');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+  renderSidebar('');
+
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
   activateTab('chat');
@@ -118,9 +124,14 @@ async function autoTitleConv(convId, userText) {
 }
 
 // ── Sidebar rendering ──────────────────────────────────────────────────────
-function renderSidebar(searchQuery = '') {
+function renderSidebar(searchQuery) {
   const container = document.getElementById('sidebar-conversations');
+  if (!container) return;
   container.innerHTML = '';
+
+  if (searchQuery === undefined) {
+    searchQuery = document.getElementById('sidebar-search')?.value || '';
+  }
 
   const q   = searchQuery.toLowerCase().trim();
   let arr   = Object.values(S.conversations).sort((a, b) => b.updatedAt - a.updatedAt);
@@ -152,10 +163,21 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let anyVisible = pinned.length > 0;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    anyVisible = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (!anyVisible && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
@@ -177,9 +199,9 @@ function makeConvEl(c) {
       `<div class="conv-item-meta">${info.name} · ${relativeTime(c.updatedAt)}</div>` +
     `</div>` +
     `<div class="conv-item-btns">` +
-      `<button class="conv-item-pin" title="${c.pinned ? 'Unpin' : 'Pin'}">${c.pinned ? '📌' : '⊙'}</button>` +
-      `<button class="conv-item-delete" title="Delete">` +
-        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>` +
+      `<button class="conv-item-pin" title="${c.pinned ? 'Unpin' : 'Pin'}" aria-label="${c.pinned ? 'Unpin' : 'Pin'} conversation">${c.pinned ? '📌' : '⊙'}</button>` +
+      `<button class="conv-item-delete" title="Delete" aria-label="Delete conversation">` +
+        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>` +
       `</button>` +
     `</div>`;
 
