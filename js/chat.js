@@ -384,10 +384,21 @@ function buildMsgActions(wrap, body, msg) {
   const actions = document.createElement('div');
   actions.className = 'msg-actions';
 
-  actions.appendChild(makeActionBtn('Copy', e => {
+  actions.appendChild(makeActionBtn('Copy', function(e) {
     e.stopPropagation();
-    navigator.clipboard.writeText(body.innerText || body.textContent);
-    toast('Copied');
+    const btn = this;
+    navigator.clipboard.writeText(body.innerText || body.textContent).then(() => {
+      toast('Copied');
+      const oldText = btn.textContent;
+      const oldAria = btn.getAttribute('aria-label');
+      btn.textContent = 'Copied';
+      btn.setAttribute('aria-label', 'Copied');
+      setTimeout(() => {
+        btn.textContent = oldText;
+        if (oldAria) btn.setAttribute('aria-label', oldAria);
+        else btn.removeAttribute('aria-label');
+      }, 2000);
+    });
   }));
   actions.appendChild(makeActionBtn('↺ Rewrite', e => {
     e.stopPropagation();
