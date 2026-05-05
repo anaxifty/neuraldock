@@ -607,10 +607,26 @@ document.addEventListener('keydown', e => {
 document.getElementById('canvas-close-btn').addEventListener('click', closeCanvas);
 document.getElementById('canvas-overlay').addEventListener('click', closeCanvas);
 
-document.getElementById('canvas-copy-btn').addEventListener('click', () => {
+document.getElementById('canvas-copy-btn').addEventListener('click', function() {
+  const btn = this;
   const code = document.getElementById('canvas-body')?.querySelector('code');
-  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText);
-  toast('Copied to clipboard');
+  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText).then(() => {
+    toast('Copied to clipboard');
+    const oldAria = btn.getAttribute('aria-label');
+    btn.setAttribute('aria-label', 'Copied!');
+    const oldTitle = btn.getAttribute('title');
+    btn.setAttribute('title', 'Copied!');
+    // Inline visual feedback for icon button
+    const originalSvg = btn.innerHTML;
+    btn.innerHTML = '<span style="font-size:10px;font-weight:bold;color:var(--ok)">✓</span>';
+    setTimeout(() => {
+      btn.innerHTML = originalSvg;
+      if (oldAria) btn.setAttribute('aria-label', oldAria);
+      else btn.removeAttribute('aria-label');
+      if (oldTitle) btn.setAttribute('title', oldTitle);
+      else btn.removeAttribute('title');
+    }, 2000);
+  });
 });
 
 document.getElementById('canvas-clear-output').addEventListener('click', () => {
@@ -750,10 +766,24 @@ function openShareModal(msg) {
   document.getElementById('share-preview').textContent = transcript;
   document.getElementById('share-modal-overlay').classList.add('open');
 
-  document.getElementById('share-copy-btn').onclick = () => {
-    navigator.clipboard.writeText(transcript);
-    toast('Chat copied to clipboard');
-    document.getElementById('share-modal-overlay').classList.remove('open');
+  document.getElementById('share-copy-btn').onclick = function() {
+    const btn = this;
+    navigator.clipboard.writeText(transcript).then(() => {
+      toast('Chat copied to clipboard');
+      const oldHtml = btn.innerHTML;
+      const oldAria = btn.getAttribute('aria-label');
+      btn.innerHTML = btn.querySelector('svg') ? btn.querySelector('svg').outerHTML + ' Copied!' : 'Copied!';
+      btn.setAttribute('aria-label', 'Copied!');
+      setTimeout(() => {
+        document.getElementById('share-modal-overlay').classList.remove('open');
+        // Reset after modal closes
+        setTimeout(() => {
+          btn.innerHTML = oldHtml;
+          if (oldAria) btn.setAttribute('aria-label', oldAria);
+          else btn.removeAttribute('aria-label');
+        }, 300);
+      }, 700);
+    });
   };
   document.getElementById('share-download-btn').onclick = () => {
     const blob = new Blob([transcript], { type: 'text/plain' });
