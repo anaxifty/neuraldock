@@ -152,10 +152,22 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let hasItems = pinned.length > 0;
   for (const [label, items] of Object.entries(groups)) {
-    if (!items.length) continue;
-    appendGroupLabel(container, label);
-    items.forEach(c => container.appendChild(makeConvEl(c)));
+    if (items.length) {
+      hasItems = true;
+      appendGroupLabel(container, label);
+      items.forEach(c => container.appendChild(makeConvEl(c)));
+    }
+  }
+
+  if (!hasItems && q) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results'; // Reusing existing style
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
@@ -177,9 +189,9 @@ function makeConvEl(c) {
       `<div class="conv-item-meta">${info.name} · ${relativeTime(c.updatedAt)}</div>` +
     `</div>` +
     `<div class="conv-item-btns">` +
-      `<button class="conv-item-pin" title="${c.pinned ? 'Unpin' : 'Pin'}">${c.pinned ? '📌' : '⊙'}</button>` +
-      `<button class="conv-item-delete" title="Delete">` +
-        `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>` +
+      `<button class="conv-item-pin" title="${c.pinned ? 'Unpin' : 'Pin'}" aria-label="${c.pinned ? 'Unpin' : 'Pin'} conversation">${c.pinned ? '📌' : '⊙'}</button>` +
+      `<button class="conv-item-delete" title="Delete" aria-label="Delete conversation">` +
+        `<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>` +
       `</button>` +
     `</div>`;
 
