@@ -137,6 +137,8 @@ function renderModelList(filter = '') {
   if (!anyVisible) {
     const none = document.createElement('div');
     none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
     none.textContent = `No models match "${filter}"`;
     list.appendChild(none);
   }
@@ -607,10 +609,15 @@ document.addEventListener('keydown', e => {
 document.getElementById('canvas-close-btn').addEventListener('click', closeCanvas);
 document.getElementById('canvas-overlay').addEventListener('click', closeCanvas);
 
-document.getElementById('canvas-copy-btn').addEventListener('click', () => {
+document.getElementById('canvas-copy-btn').addEventListener('click', function() {
   const code = document.getElementById('canvas-body')?.querySelector('code');
-  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText);
-  toast('Copied to clipboard');
+  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText).then(() => {
+    const btn = this;
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<span>Copied!</span>';
+    toast('Copied to clipboard');
+    setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+  });
 });
 
 document.getElementById('canvas-clear-output').addEventListener('click', () => {
@@ -750,10 +757,17 @@ function openShareModal(msg) {
   document.getElementById('share-preview').textContent = transcript;
   document.getElementById('share-modal-overlay').classList.add('open');
 
-  document.getElementById('share-copy-btn').onclick = () => {
-    navigator.clipboard.writeText(transcript);
-    toast('Chat copied to clipboard');
-    document.getElementById('share-modal-overlay').classList.remove('open');
+  document.getElementById('share-copy-btn').onclick = function() {
+    navigator.clipboard.writeText(transcript).then(() => {
+      const btn = this;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = '<span>Copied!</span>';
+      toast('Chat copied to clipboard');
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        document.getElementById('share-modal-overlay').classList.remove('open');
+      }, 800);
+    });
   };
   document.getElementById('share-download-btn').onclick = () => {
     const blob = new Blob([transcript], { type: 'text/plain' });
