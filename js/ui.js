@@ -137,6 +137,8 @@ function renderModelList(filter = '') {
   if (!anyVisible) {
     const none = document.createElement('div');
     none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
     none.textContent = `No models match "${filter}"`;
     list.appendChild(none);
   }
