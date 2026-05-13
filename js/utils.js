@@ -73,10 +73,38 @@ function readFileAsText(file) {
   });
 }
 
+// ── Clipboard feedback ─────────────────────────────────────────────────────
+/** Provide temporary inline feedback on a button after a copy action */
+function copyFeedback(btn, successText = 'Copied!', delay = 2000) {
+  if (!btn || btn._copying) return;
+  btn._copying = true;
+
+  const originalHTML = btn.innerHTML;
+  const originalAria = btn.getAttribute('aria-label');
+  const svg = btn.querySelector('svg');
+
+  if (svg) {
+    btn.innerHTML = svg.outerHTML + ` <span>${successText}</span>`;
+  } else {
+    btn.textContent = successText;
+  }
+  btn.setAttribute('aria-label', successText);
+
+  setTimeout(() => {
+    btn.innerHTML = originalHTML;
+    if (originalAria) btn.setAttribute('aria-label', originalAria);
+    else btn.removeAttribute('aria-label');
+    delete btn._copying;
+  }, delay);
+}
+
 // ── Code block actions ─────────────────────────────────────────────────────
 /** Copy the content of a code block to clipboard (called from inline onclick) */
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    copyFeedback(btn);
+  });
 }
