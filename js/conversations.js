@@ -152,10 +152,24 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
-  for (const [label, items] of Object.entries(groups)) {
-    if (!items.length) continue;
-    appendGroupLabel(container, label);
-    items.forEach(c => container.appendChild(makeConvEl(c)));
+  let anyVisible = pinned.length > 0;
+  for (const items of Object.values(groups)) {
+    if (items.length > 0) { anyVisible = true; break; }
+  }
+
+  if (q && !anyVisible) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
+  } else {
+    for (const [label, items] of Object.entries(groups)) {
+      if (!items.length) continue;
+      appendGroupLabel(container, label);
+      items.forEach(c => container.appendChild(makeConvEl(c)));
+    }
   }
 }
 
