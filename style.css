@@ -1356,6 +1356,12 @@ header h1 span { color: var(--accent); font-weight: 600; font-style: italic; }
   max-width: 280px;
 }
 .toast.success { border-left: 3px solid var(--ok); }
+
+/* --- Copy success feedback --- */
+.copy-success {
+  color: var(--ok) !important;
+  border-color: var(--ok) !important;
+}
 .toast.error { border-left: 3px solid var(--err); color: var(--err); }
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(10px); }
