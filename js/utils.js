@@ -78,5 +78,53 @@ function readFileAsText(file) {
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    copyFeedback(btn);
+  });
+}
+
+/**
+ * Provide visual and ARIA feedback for a copy button.
+ * @param {HTMLElement} btn
+ * @param {string} successText
+ * @param {number} delay
+ */
+function copyFeedback(btn, successText = 'Copied!', delay = 2000) {
+  if (!btn || btn._copying) return;
+
+  btn._copying = true;
+  const originalHtml = btn.innerHTML;
+  const originalAria = btn.getAttribute('aria-label');
+  const svg = btn.querySelector('svg');
+
+  // If there's an icon, preserve it and just change the text
+  if (svg) {
+    // Check if it's an icon-only button (no text other than SVG)
+    const hasText = btn.textContent.trim().length > 0;
+    if (hasText) {
+      btn.innerHTML = svg.outerHTML + ` <span>${successText}</span>`;
+    } else {
+      // Icon only - maybe just show the text or keep icon?
+      // Usually for icon-only buttons we might want to show text briefly or change icon.
+      // Let's show the text and keep the icon.
+      btn.innerHTML = svg.outerHTML + ` <span style="font-size: 0.9em; margin-left: 4px;">${successText}</span>`;
+    }
+  } else {
+    btn.textContent = successText;
+  }
+
+  btn.setAttribute('aria-label', successText);
+  btn.classList.add('copy-success');
+
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+    if (originalAria) {
+      btn.setAttribute('aria-label', originalAria);
+    } else {
+      btn.removeAttribute('aria-label');
+    }
+    btn.classList.remove('copy-success');
+    delete btn._copying;
+  }, delay);
 }
