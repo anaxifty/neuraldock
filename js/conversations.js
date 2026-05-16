@@ -152,10 +152,21 @@ function renderSidebar(searchQuery = '') {
     else                             groups['Older'].push(c);
   }
 
+  let renderedAny = !!pinned.length;
   for (const [label, items] of Object.entries(groups)) {
     if (!items.length) continue;
+    renderedAny = true;
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
+  }
+
+  if (q && !renderedAny) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No matches found for "${searchQuery}"`;
+    container.appendChild(none);
   }
 }
 
