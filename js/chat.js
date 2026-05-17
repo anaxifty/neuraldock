@@ -541,7 +541,7 @@ function populatePicker(q) {
       count++;
     }
   }
-  if (!count) list.innerHTML = '<div class="model-no-results">No models match</div>';
+  if (!count) list.innerHTML = '<div class="model-no-results" role="status" aria-live="polite">No models match</div>';
 }
 
 document.getElementById('_pickerInput')?.addEventListener('input', function () { populatePicker(this.value); });
