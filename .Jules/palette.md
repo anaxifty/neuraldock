@@ -1,0 +1,3 @@
+## 2026-05-17 - Search Accessibility and Filter Persistence
+**Learning:** Dynamic UI updates like "No results" feedback messages must include `role="status"` and `aria-live="polite"` to ensure they are announced to screen reader users. Additionally, search inputs should have descriptive `aria-label` attributes, and search filters should be preserved across state transitions (e.g., pinning/deleting items) to maintain user context.
+**Action:** Always wrap empty state messages in a region with `role="status"` and `aria-live="polite"`. Ensure search functions default to the current input value to persist filters during UI updates.
