@@ -78,5 +78,41 @@ function readFileAsText(file) {
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    copyFeedback(btn, 'Copied!');
+  });
+}
+
+/**
+ * Provide inline visual feedback for a button after a copy action.
+ * @param {HTMLElement} btn The button element
+ * @param {string} successText Text to show on success
+ * @param {number} delay How long to show the feedback (ms)
+ */
+function copyFeedback(btn, successText = 'Copied!', delay = 2000) {
+  if (!btn || btn._copying) return;
+  btn._copying = true;
+
+  const originalHTML = btn.innerHTML;
+  const originalAria = btn.getAttribute('aria-label');
+  const svg = btn.querySelector('svg');
+
+  // If there's an icon, preserve it
+  if (svg) {
+    btn.innerHTML = svg.outerHTML + ` <span>${successText}</span>`;
+  } else {
+    btn.textContent = successText;
+  }
+
+  btn.classList.add('copy-success');
+  btn.setAttribute('aria-label', successText);
+
+  setTimeout(() => {
+    btn.innerHTML = originalHTML;
+    if (originalAria) btn.setAttribute('aria-label', originalAria);
+    else btn.removeAttribute('aria-label');
+    btn.classList.remove('copy-success');
+    btn._copying = false;
+  }, delay);
 }
