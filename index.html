@@ -261,7 +261,7 @@
           <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
         </svg>
         <span class="ide-proj-name" id="ide-project-name" contenteditable="true" spellcheck="false">my-project</span>
-        <button class="ide-proj-menu-btn" id="ide-proj-menu-btn" title="Project menu">⋮</button>
+        <button class="ide-proj-menu-btn" id="ide-proj-menu-btn" title="Project menu" aria-label="Project menu">⋮</button>
       </div>
     </div>
 
@@ -306,20 +306,20 @@
   <div class="ide-topbar-actions">
 
     <!-- File ops -->
-    <button class="ide-tba-btn ide-tba-save" id="ide-save-btn" title="Save (Ctrl+S)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn ide-tba-save" id="ide-save-btn" title="Save (Ctrl+S)" aria-label="Save code">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
         <polyline points="17 21 17 13 7 13 7 21"/>
         <polyline points="7 3 7 8 15 8"/>
       </svg>
     </button>
-    <button class="ide-tba-btn ide-tba-run" id="ide-run-btn" title="Run Code (F5)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <button class="ide-tba-btn ide-tba-run" id="ide-run-btn" title="Run Code (F5)" aria-label="Run code">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <polygon points="5 3 19 12 5 21 5 3"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-preview-btn" title="Live Preview">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-preview-btn" title="Live Preview" aria-label="Live preview">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
         <polyline points="15 3 21 3 21 9"/>
         <line x1="10" y1="14" x2="21" y2="3"/>
@@ -329,31 +329,31 @@
     <div class="ide-tba-sep"></div>
 
     <!-- Editor tools -->
-    <button class="ide-tba-btn" id="ide-format-btn" title="Format (Prettier)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-format-btn" title="Format (Prettier)" aria-label="Format code">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/>
         <line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-wrap-btn" title="Toggle Word Wrap">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-wrap-btn" title="Toggle Word Wrap" aria-label="Toggle word wrap">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="17 10 21 10 21 19"/><line x1="3" y1="6" x2="21" y2="6"/>
         <path d="M21 14H9"/><polyline points="9 10 5 14 9 18"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-search-btn" title="Search in Files (Ctrl+Shift+F)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-search-btn" title="Search in Files (Ctrl+Shift+F)" aria-label="Search in files">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-fold-btn" title="Fold All">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-fold-btn" title="Fold All" aria-label="Fold all code">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="12" x2="21" y2="12"/>
         <line x1="3" y1="16" x2="21" y2="16"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-gotoline-btn" title="Go to Line (Ctrl+G)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-gotoline-btn" title="Go to Line (Ctrl+G)" aria-label="Go to line">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/>
         <polyline points="10 9 7 12 10 15"/>
       </svg>
@@ -362,14 +362,14 @@
     <div class="ide-tba-sep"></div>
 
     <!-- Download + Terminal -->
-    <button class="ide-tba-btn" id="ide-dl-btn" title="Download File">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-dl-btn" title="Download File" aria-label="Download file">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
         <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
     </button>
-    <button class="ide-tba-btn" id="ide-terminal-btn" title="Toggle Terminal">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-tba-btn" id="ide-terminal-btn" title="Toggle Terminal" aria-label="Toggle terminal">
+      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
       </svg>
     </button>
@@ -378,20 +378,20 @@
 
   <!-- Panel toggles — far right -->
   <div class="ide-panel-toggles">
-    <button class="ide-ptoggle" id="ide-toggle-explorer" title="Toggle Files">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-ptoggle" id="ide-toggle-explorer" title="Toggle Files" aria-label="Toggle Files explorer panel">
+      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
       </svg>
       Files
     </button>
-    <button class="ide-ptoggle" id="ide-toggle-output" title="Toggle Output">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-ptoggle" id="ide-toggle-output" title="Toggle Output" aria-label="Toggle Output panel">
+      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
       </svg>
       Output
     </button>
-    <button class="ide-ptoggle" id="ide-toggle-ai" title="Toggle AI">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <button class="ide-ptoggle" id="ide-toggle-ai" title="Toggle AI" aria-label="Toggle AI assistant panel">
+      <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
       AI
@@ -435,7 +435,7 @@
         <div style="display:flex;gap:6px;align-items:center">
           <button class="ide-hdr-btn" id="ide-output-rerun">▶ Rerun</button>
           <button class="ide-hdr-btn" id="ide-output-clear">Clear</button>
-          <button class="ide-hdr-btn" id="ide-output-close">✕</button>
+          <button class="ide-hdr-btn" id="ide-output-close" aria-label="Close output panel">✕</button>
         </div>
       </div>
       <div class="ide-output-body">
@@ -453,7 +453,7 @@
           </svg>
           Terminal
         </span>
-        <button class="ide-hdr-btn" id="ide-terminal-close" title="Close">✕</button>
+        <button class="ide-hdr-btn" id="ide-terminal-close" title="Close" aria-label="Close terminal">✕</button>
       </div>
       <div class="ide-term-body" id="ide-term-body"></div>
     </div>
@@ -467,10 +467,10 @@
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 AI Assistant
               </span>
-              <button class="ide-hdr-btn" id="ide-ai-clear" title="Clear chat">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>
+              <button class="ide-hdr-btn" id="ide-ai-clear" title="Clear chat" aria-label="Clear AI chat">
+                <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6"/></svg>
               </button>
-              <button class="ide-hdr-btn" id="ide-ai-close">✕</button>
+              <button class="ide-hdr-btn" id="ide-ai-close" aria-label="Close AI panel">✕</button>
             </div>
             <div class="ide-ai-msgs" id="ide-ai-msgs">
               <div class="ide-ai-welcome-msg">
@@ -495,8 +495,8 @@
               <div class="ide-ai-bottom-row">
                 <textarea id="ide-ai-input" rows="2" placeholder="Ask about code, deployment, tools…"></textarea>
                 <div class="ide-ai-btns">
-                  <button class="ide-ai-send-btn" id="ide-ai-send">➤</button>
-                  <button class="ide-ai-stop-btn" id="ide-ai-stop" style="display:none">■</button>
+                  <button class="ide-ai-send-btn" id="ide-ai-send" aria-label="Send message to AI">➤</button>
+                  <button class="ide-ai-stop-btn" id="ide-ai-stop" style="display:none" aria-label="Stop AI generation">■</button>
                 </div>
               </div>
             </div>
