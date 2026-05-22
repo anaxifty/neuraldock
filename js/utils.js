@@ -74,9 +74,39 @@ function readFileAsText(file) {
 }
 
 // ── Code block actions ─────────────────────────────────────────────────────
+/**
+ * Provide temporary visual/accessible feedback for copy actions
+ * @param {HTMLElement} btn
+ * @param {string} successText
+ * @param {number} delay
+ */
+function copyFeedback(btn, successText = 'Copied!', delay = 2000) {
+  if (!btn || btn._copying) return;
+  btn._copying = true;
+
+  const originalHtml = btn.innerHTML;
+  const originalAria = btn.getAttribute('aria-label');
+  const svg = btn.querySelector('svg');
+
+  btn.innerHTML = (svg ? svg.outerHTML + ' ' : '') + escHtml(successText);
+  btn.setAttribute('aria-label', successText);
+  btn.classList.add('copy-success');
+
+  setTimeout(() => {
+    btn.innerHTML = originalHtml;
+    if (originalAria) btn.setAttribute('aria-label', originalAria);
+    else btn.removeAttribute('aria-label');
+    btn.classList.remove('copy-success');
+    btn._copying = false;
+  }, delay);
+}
+
 /** Copy the content of a code block to clipboard (called from inline onclick) */
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    copyFeedback(btn);
+  });
 }
