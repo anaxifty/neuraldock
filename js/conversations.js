@@ -157,6 +157,15 @@ function renderSidebar(searchQuery = '') {
     appendGroupLabel(container, label);
     items.forEach(c => container.appendChild(makeConvEl(c)));
   }
+
+  if (arr.length === 0) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results';
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = q ? `No conversations match "${searchQuery}"` : 'No conversation history';
+    container.appendChild(none);
+  }
 }
 
 function appendGroupLabel(container, text) {
