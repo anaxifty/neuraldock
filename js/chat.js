@@ -342,8 +342,8 @@ const _pickerEl = document.createElement('div');
 _pickerEl.className = 'rewrite-picker';
 _pickerEl.innerHTML =
   `<div class="rewrite-picker-search">` +
-  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>` +
-  `<input id="_pickerInput" type="text" placeholder="Search models…" autocomplete="off"/>` +
+  `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>` +
+  `<input id="_pickerInput" type="text" placeholder="Search models…" autocomplete="off" aria-label="Search models for rewrite"/>` +
   `</div><div id="_pickerList" class="rewrite-picker-list"></div>`;
 document.body.appendChild(_pickerEl);
 
@@ -541,7 +541,7 @@ function populatePicker(q) {
       count++;
     }
   }
-  if (!count) list.innerHTML = '<div class="model-no-results">No models match</div>';
+  if (!count) list.innerHTML = '<div class="model-no-results" role="status" aria-live="polite">No models match</div>';
 }
 
 document.getElementById('_pickerInput')?.addEventListener('input', function () { populatePicker(this.value); });
