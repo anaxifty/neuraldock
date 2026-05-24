@@ -73,10 +73,43 @@ function readFileAsText(file) {
   });
 }
 
+// ── Clipboard feedback ─────────────────────────────────────────────────────
+/**
+ * Provide inline feedback for clipboard actions.
+ * Temporarily updates button text/HTML and synchronizes ARIA label.
+ * @param {HTMLButtonElement} btn
+ * @param {string} successText
+ * @param {number} delay
+ */
+function copyFeedback(btn, successText = 'Copied!', delay = 2000) {
+  if (!btn || btn._copying) return;
+  btn._copying = true;
+
+  const originalHTML = btn.innerHTML;
+  const originalAria = btn.getAttribute('aria-label');
+  const svg = btn.querySelector('svg');
+
+  // Update UI: preserve icon if it exists
+  btn.innerHTML = (svg ? svg.outerHTML : '') + `<span>${successText}</span>`;
+  btn.setAttribute('aria-label', successText);
+  btn.classList.add('copy-success');
+
+  setTimeout(() => {
+    btn.innerHTML = originalHTML;
+    if (originalAria) btn.setAttribute('aria-label', originalAria);
+    else btn.removeAttribute('aria-label');
+    btn.classList.remove('copy-success');
+    btn._copying = false;
+  }, delay);
+}
+
 // ── Code block actions ─────────────────────────────────────────────────────
 /** Copy the content of a code block to clipboard (called from inline onclick) */
 function copyCodeBlock(btn) {
   const code = btn.closest('pre')?.querySelector('code');
   if (!code) return;
-  navigator.clipboard.writeText(code.textContent).then(() => toast('Code copied'));
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    toast('Code copied');
+    copyFeedback(btn);
+  });
 }
