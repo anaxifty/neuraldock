@@ -607,10 +607,12 @@ document.addEventListener('keydown', e => {
 document.getElementById('canvas-close-btn').addEventListener('click', closeCanvas);
 document.getElementById('canvas-overlay').addEventListener('click', closeCanvas);
 
-document.getElementById('canvas-copy-btn').addEventListener('click', () => {
+document.getElementById('canvas-copy-btn').addEventListener('click', function () {
   const code = document.getElementById('canvas-body')?.querySelector('code');
-  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText);
-  toast('Copied to clipboard');
+  navigator.clipboard.writeText(code ? code.textContent : document.getElementById('canvas-body').innerText).then(() => {
+    toast('Copied to clipboard');
+    copyFeedback(this);
+  });
 });
 
 document.getElementById('canvas-clear-output').addEventListener('click', () => {
@@ -750,10 +752,14 @@ function openShareModal(msg) {
   document.getElementById('share-preview').textContent = transcript;
   document.getElementById('share-modal-overlay').classList.add('open');
 
-  document.getElementById('share-copy-btn').onclick = () => {
-    navigator.clipboard.writeText(transcript);
-    toast('Chat copied to clipboard');
-    document.getElementById('share-modal-overlay').classList.remove('open');
+  document.getElementById('share-copy-btn').onclick = function () {
+    navigator.clipboard.writeText(transcript).then(() => {
+      toast('Chat copied to clipboard');
+      copyFeedback(this);
+      setTimeout(() => {
+        document.getElementById('share-modal-overlay').classList.remove('open');
+      }, 700);
+    });
   };
   document.getElementById('share-download-btn').onclick = () => {
     const blob = new Blob([transcript], { type: 'text/plain' });
