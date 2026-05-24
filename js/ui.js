@@ -21,7 +21,19 @@ function _switchTab(tab) {
     p.classList.toggle('active', p.id === `panel-${tab}`)
   );
 
-  const titles = { chat: 'Chat', code: 'Code IDE', image: 'Image', voice: 'Voice' };
+  // FUNDAMENTAL LAYOUT CHANGE: Voice Studio
+  const appWrapper = document.getElementById('app-wrapper');
+  const voiceStudioContainer = document.getElementById('voice-studio-container');
+  if (tab === 'voice') {
+    appWrapper.style.display = 'none';
+    voiceStudioContainer.style.display = 'block';
+    if (typeof updateVoiceStudio === 'function') updateVoiceStudio();
+  } else {
+    appWrapper.style.display = 'flex';
+    voiceStudioContainer.style.display = 'none';
+  }
+
+  const titles = { chat: 'Chat', code: 'Code IDE', image: 'Image', voice: 'Voice Studio' };
   document.title = `${titles[tab] || 'Chat'} — AI Studio | NeuralDock`;
 
   if (tab === 'code') {
@@ -68,6 +80,31 @@ window.addEventListener('popstate', e => {
 document.querySelectorAll('.tab-btn').forEach(btn =>
   btn.addEventListener('click', () => activateTab(btn.dataset.tab))
 );
+
+// Voice Studio Sidebar Nav
+document.getElementById('vs-nav-chat').addEventListener('click',  e => { e.preventDefault(); activateTab('chat'); });
+document.getElementById('vs-nav-code').addEventListener('click',  e => { e.preventDefault(); activateTab('code'); });
+document.getElementById('vs-nav-image').addEventListener('click', e => { e.preventDefault(); activateTab('image'); });
+document.getElementById('vs-nav-voice').addEventListener('click', e => { e.preventDefault(); activateTab('voice'); });
+
+// Voice Studio Sidebar Actions
+document.getElementById('vs-new-chat-btn').addEventListener('click', () => {
+    if (typeof newChat === 'function') newChat();
+    activateTab('chat');
+});
+document.getElementById('vs-settings-btn').addEventListener('click', e => {
+    e.preventDefault();
+    openSettings();
+});
+document.getElementById('vs-account-btn').addEventListener('click', e => {
+    e.preventDefault();
+    openSettings('account');
+});
+
+document.getElementById('vs-model-selector').addEventListener('click', () => {
+    const ms = document.getElementById('model-selector');
+    ms.classList.toggle('open');
+});
 
 // ── Sidebar toggle ─────────────────────────────────────────────────────────
 document.getElementById('hamburger-btn').addEventListener('click', toggleSidebar);
@@ -186,6 +223,10 @@ function updateModelDisplay() {
   const info = getModelInfo(S.currentModel);
   document.getElementById('active-model-name').textContent = info.name;
   document.getElementById('active-model-dot').style.background = info.color;
+
+  // Voice Studio Sync
+  const vsActiveModel = document.getElementById('vs-active-model-name');
+  if (vsActiveModel) vsActiveModel.textContent = info.name;
 }
 
 function populateSettingsModel() {

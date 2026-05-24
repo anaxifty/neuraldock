@@ -16,6 +16,85 @@
   <link rel="stylesheet" href="ide-v4.css">
   <link rel="stylesheet" href="ide-singlebar.css">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container": "#211f1e",
+            "primary-fixed-dim": "#ffb77d",
+            "primary-container": "#d97707",
+            "outline": "#a38c7c",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#ffb95f",
+            "secondary-fixed-dim": "#6bd8cb",
+            "primary-fixed": "#ffdcc3",
+            "primary": "#ffb77d",
+            "secondary-fixed": "#89f5e7",
+            "surface-variant": "#363433",
+            "on-tertiary-fixed": "#2a1700",
+            "on-error": "#690005",
+            "on-secondary": "#003732",
+            "inverse-primary": "#904d00",
+            "surface-tint": "#ffb77d",
+            "on-tertiary-fixed-variant": "#653e00",
+            "tertiary": "#ffb95f",
+            "outline-variant": "#554336",
+            "on-primary-fixed-variant": "#6e3900",
+            "background": "#141312",
+            "surface-container-high": "#2b2a28",
+            "on-primary-fixed": "#2f1500",
+            "surface-container-low": "#1d1b1a",
+            "on-surface": "#e6e1df",
+            "surface-bright": "#3b3937",
+            "secondary-container": "#29a195",
+            "on-secondary-fixed-variant": "#005049",
+            "inverse-surface": "#e6e1df",
+            "secondary": "#6bd8cb",
+            "on-tertiary-container": "#3e2400",
+            "on-background": "#e6e1df",
+            "surface-container-lowest": "#0f0e0d",
+            "tertiary-fixed": "#ffddb8",
+            "error": "#ffb4ab",
+            "surface": "#141312",
+            "on-secondary-container": "#00302b",
+            "on-surface-variant": "#dbc2b0",
+            "on-tertiary": "#472a00",
+            "on-primary": "#4d2600",
+            "surface-dim": "#141312",
+            "inverse-on-surface": "#32302f",
+            "error-container": "#93000a",
+            "surface-container-highest": "#363433",
+            "on-primary-container": "#432100",
+            "tertiary-container": "#ca8100",
+            "on-secondary-fixed": "#00201d"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk"],
+            "body": ["Inter"],
+            "label": ["Inter"],
+            "mono": ["JetBrains Mono"]
+          },
+          borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .amber-calibration-line {
+      height: 1px;
+      width: 100%;
+      background: linear-gradient(90deg, transparent 0%, #d97706 20%, #ffb77d 50%, #d97706 80%, transparent 100%);
+    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -695,6 +774,201 @@
 
     </div><!-- #app -->
   </div><!-- #app-wrapper -->
+
+  <!-- VOICE STUDIO (FUNDAMENTAL LAYOUT CHANGE) -->
+  <div id="voice-studio-container" style="display: none;" class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+    <!-- SideNavBar -->
+    <aside class="fixed left-0 top-0 h-full flex flex-col w-[240px] border-r border-[#f5f0eb]/[0.06] bg-[#111009] z-50">
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-8 h-8 bg-primary-container flex items-center justify-center rounded-sm">
+            <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">neurology</span>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-[#d97706] uppercase tracking-tighter font-headline">NeuralDock</h1>
+            <p class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant/60">AI STUDIO</p>
+          </div>
+        </div>
+        <button id="vs-new-chat-btn" class="w-full bg-primary-container text-on-primary-container font-headline font-bold py-3 px-4 rounded-sm flex items-center justify-center gap-2 mb-8 active:scale-95 transition-transform">
+          <span class="material-symbols-outlined">add</span>
+          New Chat
+        </button>
+        <nav class="space-y-1">
+          <a id="vs-nav-chat" class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] px-4 py-2 flex items-center gap-3 transition-colors font-headline font-semibold tracking-tight text-sm hover:bg-[#1a1815]" href="#">
+            <span class="material-symbols-outlined">chat_bubble</span> Chat
+          </a>
+          <a id="vs-nav-code" class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] px-4 py-2 flex items-center gap-3 transition-colors font-headline font-semibold tracking-tight text-sm hover:bg-[#1a1815]" href="#">
+            <span class="material-symbols-outlined">code</span> Code IDE
+          </a>
+          <a id="vs-nav-image" class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] px-4 py-2 flex items-center gap-3 transition-colors font-headline font-semibold tracking-tight text-sm hover:bg-[#1a1815]" href="#">
+            <span class="material-symbols-outlined">image</span> Image Generation
+          </a>
+          <a id="vs-nav-voice" class="border-l-2 border-[#d97706] bg-[#1a1815] text-[#d97706] font-bold px-4 py-2 flex items-center gap-3 font-headline tracking-tight text-sm" href="#">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span> Voice
+          </a>
+        </nav>
+      </div>
+      <div class="mt-auto p-6 space-y-1">
+        <a id="vs-settings-btn" class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] px-4 py-2 flex items-center gap-3 transition-colors font-headline font-semibold tracking-tight text-sm hover:bg-[#1a1815]" href="#">
+          <span class="material-symbols-outlined">settings</span> Settings
+        </a>
+        <a id="vs-account-btn" class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] px-4 py-2 flex items-center gap-3 transition-colors font-headline font-semibold tracking-tight text-sm hover:bg-[#1a1815]" href="#">
+          <span class="material-symbols-outlined">person</span> Account
+        </a>
+      </div>
+    </aside>
+    <!-- Main Content Shell -->
+    <main class="ml-[240px] flex flex-col min-h-screen">
+      <!-- TopAppBar -->
+      <header class="h-[52px] w-full bg-[#111009] flex justify-between items-center px-6 sticky top-0 z-40">
+        <div class="flex items-center gap-8 h-full">
+          <h2 class="font-headline font-bold text-amber-600 uppercase tracking-widest text-sm">Voice Studio</h2>
+          <nav class="flex h-full items-center">
+            <a class="text-[#f5f0eb]/[0.4] h-full flex items-center px-4 hover:text-[#f5f0eb] font-body font-medium text-[13px] uppercase tracking-widest transition-opacity" href="#">Models</a>
+            <a class="border-b-2 border-[#d97706] text-[#d97706] h-full flex items-center px-4 font-body font-medium text-[13px] uppercase tracking-widest" href="#">Synthesis</a>
+            <a class="text-[#f5f0eb]/[0.4] h-full flex items-center px-4 hover:text-[#f5f0eb] font-body font-medium text-[13px] uppercase tracking-widest transition-opacity" href="#">Cloning</a>
+          </nav>
+        </div>
+        <div class="flex items-center gap-4">
+          <div id="vs-model-selector" class="flex items-center gap-2 bg-[#1a1815] px-3 py-1.5 rounded-sm border border-outline-variant/30 cursor-pointer hover:bg-[#231f1b] transition-colors">
+            <span class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Model:</span>
+            <span id="vs-active-model-name" class="font-mono text-[11px] font-bold text-primary">ND-VOICE-GEN2</span>
+            <span class="material-symbols-outlined text-xs">expand_more</span>
+          </div>
+          <button class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] transition-opacity">
+            <span class="material-symbols-outlined">notifications</span>
+          </button>
+          <button class="text-[#f5f0eb]/[0.4] hover:text-[#f5f0eb] transition-opacity">
+            <span class="material-symbols-outlined">help</span>
+          </button>
+        </div>
+      </header>
+      <!-- Calibration Line -->
+      <div class="amber-calibration-line"></div>
+      <!-- Canvas Area -->
+      <section class="flex-1 p-8 grid grid-cols-12 gap-8 bg-background">
+        <!-- Left Column: Input Buffer -->
+        <div class="col-span-8 flex flex-col gap-6">
+          <div class="bg-[#111009] rounded-lg p-6 border border-outline-variant/10 shadow-sm flex flex-col flex-1">
+            <div class="flex justify-between items-center mb-4">
+              <label class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Text Buffer / Synthesis Engine</label>
+              <div class="flex gap-4">
+                <span id="vs-char-count" class="font-mono text-[10px] uppercase tracking-[0.08em] text-secondary">Character Count: 0 / 2500</span>
+              </div>
+            </div>
+            <textarea id="vs-text-buffer" class="flex-1 bg-background border border-outline-variant/20 rounded-sm p-6 font-mono text-sm leading-relaxed text-on-surface focus:ring-1 focus:ring-primary focus:border-primary outline-none resize-none placeholder-on-surface-variant/30" placeholder="Type or paste text to generate high-fidelity neural speech..."></textarea>
+            <div class="mt-4 flex flex-col gap-4">
+              <div class="h-1.5 w-full bg-[#1a1815] rounded-full overflow-hidden">
+                <div id="vs-progress-bar" class="h-full bg-secondary-container w-[0%] transition-all duration-500"></div>
+              </div>
+              <div class="flex justify-between items-center">
+                <div class="flex gap-4">
+                  <button id="vs-pitch-btn" class="flex items-center gap-2 px-4 py-2 bg-[#1a1815] border border-outline-variant/30 rounded-sm hover:bg-[#231f1b] transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-sm">settings_input_component</span>
+                    <span class="font-mono text-[10px] uppercase tracking-[0.08em]">Pitch: 1.0x</span>
+                  </button>
+                  <button id="vs-speed-btn" class="flex items-center gap-2 px-4 py-2 bg-[#1a1815] border border-outline-variant/30 rounded-sm hover:bg-[#231f1b] transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-sm">speed</span>
+                    <span class="font-mono text-[10px] uppercase tracking-[0.08em]">Speed: 1.0x</span>
+                  </button>
+                </div>
+                <div class="flex gap-3">
+                  <button id="vs-live-voice-btn" class="flex items-center gap-2 px-6 py-3 bg-[#111009] border border-secondary text-secondary rounded-sm hover:bg-secondary/10 transition-all group relative overflow-hidden">
+                    <span class="relative z-10 font-headline font-bold uppercase tracking-widest text-xs">Live Voice Chat</span>
+                    <span class="absolute right-2 top-2 w-2 h-2 bg-secondary rounded-full animate-pulse shadow-[0_0_8px_rgba(13,148,136,0.6)]"></span>
+                  </button>
+                  <button id="vs-generate-btn" class="flex items-center gap-2 px-8 py-3 bg-primary-container text-on-primary-container rounded-sm hover:bg-primary transition-all active:scale-[0.98]">
+                    <span class="material-symbols-outlined">auto_fix_high</span>
+                    <span class="font-headline font-bold uppercase tracking-widest text-xs">Generate Speech</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Session Recordings -->
+          <div class="bg-[#111009] rounded-lg p-6 border border-outline-variant/10">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="font-headline font-bold text-on-surface uppercase tracking-widest text-xs">Session Recordings</h3>
+              <button class="font-mono text-[10px] text-primary uppercase tracking-widest hover:underline">Download All (.WAV)</button>
+            </div>
+            <div id="vs-recordings-list" class="space-y-4">
+              <!-- Recordings will be dynamically inserted here -->
+              <div id="vs-empty-recordings" class="text-center py-8 opacity-30 font-mono text-[10px] uppercase tracking-widest">
+                No recordings in this session
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column: Settings & Presets -->
+        <div class="col-span-4 flex flex-col gap-6">
+          <div class="bg-[#111009] rounded-lg p-6 border border-outline-variant/10">
+            <label class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant mb-4 block">Active Voice Profile</label>
+            <div class="relative mb-6">
+              <div class="w-full aspect-video bg-[#1a1815] rounded-sm overflow-hidden flex items-center justify-center relative group">
+                <img id="vs-profile-img" alt="Voice Profile Avatar" class="w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAv1MRPHjuboZO_LLQBr97zEtq8GW-jrY1HdvnzX3Vkq86YeKwH1aZWfjAiiMAz0H01NeI2YZBDrDksqNqQCnMhxZthPm1TJFXCufG-8hbNZqSELreI9PjdZA2f5QZ2Li2f5CPXIwNE5-XVOmSvt_e7jS903rKBFcGxxe8pRaQVjdB9K9VClnXWKCHJjpudPbmlV7_yWX_FTt8cW0MDgIPGDyPdbUlw_tndeMyK9xOl2Iv8GZQ9TgLGwvBobJRJ9KVBsTlG-7WWtu-x"/>
+                <div class="absolute inset-0 bg-gradient-to-t from-[#111009] to-transparent"></div>
+                <div class="absolute bottom-4 left-4">
+                  <h3 id="vs-profile-name" class="font-headline font-bold text-white text-lg tracking-tight">Elias ND-04</h3>
+                  <p id="vs-profile-tags" class="font-mono text-[10px] text-primary tracking-widest">NEURAL • MALE • CALM</p>
+                </div>
+                <button class="absolute top-4 right-4 bg-[#0a0908]/80 p-2 rounded-sm text-white hover:bg-primary hover:text-on-primary transition-colors">
+                  <span class="material-symbols-outlined text-sm">edit</span>
+                </button>
+              </div>
+            </div>
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between mb-2">
+                  <label class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Emotion Precision</label>
+                  <span class="font-mono text-[10px] text-on-surface">85%</span>
+                </div>
+                <div class="h-1 bg-surface-container-highest rounded-full">
+                  <div class="h-full bg-primary w-[85%] rounded-full"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <label class="font-mono text-[10px] uppercase tracking-[0.08em] text-on-surface-variant">Clarity Gain</label>
+                  <span class="font-mono text-[10px] text-on-surface">1.2db</span>
+                </div>
+                <div class="h-1 bg-surface-container-highest rounded-full">
+                  <div class="h-full bg-primary w-[60%] rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Speaker Library -->
+          <div class="bg-[#111009] rounded-lg p-6 border border-outline-variant/10 flex-1 overflow-hidden flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-headline font-bold text-on-surface uppercase tracking-widest text-xs">Voice Library</h3>
+              <span class="material-symbols-outlined text-on-surface-variant cursor-pointer">filter_list</span>
+            </div>
+            <div id="vs-library-list" class="space-y-3 overflow-y-auto scrollbar-hide pr-2">
+              <!-- Voice entries will be dynamically inserted here -->
+            </div>
+            <button class="mt-4 w-full py-2 border border-dashed border-outline-variant text-on-surface-variant font-mono text-[10px] uppercase tracking-widest hover:text-on-surface hover:border-on-surface transition-colors">
+              + Clone New Voice
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- Footer / Data Ticker -->
+      <footer class="h-[22px] w-[calc(100%-240px)] fixed bottom-0 left-[240px] z-50 bg-[#2d2824] flex justify-between items-center px-4">
+        <div class="flex items-center gap-6">
+          <span class="font-mono text-[10px] uppercase tracking-[0.08em] text-[#0d9488]">System Status: OPTIMAL</span>
+          <span class="font-mono text-[10px] uppercase tracking-[0.08em] text-[#f5f0eb]/[0.4] flex items-center gap-2">
+            <span class="w-1.5 h-1.5 bg-[#0d9488] rounded-full"></span>
+            Neural Engine Latency: 142ms
+          </span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a class="font-mono text-[10px] uppercase tracking-[0.08em] text-[#f5f0eb]/[0.4] hover:text-white transition-colors" href="#">API Docs</a>
+          <a class="font-mono text-[10px] uppercase tracking-[0.08em] text-[#f5f0eb]/[0.4] hover:text-white transition-colors" href="#">System Status</a>
+          <span class="font-mono text-[10px] uppercase tracking-[0.08em] text-[#f5f0eb]/[0.4]">v1.0.4-STABLE</span>
+        </div>
+      </footer>
+    </main>
+  </div>
 
   <!-- CANVAS PANEL -->
   <div class="canvas-overlay" id="canvas-overlay"></div>
