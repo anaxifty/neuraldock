@@ -26,6 +26,8 @@ function newChat() {
   S.activeConvId  = conv.id;
   S.chatMessages  = [];
   saveConvs();
+  const searchInp = document.getElementById('sidebar-search');
+  if (searchInp) searchInp.value = '';
   renderSidebar();
   if (typeof renderChatMessages === 'function') renderChatMessages();
   document.getElementById('chatInput').focus();
@@ -134,6 +136,16 @@ function renderSidebar(searchQuery = '') {
 
   const pinned   = arr.filter(c =>  c.pinned);
   const unpinned = arr.filter(c => !c.pinned);
+
+  if (q && !arr.length) {
+    const none = document.createElement('div');
+    none.className = 'model-no-results'; // Reuse existing class for consistency
+    none.setAttribute('role', 'status');
+    none.setAttribute('aria-live', 'polite');
+    none.textContent = `No chats match "${searchQuery}"`;
+    container.appendChild(none);
+    return;
+  }
 
   if (pinned.length) {
     appendGroupLabel(container, '📌 Pinned');
