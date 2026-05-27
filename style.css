@@ -6522,3 +6522,9 @@ body.ide-dragging-y * { cursor: row-resize !important; user-select: none !import
   .login-card-inner { padding: 28px 20px 20px; }
   .login-card-footer { padding: 12px 20px; }
 }
+
+/* Palette: Micro-UX Clipboard Feedback */
+.copy-success {
+  color: var(--ok) !important;
+  border-color: var(--ok) !important;
+}

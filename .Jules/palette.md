@@ -1,0 +1,3 @@
+## 2026-05-27 - [Clipboard Feedback Utility]
+**Learning:** Users benefit significantly from immediate, localized visual feedback for clipboard actions. Providing this feedback by temporarily updating the button's content and ARIA label ensures a smoother experience for both visual and screen reader users. In modals, delaying the close action (e.g., by 700ms) after a successful copy allows the user to actually perceive the success state.
+**Action:** Use the centralized `copyFeedback` utility in `js/utils.js` for all clipboard operations to maintain consistency and ensure accessibility standards are met.
